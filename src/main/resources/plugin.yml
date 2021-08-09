@@ -1,0 +1,10 @@
+name: IridiumFactions
+version: ${version}
+description: Factions Redefined
+main: com.iridium.iridiumfactions.IridiumFactions
+api-version: '1.13'
+author: Peaches_MLG
+commands:
+  iridiumfactions:
+    aliases: [ "factions", "f" ]
+    description: Main plugin command
