@@ -6,7 +6,13 @@ import com.iridium.iridiumfactions.configs.Commands;
 import com.iridium.iridiumfactions.configs.Configuration;
 import com.iridium.iridiumfactions.configs.Messages;
 import com.iridium.iridiumfactions.configs.SQL;
+import com.iridium.iridiumfactions.listeners.PlayerJoinListener;
+import com.iridium.iridiumfactions.managers.DatabaseManager;
+import com.iridium.iridiumfactions.managers.UserManager;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+
+import java.sql.SQLException;
 
 @Getter
 public class IridiumFactions extends IridiumCore {
@@ -14,6 +20,8 @@ public class IridiumFactions extends IridiumCore {
     private static IridiumFactions instance;
 
     private CommandManager commandManager;
+    private DatabaseManager databaseManager;
+    private UserManager userManager;
 
     private Configuration configuration;
     private Messages messages;
@@ -24,7 +32,19 @@ public class IridiumFactions extends IridiumCore {
     public void onEnable() {
         instance = this;
         super.onEnable();
+
         this.commandManager = new CommandManager("IridiumFactions");
+        this.databaseManager = new DatabaseManager();
+        try {
+            databaseManager.init();
+        } catch (SQLException exception) {
+            // We don't want the plugin to start if the connection fails
+            exception.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        this.userManager = new UserManager();
+
         getLogger().info("----------------------------------------");
         getLogger().info("");
         getLogger().info(getDescription().getName() + " Enabled!");
@@ -40,7 +60,7 @@ public class IridiumFactions extends IridiumCore {
 
     @Override
     public void registerListeners() {
-        super.registerListeners();
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
     }
 
     @Override
@@ -61,6 +81,7 @@ public class IridiumFactions extends IridiumCore {
 
     @Override
     public void saveData() {
+        getDatabaseManager().getUserTableManager().save();
     }
 
     public static IridiumFactions getInstance() {
