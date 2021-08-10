@@ -8,6 +8,7 @@ import com.iridium.iridiumfactions.configs.Messages;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.listeners.PlayerJoinListener;
 import com.iridium.iridiumfactions.managers.DatabaseManager;
+import com.iridium.iridiumfactions.managers.FactionManager;
 import com.iridium.iridiumfactions.managers.UserManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ public class IridiumFactions extends IridiumCore {
     private CommandManager commandManager;
     private DatabaseManager databaseManager;
     private UserManager userManager;
+    private FactionManager factionManager;
 
     private Configuration configuration;
     private Messages messages;
@@ -44,6 +46,7 @@ public class IridiumFactions extends IridiumCore {
             return;
         }
         this.userManager = new UserManager();
+        this.factionManager = new FactionManager();
 
         getLogger().info("----------------------------------------");
         getLogger().info("");
@@ -82,6 +85,7 @@ public class IridiumFactions extends IridiumCore {
     @Override
     public void saveData() {
         getDatabaseManager().getUserTableManager().save();
+        getDatabaseManager().getFactionTableManager().save();
     }
 
     public static IridiumFactions getInstance() {

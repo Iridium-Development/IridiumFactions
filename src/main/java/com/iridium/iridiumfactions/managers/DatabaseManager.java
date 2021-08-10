@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
+import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.UserTableManager;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -27,6 +28,7 @@ public class DatabaseManager {
     private ConnectionSource connectionSource;
 
     private UserTableManager userTableManager;
+    private FactionTableManager factionTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -44,6 +46,7 @@ public class DatabaseManager {
         );
 
         this.userTableManager = new UserTableManager(connectionSource, false);
+        this.factionTableManager = new FactionTableManager(connectionSource, false);
     }
 
     /**
