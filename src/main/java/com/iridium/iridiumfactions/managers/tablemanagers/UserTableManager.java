@@ -12,7 +12,7 @@ import java.util.*;
 public class UserTableManager extends TableManager<User, Integer> {
 
     public UserTableManager(ConnectionSource connectionSource, boolean autoCommit) throws SQLException {
-        super(connectionSource, User.class, autoCommit);
+        super(connectionSource, User.class, autoCommit, Comparator.comparing(User::getUuid));
         sort();
     }
 
@@ -23,24 +23,9 @@ public class UserTableManager extends TableManager<User, Integer> {
         getEntries().sort(Comparator.comparing(User::getUuid));
     }
 
-    /**
-     * Add an item to the list whilst maintaining sorted list
-     *
-     * @param user The item we are adding
-     */
-    public void addEntry(User user) {
-        int index = Collections.binarySearch(getEntries(), user, Comparator.comparing(User::getUuid));
-        getEntries().add(index < 0 ? -(index + 1) : index, user);
-    }
-
     public Optional<User> getUser(UUID uuid) {
         int index = Collections.binarySearch(getEntries(), new User(uuid, ""), Comparator.comparing(User::getUuid));
         if (index < 0) return Optional.empty();
         return Optional.of(getEntries().get(index));
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
     }
 }
