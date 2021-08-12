@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.UserTableManager;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Class which handles the database connection and acts as a DAO.
@@ -69,6 +71,21 @@ public class DatabaseManager {
             default:
                 throw new UnsupportedOperationException("Unsupported driver (how did we get here?): " + sqlConfig.driver.name());
         }
+    }
+
+    public CompletableFuture<Faction> registerFaction(Faction faction) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                factionTableManager.getDao().createOrUpdate(faction);
+                factionTableManager.getDao().commit(connectionSource.getReadOnlyConnection(null));
+                Faction fac = factionTableManager.getDao().queryBuilder().where().eq("name", faction.getName()).queryForFirst();
+                factionTableManager.addEntry(fac);
+                return fac;
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+            return faction;
+        });
     }
 
 }

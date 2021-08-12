@@ -14,4 +14,7 @@ public class Messages {
     public String helpCommandNextPageHover = "&7Click to go to the next page.";
     public String helpCommandPreviousPageHover = "&7Click to go to the previous page.";
     public String activeCooldown = "%prefix% &7You cannot do that due to a running cooldown, please wait %hours% hour(s), %minutes% minute(s), %seconds% second(s)!";
+    public String alreadyHaveFaction = "%prefix% &7You already have a faction";
+    public String factionNameAlreadyExists = "%prefix% &7A faction by that name already exists";
+    public String factionCreated = "%prefix% &7You have created a faction!";
 }

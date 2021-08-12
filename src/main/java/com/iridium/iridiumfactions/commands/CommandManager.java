@@ -40,6 +40,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      */
     public void registerCommands() {
         Commands commands = IridiumFactions.getInstance().getCommands();
+        registerCommand(commands.createCommand);
         registerCommand(commands.helpCommand);
         registerCommand(commands.reloadCommand);
     }
