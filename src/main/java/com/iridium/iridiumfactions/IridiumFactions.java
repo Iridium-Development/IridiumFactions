@@ -2,10 +2,8 @@ package com.iridium.iridiumfactions;
 
 import com.iridium.iridiumcore.IridiumCore;
 import com.iridium.iridiumfactions.commands.CommandManager;
-import com.iridium.iridiumfactions.configs.Commands;
-import com.iridium.iridiumfactions.configs.Configuration;
-import com.iridium.iridiumfactions.configs.Messages;
-import com.iridium.iridiumfactions.configs.SQL;
+import com.iridium.iridiumfactions.configs.*;
+import com.iridium.iridiumfactions.listeners.InventoryClickListener;
 import com.iridium.iridiumfactions.listeners.PlayerJoinListener;
 import com.iridium.iridiumfactions.managers.DatabaseManager;
 import com.iridium.iridiumfactions.managers.FactionManager;
@@ -29,6 +27,7 @@ public class IridiumFactions extends IridiumCore {
     private Messages messages;
     private Commands commands;
     private SQL sql;
+    private Inventories inventories;
 
     @Override
     public void onEnable() {
@@ -64,6 +63,7 @@ public class IridiumFactions extends IridiumCore {
     @Override
     public void registerListeners() {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);
     }
 
     @Override
@@ -72,6 +72,7 @@ public class IridiumFactions extends IridiumCore {
         this.messages = getPersist().load(Messages.class);
         this.commands = getPersist().load(Commands.class);
         this.sql = getPersist().load(SQL.class);
+        this.inventories = getPersist().load(Inventories.class);
     }
 
     @Override
@@ -80,6 +81,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(messages);
         getPersist().save(commands);
         getPersist().save(sql);
+        getPersist().save(inventories);
     }
 
     @Override

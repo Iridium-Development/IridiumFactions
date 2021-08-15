@@ -8,8 +8,10 @@ import com.iridium.iridiumfactions.database.User;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class FactionManager {
 
@@ -31,6 +33,10 @@ public class FactionManager {
 
             return faction;
         });
+    }
+
+    public List<User> getFactionMembers(@NotNull Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().getEntries().stream().filter(user -> user.getFactionID() == faction.getId()).collect(Collectors.toList());
     }
 
     public Optional<FactionInvite> getFactionInvite(@NotNull Faction faction, @NotNull User user) {

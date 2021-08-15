@@ -9,4 +9,5 @@ public class Commands {
     public InviteCommand inviteCommand = new InviteCommand();
     public UnInviteCommand unInviteCommand = new UnInviteCommand();
     public JoinCommand joinCommand = new JoinCommand();
+    public MembersCommand membersCommand = new MembersCommand();
 }
