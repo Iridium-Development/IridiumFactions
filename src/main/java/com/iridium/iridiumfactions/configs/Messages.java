@@ -23,4 +23,8 @@ public class Messages {
     public String factionInviteReceived = "%prefix% &7You have received a faction invite from %player%.";
     public String noActiveInvite = "%prefix% &7There is no active invite for that user.";
     public String factionInviteRevoked = "%prefix% &7You have revoked a faction invite from %player%.";
+    public String noFactionExists = "%prefix% &7That faction does not exist.";
+    public String noInvite = "%prefix% &7You dont have an active invite for this faction.";
+    public String joinedFaction = "%prefix% &7You have joined the faction %name%.";
+    public String userJoinedFaction = "%prefix% &7%player% has joined your faction.";
 }

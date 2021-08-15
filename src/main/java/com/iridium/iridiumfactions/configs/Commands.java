@@ -8,4 +8,5 @@ public class Commands {
     public ReloadCommand reloadCommand = new ReloadCommand();
     public InviteCommand inviteCommand = new InviteCommand();
     public UnInviteCommand unInviteCommand = new UnInviteCommand();
+    public JoinCommand joinCommand = new JoinCommand();
 }
