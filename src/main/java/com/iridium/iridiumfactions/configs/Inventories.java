@@ -33,4 +33,9 @@ public class Inventories {
             "&b&l[!] &7Left click to demote/kick"
     )));
 
+    public SingleItemGUI invitesGUI = new SingleItemGUI(27, "&7Faction Invites", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&b&l%player_name%", "%player_name%", Arrays.asList(
+            "",
+            "&b&l[!] &7Left click to uninvite"
+    )));
+
 }

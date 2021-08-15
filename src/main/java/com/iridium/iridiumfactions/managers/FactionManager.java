@@ -35,6 +35,12 @@ public class FactionManager {
         });
     }
 
+    public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntries().stream()
+                .filter(factionInvite -> factionInvite.getFactionID() == faction.getId())
+                .collect(Collectors.toList());
+    }
+
     public List<User> getFactionMembers(@NotNull Faction faction) {
         return IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().getEntries().stream().filter(user -> user.getFactionID() == faction.getId()).collect(Collectors.toList());
     }
