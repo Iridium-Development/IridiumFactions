@@ -18,13 +18,13 @@ import java.util.Optional;
 /**
  * Command which reloads all configuration files.
  */
-public class JoinCommand extends Command {
+public class LeaveCommand extends Command {
 
     /**
      * The default constructor.
      */
-    public JoinCommand() {
-        super(Collections.singletonList("join"), "Join a faction", "%prefix% &7/f join <player>", "", true, Duration.ZERO);
+    public LeaveCommand() {
+        super(Collections.singletonList("leave"), "Leave your faction", "%prefix% &7/f leave", "", true, Duration.ZERO);
     }
 
     /**
@@ -37,55 +37,31 @@ public class JoinCommand extends Command {
      */
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        if (args.length != 2) {
-            sender.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (user.getFaction().isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
-        Optional<Faction> faction = Optional.empty();
-        Player factionOwner = Bukkit.getServer().getPlayer(args[1]);
-        if (factionOwner != null) {
-            faction = IridiumFactions.getInstance().getUserManager().getUser(factionOwner).getFaction();
-        }
-        if (!faction.isPresent()) {
-            faction = IridiumFactions.getInstance().getFactionManager().getFactionViaName(args[1]);
-        }
-        if (!faction.isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noFactionExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        if (!user.getFaction().isPresent()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
-        Optional<FactionInvite> factionInvite = IridiumFactions.getInstance().getFactionManager().getFactionInvite(faction.get(), user);
-        if (!factionInvite.isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noInvite.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
-
-        user.setFaction(faction.get());
-        user.setFactionRank(FactionRank.MEMBER);
-
-        IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().delete(factionInvite.get());
-
-        sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().joinedFaction
+        sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().leftFaction
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                .replace("%name%", faction.get().getName())
+                .replace("%name%", user.getFaction().get().getName())
         ));
 
-        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).forEach(factionUser -> {
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).forEach(factionUser -> {
             Player factionPlayer = Bukkit.getPlayer(factionUser.getUuid());
             if (factionPlayer != null && factionPlayer != player) {
-                factionPlayer.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userJoinedFaction
+                factionPlayer.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userLeftFaction
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%name%", user.getFaction().get().getName())
                         .replace("%player%", player.getName())
                 ));
             }
         });
+
+        user.setFaction(null);
+        user.setFactionRank(FactionRank.VISITOR);
 
         return true;
     }
