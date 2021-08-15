@@ -17,4 +17,10 @@ public class Messages {
     public String alreadyHaveFaction = "%prefix% &7You already have a faction";
     public String factionNameAlreadyExists = "%prefix% &7A faction by that name already exists";
     public String factionCreated = "%prefix% &7You have created a faction!";
+    public String dontHaveFaction = "%prefix% &7You dont have a faction.";
+    public String inviteAlreadyPresent = "%prefix% &7There is already an active invite for that user.";
+    public String factionInviteSent = "%prefix% &7You have sent a faction invite to %player%.";
+    public String factionInviteReceived = "%prefix% &7You have received a faction invite from %player%.";
+    public String noActiveInvite = "%prefix% &7There is no active invite for that user.";
+    public String factionInviteRevoked = "%prefix% &7You have revoked a faction invite from %player%.";
 }

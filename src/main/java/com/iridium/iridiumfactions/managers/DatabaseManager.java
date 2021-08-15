@@ -3,8 +3,10 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
+import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.UserTableManager;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -31,6 +34,7 @@ public class DatabaseManager {
 
     private UserTableManager userTableManager;
     private FactionTableManager factionTableManager;
+    private ForeignFactionTableManager<FactionInvite, Integer> factionInviteTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -49,6 +53,7 @@ public class DatabaseManager {
 
         this.userTableManager = new UserTableManager(connectionSource, false);
         this.factionTableManager = new FactionTableManager(connectionSource, false);
+        this.factionInviteTableManager = new ForeignFactionTableManager<FactionInvite, Integer>(connectionSource, FactionInvite.class, false, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
     }
 
     /**
