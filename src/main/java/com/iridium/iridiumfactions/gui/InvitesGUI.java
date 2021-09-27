@@ -1,6 +1,6 @@
 package com.iridium.iridiumfactions.gui;
 
-import com.iridium.iridiumcore.GUI;
+import com.iridium.iridiumcore.gui.GUI;
 import com.iridium.iridiumcore.utils.InventoryUtils;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
 import com.iridium.iridiumcore.utils.Placeholder;
@@ -45,12 +45,10 @@ public class InvitesGUI implements GUI {
         for (FactionInvite factionInvite : IridiumFactions.getInstance().getFactionManager().getFactionInvites(faction)) {
             int itemSlot = slot.getAndIncrement();
             Optional<User> user = IridiumFactions.getInstance().getUserManager().getUserByUUID(factionInvite.getUser());
-            if (user.isPresent()) {
-                inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
-                        new Placeholder("player_name", user.get().getName()),
-                        new Placeholder("player_rank", user.get().getFactionRank().name())
-                )));
-            }
+            user.ifPresent(value -> inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
+                    new Placeholder("player_name", value.getName()),
+                    new Placeholder("player_rank", value.getFactionRank().name())
+            ))));
         }
     }
 

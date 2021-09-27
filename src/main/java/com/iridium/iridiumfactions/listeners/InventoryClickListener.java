@@ -1,6 +1,6 @@
 package com.iridium.iridiumfactions.listeners;
 
-import com.iridium.iridiumcore.GUI;
+import com.iridium.iridiumcore.gui.GUI;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;

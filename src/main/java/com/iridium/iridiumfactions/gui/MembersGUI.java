@@ -1,6 +1,6 @@
 package com.iridium.iridiumfactions.gui;
 
-import com.iridium.iridiumcore.GUI;
+import com.iridium.iridiumcore.gui.GUI;
 import com.iridium.iridiumcore.utils.InventoryUtils;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
 import com.iridium.iridiumcore.utils.Placeholder;
