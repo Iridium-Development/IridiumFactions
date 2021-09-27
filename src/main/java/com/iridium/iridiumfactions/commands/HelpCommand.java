@@ -66,11 +66,11 @@ public class HelpCommand extends Command {
         TextComponent previousButton = new TextComponent(StringUtils.color(IridiumFactions.getInstance().getMessages().helpCommandPreviousPage));
         TextComponent nextButton = new TextComponent(StringUtils.color(IridiumFactions.getInstance().getMessages().helpCommandNextPage));
         if (page != 1) {
-            previousButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is help " + (page - 1)));
+            previousButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/factions help " + (page - 1)));
             previousButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(StringUtils.color(IridiumFactions.getInstance().getMessages().helpCommandPreviousPageHover)).create()));
         }
         if (page != maxPage) {
-            nextButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is help " + (page + 1)));
+            nextButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/factions help " + (page + 1)));
             nextButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(StringUtils.color(IridiumFactions.getInstance().getMessages().helpCommandNextPageHover)).create()));
         }
 
