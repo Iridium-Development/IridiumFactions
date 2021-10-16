@@ -7,7 +7,6 @@ import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.utils.PlayerUtils;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -46,18 +45,21 @@ public class UserManager {
     }
 
     public void sendFactionMap(Player player) {
+        HashMap<Integer, Character> factionCharacterMap = new HashMap<>();
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         BlockFace direction = PlayerUtils.getDirection(player);
-        int mapWidth = 50;
-        int mapHeight = 10;
-        char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
+        int mapWidth = IridiumFactions.getInstance().getConfiguration().mapWidth;
+        int mapHeight = IridiumFactions.getInstance().getConfiguration().mapHeight;
+        char[] mapChars = IridiumFactions.getInstance().getConfiguration().mapChars;
         int currentChar = 0;
-        HashMap<Integer, Character> factionCharacterMap = new HashMap<>();
         Chunk centerChunk = player.getLocation().getChunk();
-        World world = centerChunk.getWorld();
         Optional<Faction> currentFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk);
         String factionName = (currentFaction.isPresent() && user.getFactionID() == currentFaction.get().getId() ? "&a" : "&7") + currentFaction.map(Faction::getName).orElse("&2Wilderness");
-        player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage("&8[ &c(" + centerChunk.getX() + ", " + centerChunk.getZ() + ") " + factionName + " &8]", "&8&m ")));
+        player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().mapTitle
+                        .replace("%chunk_x%", String.valueOf(centerChunk.getX()))
+                        .replace("%chunk_z%", String.valueOf(centerChunk.getZ()))
+                        .replace("%faction%", factionName)
+                , IridiumFactions.getInstance().getConfiguration().mapTitleFiller)));
         for (int z = centerChunk.getZ() - (mapHeight / 2); z < centerChunk.getZ() + (mapHeight / 2); z++) {
             boolean buffer = z < centerChunk.getZ() - (mapHeight / 2) + 3;
             StringBuilder stringBuilder = new StringBuilder();
@@ -75,7 +77,7 @@ public class UserManager {
                 stringBuilder.append(direction == BlockFace.SOUTH_EAST ? "&c" : "&e").append("\\");
             }
             for (int x = centerChunk.getX() - (mapWidth / 2) + (buffer ? 3 : 0); x < centerChunk.getX() + (mapWidth / 2); x++) {
-                Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(world, x, z);
+                Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk.getWorld(), x, z);
                 if (centerChunk.getX() == x && centerChunk.getZ() == z) {
                     stringBuilder.append("&b+");
                 } else {
