@@ -43,6 +43,11 @@ public class RenameCommand extends Command {
             return false;
         }
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        Optional<Faction> factionWithName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(name);
+        if (factionWithName.isPresent() && factionWithName.get().getId() != faction.get().getId()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
         faction.get().setName(name);
         IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
                 member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameChanged
