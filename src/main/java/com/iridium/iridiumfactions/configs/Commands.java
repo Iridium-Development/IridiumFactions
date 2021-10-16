@@ -12,4 +12,5 @@ public class Commands {
     public MembersCommand membersCommand = new MembersCommand();
     public LeaveCommand leaveCommand = new LeaveCommand();
     public InvitesCommand invitesCommand = new InvitesCommand();
+    public ClaimCommand claimCommand = new ClaimCommand();
 }

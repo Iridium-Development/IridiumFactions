@@ -5,6 +5,7 @@ import com.iridium.iridiumfactions.commands.CommandManager;
 import com.iridium.iridiumfactions.configs.*;
 import com.iridium.iridiumfactions.listeners.InventoryClickListener;
 import com.iridium.iridiumfactions.listeners.PlayerJoinListener;
+import com.iridium.iridiumfactions.listeners.PlayerMoveListener;
 import com.iridium.iridiumfactions.managers.DatabaseManager;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.iridium.iridiumfactions.managers.UserManager;
@@ -64,6 +65,7 @@ public class IridiumFactions extends IridiumCore {
     public void registerListeners() {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
         Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
     }
 
     @Override

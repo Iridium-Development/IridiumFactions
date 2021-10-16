@@ -29,4 +29,5 @@ public class Messages {
     public String userJoinedFaction = "%prefix% &7%player% has joined your faction.";
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";
+    public String notANumber = "%prefix% &7That is not a valid number.";
 }

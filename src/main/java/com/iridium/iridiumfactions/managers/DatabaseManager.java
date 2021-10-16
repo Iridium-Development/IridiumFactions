@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
@@ -35,6 +36,7 @@ public class DatabaseManager {
     private UserTableManager userTableManager;
     private FactionTableManager factionTableManager;
     private ForeignFactionTableManager<FactionInvite, Integer> factionInviteTableManager;
+    private ForeignFactionTableManager<FactionClaim, Integer> factionClaimTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -53,7 +55,8 @@ public class DatabaseManager {
 
         this.userTableManager = new UserTableManager(connectionSource, false);
         this.factionTableManager = new FactionTableManager(connectionSource, false);
-        this.factionInviteTableManager = new ForeignFactionTableManager<FactionInvite, Integer>(connectionSource, FactionInvite.class, false, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
+        this.factionInviteTableManager = new ForeignFactionTableManager<>(connectionSource, FactionInvite.class, false, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
+        this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, false, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
     }
 
     /**
