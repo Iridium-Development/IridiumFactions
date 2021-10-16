@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions.managers;
 
+import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.*;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -48,9 +50,22 @@ public class FactionManager {
     }
 
     public void claimFactionLand(Faction faction, Chunk chunk, Player player) {
-        if (getFactionViaChunk(chunk).isPresent()) return;
+        Optional<Faction> factionClaimedAtLand = getFactionViaChunk(chunk);
+        if (factionClaimedAtLand.isPresent()) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                    .replace("%faction%", factionClaimedAtLand.get().getName())
+            ));
+            return;
+        }
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, chunk));
-        player.sendMessage("Claimed land for your faction");
+        getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", player.getName())
+                        .replace("%faction%", faction.getName())
+                ))
+        );
     }
 
     public void claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,5 +55,9 @@ public final class User {
 
     public void setFaction(Faction faction) {
         this.factionID = faction == null ? 0 : faction.getId();
+    }
+
+    public Player getPlayer(){
+        return Bukkit.getPlayer(uuid);
     }
 }

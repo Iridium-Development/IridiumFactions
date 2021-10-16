@@ -30,4 +30,6 @@ public class Messages {
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";
     public String notANumber = "%prefix% &7That is not a valid number.";
+    public String factionClaimedLand = "%prefix% &7%player% has claimed land for %faction%.";
+    public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
 }

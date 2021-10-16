@@ -90,6 +90,7 @@ public class IridiumFactions extends IridiumCore {
     public void saveData() {
         getDatabaseManager().getUserTableManager().save();
         getDatabaseManager().getFactionTableManager().save();
+        getDatabaseManager().getFactionClaimTableManager().save();
     }
 
     public static IridiumFactions getInstance() {
