@@ -22,10 +22,6 @@ public class SQL {
      */
     public enum Driver {
         MYSQL,
-        MARIADB,
-        SQLSERVER,
-        POSTGRESQL,
-        H2,
         SQLITE
     }
 
