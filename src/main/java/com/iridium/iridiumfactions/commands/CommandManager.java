@@ -51,6 +51,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         registerCommand(commands.invitesCommand);
         registerCommand(commands.claimCommand);
         registerCommand(commands.unClaimCommand);
+        registerCommand(commands.unClaimAllCommand);
     }
 
     /**

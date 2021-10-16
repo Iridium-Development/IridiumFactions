@@ -111,6 +111,19 @@ public class FactionManager {
         }
     }
 
+    public void unClaimAllFactionLand(Faction faction, Player player) {
+        for (FactionClaim factionClaim : IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction)) {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim);
+        }
+        getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", player.getName())
+                        .replace("%faction%", faction.getName())
+                ))
+        );
+    }
+
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntries().stream()
                 .filter(factionInvite -> factionInvite.getFactionID() == faction.getId())

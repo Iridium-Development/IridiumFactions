@@ -14,4 +14,5 @@ public class Commands {
     public InvitesCommand invitesCommand = new InvitesCommand();
     public ClaimCommand claimCommand = new ClaimCommand();
     public UnClaimCommand unClaimCommand = new UnClaimCommand();
+    public UnClaimAllCommand unClaimAllCommand = new UnClaimAllCommand();
 }

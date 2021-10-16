@@ -34,5 +34,5 @@ public class Messages {
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
     public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed land for %faction%.";
-    public String exceedsUnClaimLimit = "%prefix% &7That radius exceeds the unclaim limit.";
+    public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
 }
