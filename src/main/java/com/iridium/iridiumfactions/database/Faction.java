@@ -5,10 +5,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 /**
  * Represents a Faction of IridiumFactions.
@@ -25,6 +22,9 @@ public final class Faction {
     @DatabaseField(columnName = "name", canBeNull = false)
     private @NotNull String name;
 
+    @DatabaseField(columnName = "description", canBeNull = false)
+    private @NotNull String description;
+
     /**
      * The default constructor.
      *
@@ -32,6 +32,7 @@ public final class Faction {
      */
     public Faction(final @NotNull String name) {
         this.name = name;
+        this.description = "Default Faction Description";
     }
 
     /**

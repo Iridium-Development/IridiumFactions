@@ -2,25 +2,27 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
  */
-public class CreateCommand extends Command {
+public class RenameCommand extends Command {
 
     /**
      * The default constructor.
      */
-    public CreateCommand() {
-        super(Collections.singletonList("create"), "Create a new faction", "%prefix% &7/f create <name>", "", true, Duration.ZERO);
+    public RenameCommand() {
+        super(Arrays.asList("rename", "name", "tag"), "change your faction name", "", true, Duration.ZERO);
     }
 
     /**
@@ -33,26 +35,23 @@ public class CreateCommand extends Command {
      */
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        if (args.length < 2) {
-            sender.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (user.getFaction().isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        Optional<Faction> faction = user.getFaction();
+        if (!faction.isPresent()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-
-        String factionName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        if (IridiumFactions.getInstance().getFactionManager().getFactionViaName(factionName).isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
-        IridiumFactions.getInstance().getFactionManager().createFaction(player, factionName).thenAccept(faction ->
-                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionCreated.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)))
+        String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        faction.get().setName(name);
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameChanged
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", player.getName())
+                        .replace("%name%", name)
+                ))
         );
-        return true;
+        return false;
     }
 
     /**
@@ -66,9 +65,7 @@ public class CreateCommand extends Command {
      */
     @Override
     public List<String> onTabComplete(CommandSender commandSender, org.bukkit.command.Command command, String label, String[] args) {
-        // We currently don't want to tab-completion here
-        // Return a new List so it isn't a list of online players
-        return Collections.emptyList();
+        return null;
     }
 
 }

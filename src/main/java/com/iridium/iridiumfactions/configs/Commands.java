@@ -15,4 +15,6 @@ public class Commands {
     public ClaimCommand claimCommand = new ClaimCommand();
     public UnClaimCommand unClaimCommand = new UnClaimCommand();
     public UnClaimAllCommand unClaimAllCommand = new UnClaimAllCommand();
+    public DescriptionCommand descriptionCommand = new DescriptionCommand();
+    public RenameCommand renameCommand = new RenameCommand();
 }

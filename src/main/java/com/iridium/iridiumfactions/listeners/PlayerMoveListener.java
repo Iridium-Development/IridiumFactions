@@ -20,7 +20,7 @@ public class PlayerMoveListener implements Listener {
         Faction toFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getTo()).orElse(null);
         if (fromFaction != toFaction) {
             if (toFaction != null) {
-                IridiumFactions.getInstance().getNms().sendTitle(player, ChatColor.GREEN + toFaction.getName(), StringUtils.color("&7Default Faction Description"), 20, 40, 20);
+                IridiumFactions.getInstance().getNms().sendTitle(player, ChatColor.GREEN + toFaction.getName(), StringUtils.color(ChatColor.GRAY + toFaction.getDescription()), 20, 40, 20);
             } else {
                 IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color("&2Wilderness"), StringUtils.color(""), 20, 40, 20);
             }
