@@ -103,10 +103,13 @@ public class FactionManager {
     }
 
     public void unClaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
-                Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + x, centerChunk.getZ() + z);
-                unClaimFactionLand(faction, chunk, player);
+        for (FactionClaim factionClaim : IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction)) {
+            if (factionClaim.getX() > centerChunk.getX() - radius && factionClaim.getX() < centerChunk.getX() + radius) {
+                if (factionClaim.getZ() > centerChunk.getZ() - radius && factionClaim.getZ() < centerChunk.getZ() + radius) {
+                    if (factionClaim.getWorld().equals(centerChunk.getWorld().getName())) {
+                        unClaimFactionLand(faction, factionClaim.getChunk(), player);
+                    }
+                }
             }
         }
     }
