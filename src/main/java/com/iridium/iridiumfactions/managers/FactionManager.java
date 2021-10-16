@@ -85,8 +85,8 @@ public class FactionManager {
     }
 
     public void claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
+        for (int x = -radius + 1; x <= radius - 1; x++) {
+            for (int z = -radius + 1; z <= radius - 1; z++) {
                 Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + x, centerChunk.getZ() + z);
                 if (faction.getRemainingPower() < 1) {
                     player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
