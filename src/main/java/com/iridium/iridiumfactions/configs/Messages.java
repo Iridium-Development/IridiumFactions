@@ -37,4 +37,5 @@ public class Messages {
     public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
     public String factionDescriptionChanged = "%prefix% &7%player% has changed your faction description to %description%.";
     public String factionNameChanged = "%prefix% &7%player% has changed your faction name to %name%.";
+    public String notEnoughPowerToClaim = "%prefix% &7You do not have enough power to claim this land.";
 }

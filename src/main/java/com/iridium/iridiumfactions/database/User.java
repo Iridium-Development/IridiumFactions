@@ -34,6 +34,9 @@ public final class User {
     @DatabaseField(columnName = "faction_id", canBeNull = false)
     private int factionID;
 
+    @DatabaseField(columnName = "power", canBeNull = false)
+    private double power;
+
     @DatabaseField(columnName = "faction_rank", canBeNull = false)
     private @NotNull FactionRank factionRank;
 
@@ -47,6 +50,7 @@ public final class User {
         this.uuid = uuid;
         this.name = name;
         this.factionRank = FactionRank.VISITOR;
+        this.power = 10;
     }
 
     public Optional<Faction> getFaction() {

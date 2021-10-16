@@ -55,6 +55,12 @@ public class FactionManager {
     }
 
     public void claimFactionLand(Faction faction, Chunk chunk, Player player) {
+        if (faction.getRemainingPower() < 1) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+            ));
+            return;
+        }
         Optional<Faction> factionClaimedAtLand = getFactionViaChunk(chunk);
         if (factionClaimedAtLand.isPresent()) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
@@ -77,6 +83,12 @@ public class FactionManager {
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
                 Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + x, centerChunk.getZ() + z);
+                if (faction.getRemainingPower() < 1) {
+                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                    ));
+                    return;
+                }
                 claimFactionLand(faction, chunk, player);
             }
         }

@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions.database;
 
+import com.iridium.iridiumfactions.IridiumFactions;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
@@ -35,11 +36,21 @@ public final class Faction {
         this.description = "Default Faction Description";
     }
 
+    public double getRemainingPower() {
+        int land = IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(this).size();
+        return getTotalPower() - land;
+    }
+
+    public double getTotalPower() {
+        return IridiumFactions.getInstance().getFactionManager().getFactionMembers(this).stream().map(User::getPower).reduce(0.00, Double::sum);
+    }
+
     /**
      * Constructor Used for Comparators
+     *
      * @param id The Faction's id
      */
-    public Faction(int id){
+    public Faction(int id) {
         this.id = id;
     }
 }
