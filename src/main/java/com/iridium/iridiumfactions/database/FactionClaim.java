@@ -33,6 +33,13 @@ public class FactionClaim extends FactionData {
         this.world = chunk.getWorld().getName();
     }
 
+    public FactionClaim(@NotNull Faction faction, @NotNull String world, int x, int z) {
+        super(faction);
+        this.x = x;
+        this.z = z;
+        this.world = world;
+    }
+
     public Chunk getChunk() {
         World world = Bukkit.getWorld(this.world);
         if (world == null) world = Bukkit.getWorlds().get(0);

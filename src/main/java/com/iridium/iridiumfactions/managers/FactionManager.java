@@ -6,6 +6,7 @@ import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.*;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,8 +31,12 @@ public class FactionManager {
     }
 
     public Optional<Faction> getFactionViaChunk(Chunk chunk) {
+        return getFactionViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    public Optional<Faction> getFactionViaChunk(World world, int x, int z) {
         int factionID = IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager()
-                .getEntry(new FactionClaim(new Faction(""), chunk))
+                .getEntry(new FactionClaim(new Faction(""), world.getName(), x, z))
                 .map(FactionData::getFactionID)
                 .orElse(0);
         return getFactionViaId(factionID);
