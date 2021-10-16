@@ -32,4 +32,7 @@ public class Messages {
     public String notANumber = "%prefix% &7That is not a valid number.";
     public String factionClaimedLand = "%prefix% &7%player% has claimed land for %faction%.";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
+    public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
+    public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed land for %faction%.";
+    public String exceedsUnClaimLimit = "%prefix% &7That radius exceeds the unclaim limit.";
 }

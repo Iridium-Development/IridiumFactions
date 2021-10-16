@@ -13,4 +13,5 @@ public class Commands {
     public LeaveCommand leaveCommand = new LeaveCommand();
     public InvitesCommand invitesCommand = new InvitesCommand();
     public ClaimCommand claimCommand = new ClaimCommand();
+    public UnClaimCommand unClaimCommand = new UnClaimCommand();
 }

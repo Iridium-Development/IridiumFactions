@@ -37,6 +37,11 @@ public class FactionManager {
         return getFactionViaId(factionID);
     }
 
+    private Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager()
+                .getEntry(new FactionClaim(new Faction(""), chunk));
+    }
+
     public CompletableFuture<Faction> createFaction(@NotNull Player owner, @NotNull String name) {
         return CompletableFuture.supplyAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(owner);
@@ -73,6 +78,35 @@ public class FactionManager {
             for (int z = -radius; z <= radius; z++) {
                 Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + x, centerChunk.getZ() + z);
                 claimFactionLand(faction, chunk, player);
+            }
+        }
+    }
+
+    public void unClaimFactionLand(Faction faction, Chunk chunk, Player player) {
+        Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(chunk);
+        Optional<Faction> factionClaimedAtLand = getFactionViaId(factionClaim.map(FactionData::getFactionID).orElse(0));
+        if (!factionClaim.isPresent() || !factionClaimedAtLand.isPresent() || factionClaimedAtLand.get().getId() != faction.getId()) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaim
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                    .replace("%faction%", faction.getName())
+            ));
+            return;
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
+        getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", player.getName())
+                        .replace("%faction%", faction.getName())
+                ))
+        );
+    }
+
+    public void unClaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + x, centerChunk.getZ() + z);
+                unClaimFactionLand(faction, chunk, player);
             }
         }
     }
