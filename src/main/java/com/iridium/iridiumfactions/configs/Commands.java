@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions.configs;
 
+import com.iridium.iridiumfactions.MapCommand;
 import com.iridium.iridiumfactions.commands.*;
 
 public class Commands {
@@ -17,4 +18,5 @@ public class Commands {
     public UnClaimAllCommand unClaimAllCommand = new UnClaimAllCommand();
     public DescriptionCommand descriptionCommand = new DescriptionCommand();
     public RenameCommand renameCommand = new RenameCommand();
+    public MapCommand mapCommand = new MapCommand();
 }
