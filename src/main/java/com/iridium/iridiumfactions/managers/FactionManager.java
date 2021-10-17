@@ -195,6 +195,24 @@ public class FactionManager {
         });
     }
 
+    public CompletableFuture<Void> deleteFaction(Faction faction, User user) {
+        return CompletableFuture.runAsync(() -> {
+            getFactionMembers(faction).forEach(user1 -> {
+                Player player = user1.getPlayer();
+                if (player != null) {
+                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDisbanded
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", user.getName())
+                            .replace("%faction%", faction.getName())
+                    ));
+                }
+                user1.setFaction(null);
+            });
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction));
+            IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().delete(faction);
+        });
+    }
+
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntries().stream()
                 .filter(factionInvite -> factionInvite.getFactionID() == faction.getId())
@@ -208,5 +226,4 @@ public class FactionManager {
     public Optional<FactionInvite> getFactionInvite(@NotNull Faction faction, @NotNull User user) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntry(new FactionInvite(faction, user, user));
     }
-
 }

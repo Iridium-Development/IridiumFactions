@@ -43,4 +43,6 @@ public class Messages {
     public String factionDoesntExistByName = "%prefix% &7No faction by that name exists.";
     public String nowBypassing = "%prefix% &7You are now bypassing Faction restrictions.";
     public String noLongerBypassing = "%prefix% &7You are no longer bypassing Faction restrictions.";
+    public String cannotDeleteFaction = "%prefix% &7Only the Faction owner can delete the faction";
+    public String factionDisbanded = "%prefix% &7%player% has disbanded the Faction %faction%";
 }

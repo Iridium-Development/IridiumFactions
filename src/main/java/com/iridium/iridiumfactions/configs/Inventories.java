@@ -5,6 +5,7 @@ import com.iridium.iridiumcore.Background;
 import com.iridium.iridiumcore.Item;
 import com.iridium.iridiumcore.dependencies.fasterxml.annotation.JsonIgnore;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
+import com.iridium.iridiumfactions.configs.inventories.ConfirmationInventoryConfig;
 import com.iridium.iridiumfactions.configs.inventories.SingleItemGUI;
 
 import java.util.Arrays;
@@ -38,5 +39,7 @@ public class Inventories {
             "",
             "&b&l[!] &7Left click to uninvite"
     )));
+
+    public ConfirmationInventoryConfig confirmationGUI = new ConfirmationInventoryConfig(27, "&7Are you sure?", background2, new Item(XMaterial.GREEN_STAINED_GLASS_PANE, 15, 1, "&a&lYes", Collections.emptyList()), new Item(XMaterial.RED_STAINED_GLASS_PANE, 11, 1, "&c&lNo", Collections.emptyList()));
 
 }
