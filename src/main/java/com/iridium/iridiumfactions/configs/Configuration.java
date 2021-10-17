@@ -13,7 +13,7 @@ public class Configuration {
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
 
-    public String factionInfoTitle = "&8[ %faction% &7]";
+    public String factionInfoTitle = "&8[ %faction% &8]";
     public String factionInfoTitleFiller = "&8&m ";
     public List<String> factionInfo = Arrays.asList(
             "&cDescription: &7%faction_description%",

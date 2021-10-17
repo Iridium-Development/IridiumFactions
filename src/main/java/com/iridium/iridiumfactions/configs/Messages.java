@@ -33,10 +33,10 @@ public class Messages {
     public String notANumber = "%prefix% &7That is not a valid number.";
     public String youHaveBeenKicked = "%prefix% &7You have been kicked from your Faction by %player%";
     public String playerKicked = "%prefix% &7%player% has been kicked from your Faction by %kicker%";
-    public String factionClaimedLand = "%prefix% &7%player% has claimed land at (%x%,%z%) for %faction%.";
+    public String factionClaimedLand = "%prefix% &7%player% has claimed land at (%x%,%z%).";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
-    public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed %size%x%size% land for %faction%.";
+    public String factionUnClaimedLand =  "%prefix% &7%player% has un-claimed land at (%x%,%z%).";
     public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
     public String factionDescriptionChanged = "%prefix% &7%player% has changed your faction description to %description%.";
     public String factionNameChanged = "%prefix% &7%player% has changed your faction name to %name%.";

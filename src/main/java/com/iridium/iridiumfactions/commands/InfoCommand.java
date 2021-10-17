@@ -69,7 +69,7 @@ public class InfoCommand extends Command {
     }
 
     public void sendFactionInfo(Player player, Faction faction) {
-        player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().factionInfoTitle.replace("%faction%", faction.getName()), IridiumFactions.getInstance().getConfiguration().factionInfoTitleFiller)));
+        player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().factionInfoTitle.replace("%faction%", "&a" + faction.getName()), IridiumFactions.getInstance().getConfiguration().factionInfoTitleFiller)));
         List<String> users = IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream()
                 .map(User::getName)
                 .collect(Collectors.toList());

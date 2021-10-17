@@ -155,14 +155,18 @@ public class FactionManager {
                 return;
             }
             IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
-            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+            getFactionMembers(faction).forEach(user1 -> {
+                Player p = user1.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
                             .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", player.getName())
+                            .replace("%player%", user.getName())
                             .replace("%faction%", faction.getName())
-                            .replace("%size%", "1")
-                    ))
-            );
+                            .replace("%x%", String.valueOf(x))
+                            .replace("%z%", String.valueOf(z))
+                    ));
+                }
+            });
         });
     }
 
@@ -180,18 +184,22 @@ public class FactionManager {
                     if (factionClaim.getZ() > centerChunk.getZ() - radius && factionClaim.getZ() < centerChunk.getZ() + radius) {
                         if (factionClaim.getWorld().equals(centerChunk.getWorld().getName())) {
                             IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim).join();
+                            getFactionMembers(faction).forEach(user1 -> {
+                                Player p = user1.getPlayer();
+                                if (p != null) {
+                                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                                            .replace("%player%", user.getName())
+                                            .replace("%faction%", faction.getName())
+                                            .replace("%x%", String.valueOf(factionClaim.getX()))
+                                            .replace("%z%", String.valueOf(factionClaim.getZ()))
+                                    ));
+                                }
+                            });
                         }
                     }
                 }
             }
-            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", player.getName())
-                            .replace("%faction%", faction.getName())
-                            .replace("%size%", String.valueOf(((radius - 1) * 2) + 1))
-                    ))
-            );
         });
     }
 
