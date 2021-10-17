@@ -25,4 +25,5 @@ public class Commands {
     public KickCommand kickCommand = new KickCommand();
     public PromoteCommand promoteCommand = new PromoteCommand();
     public DemoteCommand demoteCommand = new DemoteCommand();
+    public AboutCommand aboutCommand = new AboutCommand();
 }
