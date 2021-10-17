@@ -1,6 +1,5 @@
 package com.iridium.iridiumfactions.configs;
 
-import com.iridium.iridiumfactions.MapCommand;
 import com.iridium.iridiumfactions.commands.*;
 
 public class Commands {

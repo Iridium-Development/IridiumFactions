@@ -1,6 +1,6 @@
-package com.iridium.iridiumfactions;
+package com.iridium.iridiumfactions.commands;
 
-import com.iridium.iridiumfactions.commands.Command;
+import com.iridium.iridiumfactions.IridiumFactions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
