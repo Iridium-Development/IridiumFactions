@@ -27,6 +27,7 @@ public class Inventories {
             .build());
 
     public SingleItemGUI membersGUI = new SingleItemGUI(27, "&7Faction Members", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&b&l%player_name%", "%player_name%", Arrays.asList(
+            "&7Joined: %player_join%",
             "&7Rank: %player_rank%",
             "",
             "&b&l[!] &7Right Click to promote",

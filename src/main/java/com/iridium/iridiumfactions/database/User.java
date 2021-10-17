@@ -12,6 +12,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +38,9 @@ public final class User {
     @DatabaseField(columnName = "faction_id", canBeNull = false)
     private int factionID;
 
+    @DatabaseField(columnName = "join_time")
+    private long joinTime;
+
     @DatabaseField(columnName = "power", canBeNull = false)
     private double power;
 
@@ -49,6 +56,7 @@ public final class User {
     public User(final @NotNull UUID uuid, final @NotNull String name) {
         this.uuid = uuid;
         this.name = name;
+        this.joinTime = 0L;
         this.factionRank = FactionRank.VISITOR;
         this.power = 10;
     }
@@ -59,6 +67,15 @@ public final class User {
 
     public void setFaction(Faction faction) {
         this.factionID = faction == null ? 0 : faction.getId();
+        setJoinTime(LocalDateTime.now());
+    }
+
+    public LocalDateTime getJoinTime() {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(joinTime), ZoneId.systemDefault());
+    }
+
+    public void setJoinTime(LocalDateTime joinTime) {
+        this.joinTime = ZonedDateTime.of(joinTime, ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public Player getPlayer(){

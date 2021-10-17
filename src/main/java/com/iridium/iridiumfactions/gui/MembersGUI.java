@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,7 +45,8 @@ public class MembersGUI implements GUI {
             int itemSlot = slot.getAndIncrement();
             inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
                     new Placeholder("player_name", user.getName()),
-                    new Placeholder("player_rank", user.getFactionRank().name())
+                    new Placeholder("player_rank", user.getFactionRank().name()),
+                    new Placeholder("player_join", user.getJoinTime().format(DateTimeFormatter.ofPattern(IridiumFactions.getInstance().getConfiguration().dateTimeFormat)))
             )));
         }
     }

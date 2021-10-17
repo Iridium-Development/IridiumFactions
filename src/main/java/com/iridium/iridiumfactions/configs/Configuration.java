@@ -7,4 +7,5 @@ public class Configuration {
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
+    public String dateTimeFormat = "EEEE, MMMM dd HH:mm:ss";
 }
