@@ -40,7 +40,7 @@ public class DeleteCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (!user.getFactionRank().equals(FactionRank.OWNER)) {
+        if (!user.getFactionRank().equals(FactionRank.OWNER) && !user.isBypassing()) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotDeleteFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }

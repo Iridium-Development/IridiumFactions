@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -62,6 +63,10 @@ public class KickCommand extends Command {
         User offlinePlayerUser = IridiumFactions.getInstance().getUserManager().getUser(kickedPlayer);
         if (faction.get().getId() != offlinePlayerUser.getFactionID()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userNotInFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
+        if (offlinePlayerUser.getFactionRank() == FactionRank.OWNER) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotKickOwner.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         offlinePlayerUser.setFaction(null);
