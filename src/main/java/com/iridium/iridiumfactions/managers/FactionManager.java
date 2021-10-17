@@ -4,7 +4,6 @@ import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -60,12 +59,12 @@ public class FactionManager {
         });
     }
 
-    public void claimFactionLand(Faction faction, Chunk chunk, Player player) {
-        claimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
+    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk chunk, Player player) {
+        return claimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
     }
 
-    public void claimFactionLand(Faction faction, World world, int x, int z, Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(IridiumFactions.getInstance(), () -> {
+    public CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
+        return CompletableFuture.runAsync(() -> {
             if (faction.getRemainingPower() < 1) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
@@ -81,29 +80,51 @@ public class FactionManager {
                 return;
             }
             IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, world.getName(), x, z));
-            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", player.getName())
-                            .replace("%faction%", faction.getName())
-                    ))
-            );
         });
     }
 
-    public void claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        World world = centerChunk.getWorld();
-        for (int x = centerChunk.getX() - radius; x <= centerChunk.getX() + radius; x++) {
-            for (int z = centerChunk.getZ() - radius; z <= centerChunk.getZ() + radius; z++) {
-                if (faction.getRemainingPower() < 1) {
-                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                    ));
-                    return;
+    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            long startTime = System.nanoTime();
+            World world = centerChunk.getWorld();
+            for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
+                for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
+                    if (faction.getRemainingPower() < 1) {
+                        long endTime = System.nanoTime();
+                        long duration = (endTime - startTime) / 1000000;  //divide by 1000000 to get milliseconds.
+                        getFactionMembers(faction).forEach(user -> {
+                            Player p = user.getPlayer();
+                            if (p != null) {
+                                p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().ranOutOfPowerWhileClaimingLand
+                                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                                        .replace("%player%", player.getName())
+                                        .replace("%faction%", faction.getName())
+                                        .replace("%size%", String.valueOf(((radius - 1) * 2) + 1))
+                                        .replace("%ms%", String.valueOf(duration))
+                                ));
+                            }
+                        });
+                        return;
+                    }
+                    claimFactionLand(faction, world, x, z, player).join();
                 }
-                claimFactionLand(faction, world, x, z, player);
             }
-        }
+            long endTime = System.nanoTime();
+
+            long duration = (endTime - startTime) / 1000000;  //divide by 1000000 to get milliseconds.
+            getFactionMembers(faction).forEach(user -> {
+                Player p = user.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.getName())
+                            .replace("%size%", String.valueOf(((radius - 1) * 2) + 1))
+                            .replace("%ms%", String.valueOf(duration))
+                    ));
+                }
+            });
+        });
     }
 
     public void unClaimFactionLand(Faction faction, Chunk chunk, Player player) {

@@ -30,7 +30,8 @@ public class Messages {
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";
     public String notANumber = "%prefix% &7That is not a valid number.";
-    public String factionClaimedLand = "%prefix% &7%player% has claimed land for %faction%.";
+    public String factionClaimedLand = "%prefix% &7%player% has claimed %size%x%size% chunks for %faction% (took %ms%ms).";
+    public String ranOutOfPowerWhileClaimingLand = "%prefix% &7%player% has run out of power while claiming %size%x%size% chunks for %faction% (took %ms%ms).";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
     public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed land for %faction%.";
