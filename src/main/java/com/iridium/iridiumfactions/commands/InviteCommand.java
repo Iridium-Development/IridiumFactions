@@ -2,10 +2,11 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -42,8 +43,15 @@ public class InviteCommand extends Command {
         }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (!user.getFaction().isPresent()) {
+        Optional<Faction> faction = user.getFaction();
+        if (!faction.isPresent()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction.get(), user, PermissionType.INVITE)) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotInvite
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+            ));
             return false;
         }
         Player invitee = Bukkit.getServer().getPlayer(args[1]);

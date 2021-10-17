@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.command.CommandSender;
@@ -37,6 +38,12 @@ public class DescriptionCommand extends Command {
         Optional<Faction> faction = user.getFaction();
         if (!faction.isPresent()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction.get(), user, PermissionType.DESCRIPTION)) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotChangeDescription
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+            ));
             return false;
         }
         String description = String.join(" ", Arrays.copyOfRange(args, 1, args.length));

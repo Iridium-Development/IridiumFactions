@@ -3,8 +3,6 @@ package com.iridium.iridiumfactions.commands;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.database.Faction;
-import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -13,7 +11,6 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
@@ -61,7 +58,7 @@ public class LeaveCommand extends Command {
         });
 
         user.setFaction(null);
-        user.setFactionRank(FactionRank.VISITOR);
+        user.setFactionRank(FactionRank.TRUCE);
 
         return true;
     }

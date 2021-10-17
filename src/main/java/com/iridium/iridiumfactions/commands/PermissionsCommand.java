@@ -3,7 +3,7 @@ package com.iridium.iridiumfactions.commands;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.User;
-import com.iridium.iridiumfactions.gui.FactionMembersGUI;
+import com.iridium.iridiumfactions.gui.FactionRanksGUI;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -14,13 +14,13 @@ import java.util.List;
 /**
  * Command which reloads all configuration files.
  */
-public class MembersCommand extends Command {
+public class PermissionsCommand extends Command {
 
     /**
      * The default constructor.
      */
-    public MembersCommand() {
-        super(Collections.singletonList("members"), "View your faction members", "%prefix% &7/f members", "", true, Duration.ZERO);
+    public PermissionsCommand() {
+        super(Collections.singletonList("permissions"), "Change your faction permissions", "", true, Duration.ZERO);
     }
 
     /**
@@ -39,7 +39,7 @@ public class MembersCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        player.openInventory(new FactionMembersGUI(user.getFaction().get()).getInventory());
+        player.openInventory(new FactionRanksGUI(user.getFaction().get()).getInventory());
         return true;
     }
 

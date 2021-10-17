@@ -21,4 +21,5 @@ public class Commands {
     public InfoCommand infoCommand = new InfoCommand();
     public BypassCommand bypassCommand = new BypassCommand();
     public DeleteCommand deleteCommand = new DeleteCommand();
+    public PermissionsCommand permissionsCommand = new PermissionsCommand();
 }

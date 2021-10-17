@@ -3,8 +3,7 @@ package com.iridium.iridiumfactions.commands;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.User;
-import com.iridium.iridiumfactions.gui.InvitesGUI;
-import com.iridium.iridiumfactions.gui.MembersGUI;
+import com.iridium.iridiumfactions.gui.FactionInvitesGUI;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -40,7 +39,7 @@ public class InvitesCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        player.openInventory(new InvitesGUI(user.getFaction().get()).getInventory());
+        player.openInventory(new FactionInvitesGUI(user.getFaction().get()).getInventory());
         return true;
     }
 

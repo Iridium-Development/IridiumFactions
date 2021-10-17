@@ -59,7 +59,7 @@ public final class User {
         this.uuid = uuid;
         this.name = name;
         this.joinTime = 0L;
-        this.factionRank = FactionRank.VISITOR;
+        this.factionRank = FactionRank.TRUCE;
         this.power = 10;
     }
 

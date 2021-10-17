@@ -30,11 +30,10 @@ public class Messages {
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";
     public String notANumber = "%prefix% &7That is not a valid number.";
-    public String factionClaimedLand = "%prefix% &7%player% has claimed %size%x%size% chunks for %faction% (took %ms%ms).";
-    public String ranOutOfPowerWhileClaimingLand = "%prefix% &7%player% has run out of power while claiming %size%x%size% chunks for %faction% (took %ms%ms).";
+    public String factionClaimedLand = "%prefix% &7%player% has claimed land at (%x%,%z%) for %faction%.";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
-    public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed %size%x%size%land for %faction%.";
+    public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed %size%x%size% land for %faction%.";
     public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
     public String factionDescriptionChanged = "%prefix% &7%player% has changed your faction description to %description%.";
     public String factionNameChanged = "%prefix% &7%player% has changed your faction name to %name%.";
@@ -45,4 +44,13 @@ public class Messages {
     public String noLongerBypassing = "%prefix% &7You are no longer bypassing Faction restrictions.";
     public String cannotDeleteFaction = "%prefix% &7Only the Faction owner can delete the faction";
     public String factionDisbanded = "%prefix% &7%player% has disbanded the Faction %faction%";
+    public String cannotChangePermissions = "%prefix% &7You cannot change this permission.";
+    public String cannotBreakBlocks = "%prefix% &7You cannot break blocks in this Faction.";
+    public String cannotPlaceBlocks = "%prefix% &7You cannot place blocks in this Faction.";
+    public String cannotUseBuckets = "%prefix% &7You cannot use buckets in this Faction.";
+    public String cannotClaimLand = "%prefix% &7You cannot claim land in this Faction.";
+    public String cannotUnClaimLand = "%prefix% &7You cannot un claim land in this Faction.";
+    public String cannotChangeDescription = "%prefix% &7You cannot change the Faction's Description.";
+    public String cannotInvite = "%prefix% &7You cannot invite players to the Faction.";
+    public String cannotChangeName = "%prefix% &7You cannot change the Faction's Name.";
 }

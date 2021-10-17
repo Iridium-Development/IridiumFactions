@@ -9,28 +9,27 @@ import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.inventories.NoItemGUI;
 import com.iridium.iridiumfactions.configs.inventories.SingleItemGUI;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
+import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MembersGUI implements GUI {
+@AllArgsConstructor
+public class FactionInvitesGUI implements GUI {
 
     private final Faction faction;
-
-    public MembersGUI(@NotNull Faction faction) {
-        this.faction = faction;
-    }
 
     @NotNull
     @Override
     public Inventory getInventory() {
-        NoItemGUI noItemGUI = IridiumFactions.getInstance().getInventories().membersGUI;
+        NoItemGUI noItemGUI = IridiumFactions.getInstance().getInventories().invitesGUI;
         Inventory inventory = Bukkit.createInventory(this, noItemGUI.size, StringUtils.color(noItemGUI.title));
         addContent(inventory);
         return inventory;
@@ -38,16 +37,16 @@ public class MembersGUI implements GUI {
 
     @Override
     public void addContent(Inventory inventory) {
-        SingleItemGUI singleItemGUI = IridiumFactions.getInstance().getInventories().membersGUI;
+        SingleItemGUI singleItemGUI = IridiumFactions.getInstance().getInventories().invitesGUI;
         InventoryUtils.fillInventory(inventory, singleItemGUI.background);
         AtomicInteger slot = new AtomicInteger(0);
-        for (User user : IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction)) {
+        for (FactionInvite factionInvite : IridiumFactions.getInstance().getFactionManager().getFactionInvites(faction)) {
             int itemSlot = slot.getAndIncrement();
-            inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
-                    new Placeholder("player_name", user.getName()),
-                    new Placeholder("player_rank", user.getFactionRank().name()),
-                    new Placeholder("player_join", user.getJoinTime().format(DateTimeFormatter.ofPattern(IridiumFactions.getInstance().getConfiguration().dateTimeFormat)))
-            )));
+            Optional<User> user = IridiumFactions.getInstance().getUserManager().getUserByUUID(factionInvite.getUser());
+            user.ifPresent(value -> inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
+                    new Placeholder("player_name", value.getName()),
+                    new Placeholder("player_rank", value.getFactionRank().name())
+            ))));
         }
     }
 

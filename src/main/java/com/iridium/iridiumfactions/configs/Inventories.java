@@ -6,6 +6,8 @@ import com.iridium.iridiumcore.Item;
 import com.iridium.iridiumcore.dependencies.fasterxml.annotation.JsonIgnore;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumfactions.configs.inventories.ConfirmationInventoryConfig;
+import com.iridium.iridiumfactions.configs.inventories.FactionRanksInventoryConfig;
+import com.iridium.iridiumfactions.configs.inventories.NoItemGUI;
 import com.iridium.iridiumfactions.configs.inventories.SingleItemGUI;
 
 import java.util.Arrays;
@@ -35,11 +37,26 @@ public class Inventories {
             "&b&l[!] &7Left click to demote/kick"
     )));
 
+    public FactionRanksInventoryConfig factionRanksGUI = new FactionRanksInventoryConfig(27, "&7Faction Permissions", background1,
+            new Item(XMaterial.DIAMOND_AXE, 14, 1, "&b&lOwner", Collections.emptyList()),
+            new Item(XMaterial.GOLDEN_AXE, 13, 1, "&b&lCo-Owner", Collections.emptyList()),
+            new Item(XMaterial.IRON_AXE, 12, 1, "&b&lModerator", Collections.emptyList()),
+            new Item(XMaterial.STONE_AXE, 11, 1, "&b&lMember", Collections.emptyList()),
+            new Item(XMaterial.WOODEN_AXE, 10, 1, "&b&lTruce", Collections.emptyList()),
+            new Item(XMaterial.GOLDEN_APPLE, 15, 1, "&b&lAlly", Collections.emptyList()),
+            new Item(XMaterial.BARRIER, 16, 1, "&b&lEnemy", Collections.emptyList())
+    );
+
+    public NoItemGUI factionPermissionsGUI = new NoItemGUI(54, "&7Faction Permissions", background1);
+
     public SingleItemGUI invitesGUI = new SingleItemGUI(27, "&7Faction Invites", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&b&l%player_name%", "%player_name%", Arrays.asList(
             "",
             "&b&l[!] &7Left click to uninvite"
     )));
 
     public ConfirmationInventoryConfig confirmationGUI = new ConfirmationInventoryConfig(27, "&7Are you sure?", background2, new Item(XMaterial.GREEN_STAINED_GLASS_PANE, 15, 1, "&a&lYes", Collections.emptyList()), new Item(XMaterial.RED_STAINED_GLASS_PANE, 11, 1, "&c&lNo", Collections.emptyList()));
+
+    public Item nextPage = new Item(XMaterial.LIME_STAINED_GLASS_PANE, 1, "&a&lNext Page", Collections.emptyList());
+    public Item previousPage = new Item(XMaterial.RED_STAINED_GLASS_PANE, 1, "&c&lPrevious Page", Collections.emptyList());
 
 }
