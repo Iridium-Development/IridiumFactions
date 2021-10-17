@@ -4,6 +4,7 @@ import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -60,41 +61,47 @@ public class FactionManager {
     }
 
     public void claimFactionLand(Faction faction, Chunk chunk, Player player) {
-        if (faction.getRemainingPower() < 1) {
-            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
-                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-            ));
-            return;
-        }
-        Optional<Faction> factionClaimedAtLand = getFactionViaChunk(chunk);
-        if (factionClaimedAtLand.isPresent()) {
-            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
-                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                    .replace("%faction%", factionClaimedAtLand.get().getName())
-            ));
-            return;
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, chunk));
-        getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+        claimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
+    }
+
+    public void claimFactionLand(Faction faction, World world, int x, int z, Player player) {
+        Bukkit.getScheduler().runTaskAsynchronously(IridiumFactions.getInstance(), () -> {
+            if (faction.getRemainingPower() < 1) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%player%", player.getName())
-                        .replace("%faction%", faction.getName())
-                ))
-        );
+                ));
+                return;
+            }
+            Optional<Faction> factionClaimedAtLand = getFactionViaChunk(world, x, z);
+            if (factionClaimedAtLand.isPresent()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%faction%", factionClaimedAtLand.get().getName())
+                ));
+                return;
+            }
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, world.getName(), x, z));
+            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.getName())
+                    ))
+            );
+        });
     }
 
     public void claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        for (int x = -radius + 1; x <= radius - 1; x++) {
-            for (int z = -radius + 1; z <= radius - 1; z++) {
-                Chunk chunk = centerChunk.getWorld().getChunkAt(centerChunk.getX() + x, centerChunk.getZ() + z);
+        World world = centerChunk.getWorld();
+        for (int x = centerChunk.getX() - radius; x <= centerChunk.getX() + radius; x++) {
+            for (int z = centerChunk.getZ() - radius; z <= centerChunk.getZ() + radius; z++) {
                 if (faction.getRemainingPower() < 1) {
                     player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                             .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                     ));
                     return;
                 }
-                claimFactionLand(faction, chunk, player);
+                claimFactionLand(faction, world, x, z, player);
             }
         }
     }
