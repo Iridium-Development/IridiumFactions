@@ -19,4 +19,5 @@ public class Commands {
     public DescriptionCommand descriptionCommand = new DescriptionCommand();
     public RenameCommand renameCommand = new RenameCommand();
     public MapCommand mapCommand = new MapCommand();
+    public InfoCommand infoCommand = new InfoCommand();
 }
