@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Used for handling Crud operations on a table + handling cache
@@ -78,16 +79,18 @@ public class TableManager<T, S> {
      *
      * @param t the variable we are deleting
      */
-    public void delete(T t) {
-        try {
-            dao.delete(t);
-            entries.remove(t);
-            if (!autoCommit) {
-                dao.commit(getDatabaseConnection());
+    public CompletableFuture<Void> delete(T t) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                dao.delete(t);
+                entries.remove(t);
+                if (!autoCommit) {
+                    dao.commit(getDatabaseConnection());
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        });
     }
 
     /**
@@ -95,16 +98,18 @@ public class TableManager<T, S> {
      *
      * @param t The collection of variables we are deleting
      */
-    public void delete(Collection<T> t) {
-        try {
-            dao.delete(t);
-            entries.removeAll(t);
-            if (!autoCommit) {
-                dao.commit(getDatabaseConnection());
+    public CompletableFuture<Void> delete(Collection<T> t) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                dao.delete(t);
+                entries.removeAll(t);
+                if (!autoCommit) {
+                    dao.commit(getDatabaseConnection());
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        });
     }
 
     /**

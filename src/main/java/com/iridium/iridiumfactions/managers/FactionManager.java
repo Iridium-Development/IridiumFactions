@@ -43,8 +43,12 @@ public class FactionManager {
     }
 
     private Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
+        return getFactionClaimViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    private Optional<FactionClaim> getFactionClaimViaChunk(World world, int x, int z) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager()
-                .getEntry(new FactionClaim(new Faction(""), chunk));
+                .getEntry(new FactionClaim(new Faction(""), world.getName(), x, z));
     }
 
     public CompletableFuture<Faction> createFaction(@NotNull Player owner, @NotNull String name) {
@@ -127,49 +131,66 @@ public class FactionManager {
         });
     }
 
-    public void unClaimFactionLand(Faction faction, Chunk chunk, Player player) {
-        Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(chunk);
-        Optional<Faction> factionClaimedAtLand = getFactionViaId(factionClaim.map(FactionData::getFactionID).orElse(0));
-        if (!factionClaim.isPresent() || !factionClaimedAtLand.isPresent() || factionClaimedAtLand.get().getId() != faction.getId()) {
-            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaim
-                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                    .replace("%faction%", faction.getName())
-            ));
-            return;
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
-        getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%player%", player.getName())
-                        .replace("%faction%", faction.getName())
-                ))
-        );
+    public CompletableFuture<Void> unClaimFactionLand(Faction faction, Chunk chunk, Player player) {
+        return unClaimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
     }
 
-    public void unClaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        for (FactionClaim factionClaim : IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction)) {
-            if (factionClaim.getX() > centerChunk.getX() - radius && factionClaim.getX() < centerChunk.getX() + radius) {
-                if (factionClaim.getZ() > centerChunk.getZ() - radius && factionClaim.getZ() < centerChunk.getZ() + radius) {
-                    if (factionClaim.getWorld().equals(centerChunk.getWorld().getName())) {
-                        unClaimFactionLand(faction, factionClaim.getChunk(), player);
+    public CompletableFuture<Void> unClaimFactionLand(Faction faction, World world, int x, int z, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
+            Optional<Faction> factionClaimedAtLand = getFactionViaId(factionClaim.map(FactionData::getFactionID).orElse(0));
+            if (!factionClaim.isPresent() || !factionClaimedAtLand.isPresent() || factionClaimedAtLand.get().getId() != faction.getId()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaim
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%faction%", faction.getName())
+                ));
+                return;
+            }
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
+            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.getName())
+                            .replace("%size%", "1")
+                    ))
+            );
+        });
+    }
+
+    public CompletableFuture<Void> unClaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            for (FactionClaim factionClaim : IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction)) {
+                if (factionClaim.getX() > centerChunk.getX() - radius && factionClaim.getX() < centerChunk.getX() + radius) {
+                    if (factionClaim.getZ() > centerChunk.getZ() - radius && factionClaim.getZ() < centerChunk.getZ() + radius) {
+                        if (factionClaim.getWorld().equals(centerChunk.getWorld().getName())) {
+                            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim).join();
+                        }
                     }
                 }
             }
-        }
+            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.getName())
+                            .replace("%size%", String.valueOf(((radius - 1) * 2) + 1))
+                    ))
+            );
+        });
     }
 
-    public void unClaimAllFactionLand(Faction faction, Player player) {
-        for (FactionClaim factionClaim : IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction)) {
-            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim);
-        }
-        getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%player%", player.getName())
-                        .replace("%faction%", faction.getName())
-                ))
-        );
+    public CompletableFuture<Void> unClaimAllFactionLand(Faction faction, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction));
+            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.getName())
+                    ))
+            );
+        });
     }
 
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
