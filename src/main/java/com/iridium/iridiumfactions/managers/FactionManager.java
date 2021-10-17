@@ -69,7 +69,8 @@ public class FactionManager {
 
     public CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
         return CompletableFuture.runAsync(() -> {
-            if (faction.getRemainingPower() < 1) {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+            if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                 ));
@@ -89,15 +90,16 @@ public class FactionManager {
 
     public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
         return CompletableFuture.runAsync(() -> {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
             long startTime = System.nanoTime();
             World world = centerChunk.getWorld();
             for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
                 for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
-                    if (faction.getRemainingPower() < 1) {
+                    if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
                         long endTime = System.nanoTime();
                         long duration = (endTime - startTime) / 1000000;  //divide by 1000000 to get milliseconds.
-                        getFactionMembers(faction).forEach(user -> {
-                            Player p = user.getPlayer();
+                        getFactionMembers(faction).forEach(u -> {
+                            Player p = u.getPlayer();
                             if (p != null) {
                                 p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().ranOutOfPowerWhileClaimingLand
                                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
@@ -116,8 +118,8 @@ public class FactionManager {
             long endTime = System.nanoTime();
 
             long duration = (endTime - startTime) / 1000000;  //divide by 1000000 to get milliseconds.
-            getFactionMembers(faction).forEach(user -> {
-                Player p = user.getPlayer();
+            getFactionMembers(faction).forEach(u -> {
+                Player p = u.getPlayer();
                 if (p != null) {
                     p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
                             .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)

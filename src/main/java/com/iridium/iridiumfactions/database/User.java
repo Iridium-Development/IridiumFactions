@@ -47,6 +47,8 @@ public final class User {
     @DatabaseField(columnName = "faction_rank", canBeNull = false)
     private @NotNull FactionRank factionRank;
 
+    private boolean bypassing = false;
+
     /**
      * The default constructor.
      *

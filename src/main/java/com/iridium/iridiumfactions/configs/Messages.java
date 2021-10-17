@@ -41,4 +41,6 @@ public class Messages {
     public String notEnoughPowerToClaim = "%prefix% &7You do not have enough power to claim this land.";
     public String playerNoFaction = "%prefix% &7That player does not have a Faction.";
     public String factionDoesntExistByName = "%prefix% &7No faction by that name exists.";
+    public String nowBypassing = "%prefix% &7You are now bypassing Faction restrictions.";
+    public String noLongerBypassing = "%prefix% &7You are no longer bypassing Faction restrictions.";
 }

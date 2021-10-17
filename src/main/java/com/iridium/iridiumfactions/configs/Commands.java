@@ -20,4 +20,5 @@ public class Commands {
     public RenameCommand renameCommand = new RenameCommand();
     public MapCommand mapCommand = new MapCommand();
     public InfoCommand infoCommand = new InfoCommand();
+    public BypassCommand bypassCommand = new BypassCommand();
 }

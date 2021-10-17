@@ -61,7 +61,7 @@ public class JoinCommand extends Command {
         }
 
         Optional<FactionInvite> factionInvite = IridiumFactions.getInstance().getFactionManager().getFactionInvite(faction.get(), user);
-        if (!factionInvite.isPresent()) {
+        if (!factionInvite.isPresent() && !user.isBypassing()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noInvite.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
@@ -69,7 +69,7 @@ public class JoinCommand extends Command {
         user.setFaction(faction.get());
         user.setFactionRank(FactionRank.MEMBER);
 
-        IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().delete(factionInvite.get());
+        factionInvite.ifPresent(invite -> IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().delete(invite));
 
         sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().joinedFaction
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)

@@ -13,6 +13,7 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+        user.setBypassing(false);
 
         // Update the internal username in case of name change
         user.setName(event.getPlayer().getName());
