@@ -23,4 +23,6 @@ public class Commands {
     public DeleteCommand deleteCommand = new DeleteCommand();
     public PermissionsCommand permissionsCommand = new PermissionsCommand();
     public KickCommand kickCommand = new KickCommand();
+    public PromoteCommand promoteCommand = new PromoteCommand();
+    public DemoteCommand demoteCommand = new DemoteCommand();
 }

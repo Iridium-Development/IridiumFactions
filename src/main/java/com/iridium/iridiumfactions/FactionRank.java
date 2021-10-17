@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -15,4 +16,17 @@ public enum FactionRank {
     ENEMY(-2);
     private final int level;
 
+    @NotNull
+    public String getDisplayName() {
+        return IridiumFactions.getInstance().getConfiguration().factionRankNames.getOrDefault(this, this.name());
+    }
+
+    public static FactionRank getByLevel(int level) {
+        for (FactionRank factionRank : values()) {
+            if (factionRank.getLevel() == level) {
+                return factionRank;
+            }
+        }
+        return null;
+    }
 }

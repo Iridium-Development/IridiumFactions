@@ -36,7 +36,7 @@ public class Messages {
     public String factionClaimedLand = "%prefix% &7%player% has claimed land at (%x%,%z%).";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
-    public String factionUnClaimedLand =  "%prefix% &7%player% has un-claimed land at (%x%,%z%).";
+    public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed land at (%x%,%z%).";
     public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
     public String factionDescriptionChanged = "%prefix% &7%player% has changed your faction description to %description%.";
     public String factionNameChanged = "%prefix% &7%player% has changed your faction name to %name%.";
@@ -45,6 +45,10 @@ public class Messages {
     public String factionDoesntExistByName = "%prefix% &7No faction by that name exists.";
     public String nowBypassing = "%prefix% &7You are now bypassing Faction restrictions.";
     public String noLongerBypassing = "%prefix% &7You are no longer bypassing Faction restrictions.";
+    public String promotedPlayer = "%prefix% &7You have promoted %player% to %rank%.";
+    public String userPromotedPlayer = "%prefix% &7%promoter% has promoted %player% to %rank%.";
+    public String demotedPlayer = "%prefix% &7You have demoted %player% to %rank%.";
+    public String userDemotedPlayer = "%prefix% &7%promoter% has demoted %player% to %rank%.";
     public String cannotDeleteFaction = "%prefix% &7Only the Faction owner can delete the faction";
     public String factionDisbanded = "%prefix% &7%player% has disbanded the Faction %faction%";
     public String cannotChangePermissions = "%prefix% &7You cannot change this permission.";
@@ -57,4 +61,6 @@ public class Messages {
     public String cannotInvite = "%prefix% &7You cannot invite players to the Faction.";
     public String cannotChangeName = "%prefix% &7You cannot change the Faction's Name.";
     public String cannotKick = "%prefix% &7You cannot kick players from the Faction.";
+    public String cannotPromoteUser = "%prefix% &7You cannot promote this User";
+    public String cannotDemoteUser = "%prefix% &7You cannot demote this User";
 }
