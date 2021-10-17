@@ -27,9 +27,12 @@ public class Messages {
     public String noInvite = "%prefix% &7You dont have an active invite for this faction.";
     public String joinedFaction = "%prefix% &7You have joined the faction %name%.";
     public String userJoinedFaction = "%prefix% &7%player% has joined your faction.";
+    public String userNotInFaction = "%prefix% &7That user is not a member of your faction";
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";
     public String notANumber = "%prefix% &7That is not a valid number.";
+    public String youHaveBeenKicked = "%prefix% &7You have been kicked from your Faction by %player%";
+    public String playerKicked = "%prefix% &7%player% has been kicked from your Faction by %kicker%";
     public String factionClaimedLand = "%prefix% &7%player% has claimed land at (%x%,%z%) for %faction%.";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String factionLandNotClaim = "%prefix% &7This land has not been claimed by %faction%.";
@@ -53,4 +56,5 @@ public class Messages {
     public String cannotChangeDescription = "%prefix% &7You cannot change the Faction's Description.";
     public String cannotInvite = "%prefix% &7You cannot invite players to the Faction.";
     public String cannotChangeName = "%prefix% &7You cannot change the Faction's Name.";
+    public String cannotKick = "%prefix% &7You cannot kick players from the Faction.";
 }

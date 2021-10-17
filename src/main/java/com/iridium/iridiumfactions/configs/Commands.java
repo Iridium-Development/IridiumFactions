@@ -22,4 +22,5 @@ public class Commands {
     public BypassCommand bypassCommand = new BypassCommand();
     public DeleteCommand deleteCommand = new DeleteCommand();
     public PermissionsCommand permissionsCommand = new PermissionsCommand();
+    public KickCommand kickCommand = new KickCommand();
 }
