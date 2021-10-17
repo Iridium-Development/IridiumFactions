@@ -5,9 +5,11 @@ import com.iridium.iridiumfactions.database.Faction;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Used for handling Crud operations on a table + handling cache
@@ -26,6 +28,18 @@ public class FactionTableManager extends TableManager<Faction, Integer> {
     public void addEntry(Faction faction) {
         super.addEntry(faction);
         factionNameEntries.add(faction);
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(Faction faction) {
+        factionNameEntries.remove(faction);
+        return super.delete(faction);
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(Collection<Faction> factions) {
+        factionNameEntries.removeAll(factions);
+        return super.delete(factions);
     }
 
     /**
