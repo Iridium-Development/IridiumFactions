@@ -20,7 +20,7 @@ public class FactionTableManager extends TableManager<Faction, Integer> {
     public FactionTableManager(ConnectionSource connectionSource, boolean autoCommit) throws SQLException {
         super(connectionSource, Faction.class, autoCommit, Comparator.comparing(Faction::getId));
         this.factionNameEntries = new SortedList<>(Comparator.comparing(Faction::getName, String.CASE_INSENSITIVE_ORDER));
-        this.factionNameEntries.addAll(getDao().queryForAll());
+        this.factionNameEntries.addAll(getEntries());
         sort();
     }
 
