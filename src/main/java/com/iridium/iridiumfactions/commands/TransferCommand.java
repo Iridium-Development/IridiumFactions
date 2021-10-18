@@ -66,8 +66,10 @@ public class TransferCommand extends Command {
 
         player.openInventory(new ConfirmationGUI(() -> {
             user.setFactionRank(FactionRank.CO_OWNER);
-            targetUser.setFactionRank(FactionRank.OWNER);
             IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).forEach(user1 -> {
+                if (user1.getFactionRank() == FactionRank.OWNER) {
+                    user1.setFactionRank(FactionRank.CO_OWNER);
+                }
                 Player p = user1.getPlayer();
                 if (p != null) {
                     p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionOwnershipTransferred
