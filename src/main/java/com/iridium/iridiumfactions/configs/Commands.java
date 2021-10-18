@@ -28,4 +28,5 @@ public class Commands {
     public AboutCommand aboutCommand = new AboutCommand();
     public HomeCommand homeCommand = new HomeCommand();
     public SetHomeCommand setHomeCommand = new SetHomeCommand();
+    public TransferCommand transferCommand = new TransferCommand();
 }

@@ -48,6 +48,8 @@ public class Messages {
     public String notEnoughPowerToClaim = "%prefix% &7You do not have enough power to claim this land.";
     public String playerNoFaction = "%prefix% &7That player does not have a Faction.";
     public String factionDoesntExistByName = "%prefix% &7No faction by that name exists.";
+    public String cannotTransferToYourself = "%prefix% &7You cannot transfer Faction ownership to yourself.";
+    public String factionOwnershipTransferred = "%prefix% &7%old_owner% has transfered Faction ownership to %new_owner%.";
     public String nowBypassing = "%prefix% &7You are now bypassing Faction restrictions.";
     public String noLongerBypassing = "%prefix% &7You are no longer bypassing Faction restrictions.";
     public String promotedPlayer = "%prefix% &7You have promoted %player% to %rank%.";
@@ -55,6 +57,7 @@ public class Messages {
     public String demotedPlayer = "%prefix% &7You have demoted %player% to %rank%.";
     public String userDemotedPlayer = "%prefix% &7%promoter% has demoted %player% to %rank%.";
     public String cannotDeleteFaction = "%prefix% &7Only the Faction owner can delete the faction";
+    public String mustBeOwnerToTransfer = "%prefix% &7You must be the Faction owner to transfer ownership";
     public String factionDisbanded = "%prefix% &7%player% has disbanded the Faction %faction%";
     public String cannotChangePermissions = "%prefix% &7You cannot change this permission.";
     public String cannotBreakBlocks = "%prefix% &7You cannot break blocks in this Faction.";
