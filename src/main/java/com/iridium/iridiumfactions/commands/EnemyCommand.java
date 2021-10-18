@@ -18,13 +18,13 @@ import java.util.Optional;
 /**
  * Command which reloads all configuration files.
  */
-public class AllyCommand extends Command {
+public class EnemyCommand extends Command {
 
     /**
      * The default constructor.
      */
-    public AllyCommand() {
-        super(Collections.singletonList("ally"), "Ally with another Faction", "", true, Duration.ZERO);
+    public EnemyCommand() {
+        super(Collections.singletonList("enemy"), "Set a Faction as your enemy", "", true, Duration.ZERO);
     }
 
     /**
@@ -44,15 +44,15 @@ public class AllyCommand extends Command {
             return false;
         }
         Optional<Faction> faction = getFaction(player, args);
-        if(!faction.isPresent()){
+        if (!faction.isPresent()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        IridiumFactions.getInstance().getFactionManager().setFactionRelationship(user.getFaction().get(), faction.get(), RelationshipType.ALLY);
+        IridiumFactions.getInstance().getFactionManager().setFactionRelationship(user.getFaction().get(), faction.get(), RelationshipType.ENEMY);
         IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).forEach(user1 -> {
             Player p = user1.getPlayer();
             if (p != null) {
-                p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionAllied
+                p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionEnemied
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%player%", player.getName())
                         .replace("%faction%", faction.get().getName())

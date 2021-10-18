@@ -30,4 +30,6 @@ public class Commands {
     public SetHomeCommand setHomeCommand = new SetHomeCommand();
     public TransferCommand transferCommand = new TransferCommand();
     public AllyCommand allyCommand = new AllyCommand();
+    public EnemyCommand enemyCommand = new EnemyCommand();
+    public TruceCommand truceCommand = new TruceCommand();
 }

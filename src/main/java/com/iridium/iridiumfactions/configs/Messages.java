@@ -72,4 +72,7 @@ public class Messages {
     public String cannotPromoteUser = "%prefix% &7You cannot promote this User";
     public String cannotDemoteUser = "%prefix% &7You cannot demote this User";
     public String cannotSetHome = "%prefix% &7You cannot change the Faction home.";
+    public String factionAllied = "%prefix% &7%player% has declared an alliance with %faction%";
+    public String factionEnemied = "%prefix% &7%player% has declared %faction% as an enemy";
+    public String factionTruced = "%prefix% &7%player% has declared a truce with %faction%";
 }
