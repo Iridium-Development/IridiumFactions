@@ -6,6 +6,9 @@ import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -33,6 +36,9 @@ public final class Faction {
 
     @DatabaseField(columnName = "create_time")
     private long time;
+
+    @DatabaseField(columnName = "home")
+    private String home;
 
     /**
      * The default constructor.
@@ -71,6 +77,27 @@ public final class Faction {
      */
     public LocalDateTime getCreateTime() {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(getTime()), ZoneId.systemDefault());
+    }
+
+    public Location getHome() {
+        if (this.home == null) return null;
+        String[] locations = home.split(",");
+        World world = Bukkit.getWorld(locations[0]);
+        double x = Double.parseDouble(locations[1]);
+        double y = Double.parseDouble(locations[2]);
+        double z = Double.parseDouble(locations[3]);
+        float pitch = Float.parseFloat(locations[4]);
+        float yaw = Float.parseFloat(locations[5]);
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public void setHome(Location location) {
+        if (location == null) {
+            this.home = null;
+        } else {
+            String world = location.getWorld() != null ? location.getWorld().getName() : "";
+            this.home = world + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getPitch() + "," + location.getYaw();
+        }
     }
 
     /**

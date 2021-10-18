@@ -18,6 +18,10 @@ public class Messages {
     public String factionNameAlreadyExists = "%prefix% &7A faction by that name already exists";
     public String factionCreated = "%prefix% &7You have created a faction!";
     public String dontHaveFaction = "%prefix% &7You dont have a faction.";
+    public String homeNotSet = "%prefix% &7Your Faction home is not set.";
+    public String homeNotInFaction = "%prefix% &7Your Faction home is not inside your Faction.";
+    public String notInFactionLand = "%prefix% &7You must be inside your faction land to do this.";
+    public String factionHomeSet = "%prefix% &7Your Faction home has been set.";
     public String inviteAlreadyPresent = "%prefix% &7There is already an active invite for that user.";
     public String factionInviteSent = "%prefix% &7You have sent a faction invite to %player%.";
     public String factionInviteReceived = "%prefix% &7You have received a faction invite from %player%.";
@@ -64,4 +68,5 @@ public class Messages {
     public String cannotKick = "%prefix% &7You cannot kick players from the Faction.";
     public String cannotPromoteUser = "%prefix% &7You cannot promote this User";
     public String cannotDemoteUser = "%prefix% &7You cannot demote this User";
+    public String cannotSetHome = "%prefix% &7You cannot change the Faction home.";
 }

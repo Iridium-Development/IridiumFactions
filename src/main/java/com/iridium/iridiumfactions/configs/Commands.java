@@ -26,4 +26,6 @@ public class Commands {
     public PromoteCommand promoteCommand = new PromoteCommand();
     public DemoteCommand demoteCommand = new DemoteCommand();
     public AboutCommand aboutCommand = new AboutCommand();
+    public HomeCommand homeCommand = new HomeCommand();
+    public SetHomeCommand setHomeCommand = new SetHomeCommand();
 }
