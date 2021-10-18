@@ -2,10 +2,7 @@ package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
-import com.iridium.iridiumfactions.database.Faction;
-import com.iridium.iridiumfactions.database.FactionClaim;
-import com.iridium.iridiumfactions.database.FactionInvite;
-import com.iridium.iridiumfactions.database.FactionPermission;
+import com.iridium.iridiumfactions.database.*;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
@@ -39,6 +36,7 @@ public class DatabaseManager {
     private ForeignFactionTableManager<FactionInvite, Integer> factionInviteTableManager;
     private ForeignFactionTableManager<FactionClaim, Integer> factionClaimTableManager;
     private ForeignFactionTableManager<FactionPermission, Integer> factionPermissionTableManager;
+    private ForeignFactionTableManager<FactionRelationship, Integer> factionRelationshipTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -57,6 +55,7 @@ public class DatabaseManager {
 
         this.userTableManager = new UserTableManager(connectionSource, false);
         this.factionTableManager = new FactionTableManager(connectionSource, false);
+        this.factionRelationshipTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationship.class, false, Comparator.comparing(FactionRelationship::getFactionID).thenComparing(FactionRelationship::getFaction2ID));
         this.factionInviteTableManager = new ForeignFactionTableManager<>(connectionSource, FactionInvite.class, false, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
         this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, false, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
         this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, false, Comparator.comparing(FactionPermission::getId).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
@@ -78,18 +77,13 @@ public class DatabaseManager {
         }
     }
 
-    public CompletableFuture<Faction> registerFaction(Faction faction) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                factionTableManager.getDao().createOrUpdate(faction);
-                factionTableManager.getDao().commit(connectionSource.getReadOnlyConnection(null));
-                Faction fac = factionTableManager.getDao().queryBuilder().where().eq("name", faction.getName()).queryForFirst();
-                factionTableManager.addEntry(fac);
-                return fac;
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-            return faction;
+    public CompletableFuture<Void> registerFaction(Faction faction) {
+        return CompletableFuture.runAsync(() -> {
+            factionTableManager.addEntry(faction);
+            // Saving the object will also assign the Faction's ID
+            factionTableManager.save();
+            // Since the FactionID was null before we need to resort
+            factionTableManager.sort();
         });
     }
 

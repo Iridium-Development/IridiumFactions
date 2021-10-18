@@ -2,8 +2,10 @@ package com.iridium.iridiumfactions.configs;
 
 import com.google.common.collect.ImmutableMap;
 import com.iridium.iridiumfactions.FactionRank;
+import com.iridium.iridiumfactions.RelationshipType;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +19,7 @@ public class Configuration {
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
 
-    public Map<FactionRank, String> factionRankNames = ImmutableMap.<FactionRank, String>builder()
+    public Map<FactionRank, String> factionRankNames = new HashMap<>(ImmutableMap.<FactionRank, String>builder()
             .put(FactionRank.OWNER, "Owner")
             .put(FactionRank.CO_OWNER, "CoOwner")
             .put(FactionRank.MODERATOR, "Moderator")
@@ -25,7 +27,13 @@ public class Configuration {
             .put(FactionRank.TRUCE, "Truce")
             .put(FactionRank.ALLY, "Ally")
             .put(FactionRank.ENEMY, "Enemy")
-            .build();
+            .build());
+    public Map<RelationshipType, String> factionRelationshipColors = new HashMap<>(ImmutableMap.<RelationshipType, String>builder()
+            .put(RelationshipType.OWN, "&a")
+            .put(RelationshipType.ALLY, "&d")
+            .put(RelationshipType.TRUCE, "&7")
+            .put(RelationshipType.ENEMY, "&c")
+            .build());
 
     public String factionInfoTitle = "&8[ %faction% &8]";
     public String factionInfoTitleFiller = "&8&m ";
