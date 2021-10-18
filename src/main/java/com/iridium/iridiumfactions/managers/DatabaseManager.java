@@ -58,7 +58,7 @@ public class DatabaseManager {
         this.factionRelationshipTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationship.class, false, Comparator.comparing(FactionRelationship::getFactionID).thenComparing(FactionRelationship::getFaction2ID));
         this.factionInviteTableManager = new ForeignFactionTableManager<>(connectionSource, FactionInvite.class, false, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
         this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, false, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
-        this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, false, Comparator.comparing(FactionPermission::getId).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
+        this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, false, Comparator.comparing(FactionPermission::getFactionID).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
     }
 
     /**
