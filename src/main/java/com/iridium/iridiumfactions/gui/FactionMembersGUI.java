@@ -18,9 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @AllArgsConstructor
@@ -44,7 +42,9 @@ public class FactionMembersGUI implements GUI {
         SingleItemGUI singleItemGUI = IridiumFactions.getInstance().getInventories().membersGUI;
         InventoryUtils.fillInventory(inventory, singleItemGUI.background);
         AtomicInteger slot = new AtomicInteger(0);
-        for (User user : IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction)) {
+        List<User> users = IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction);
+        users.sort(Comparator.comparing(User::getFactionRank));
+        for (User user : users) {
             int itemSlot = slot.getAndIncrement();
             members.put(itemSlot, user);
             inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
