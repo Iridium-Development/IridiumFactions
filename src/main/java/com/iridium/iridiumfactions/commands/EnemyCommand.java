@@ -10,10 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Command which reloads all configuration files.
@@ -48,18 +45,34 @@ public class EnemyCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
+        if (faction.get().getId() == user.getFactionID()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotRelationshipYourFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
+        RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user.getFaction().get(), faction.get());
+        if (relationshipType == RelationshipType.ENEMY) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyEnemies
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                    .replace("%player%", player.getName())
+                    .replace("%faction%", faction.get().getName())
+            ));
+        }
         IridiumFactions.getInstance().getFactionManager().setFactionRelationship(user.getFaction().get(), faction.get(), RelationshipType.ENEMY);
-        IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).forEach(user1 -> {
-            Player p = user1.getPlayer();
-            if (p != null) {
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
                 p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionEnemied
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%player%", player.getName())
                         .replace("%faction%", faction.get().getName())
-                ));
-            }
-        });
-        return false;
+                ))
+        );
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
+                p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().yourFactionEnemied
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", player.getName())
+                        .replace("%faction%", faction.get().getName())
+                ))
+        );
+        return true;
     }
 
     public Optional<Faction> getFaction(Player player, String[] args) {

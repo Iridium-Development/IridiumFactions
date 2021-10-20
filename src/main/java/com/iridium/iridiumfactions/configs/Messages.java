@@ -73,6 +73,17 @@ public class Messages {
     public String cannotDemoteUser = "%prefix% &7You cannot demote this User";
     public String cannotSetHome = "%prefix% &7You cannot change the Faction home.";
     public String factionAllied = "%prefix% &7%player% has declared an alliance with %faction%";
+    public String factionTruced = "%prefix% &7%player% has declared a Truce with %faction%";
     public String factionEnemied = "%prefix% &7%player% has declared %faction% as an enemy";
-    public String factionTruced = "%prefix% &7%player% has declared a truce with %faction%";
+    public String yourFactionEnemied = "%prefix% &7%player% has declared your Faction as an enemy";
+    public String factionUnAllied = "%prefix% &7%player% has revoked the alliance with %faction%";
+    public String yourFactionAlianceRevoked = "%prefix% &7%player% has revoked the alliance with your Faction";
+    public String alreadyTruced = "%prefix% &7You are already at a truce with this Faction";
+    public String alreadyAllied = "%prefix% &7You are already in an alliance with this Faction";
+    public String alreadyEnemies = "%prefix% &7You are already enemies with this Faction";
+    public String allianceRequestSent = "%prefix% &7%player% has sent an alliance request to %faction%";
+    public String allianceRequestReceived = "%prefix% &7You have received an alliance request from %player%";
+    public String truceRequestSent = "%prefix% &7%player% has sent an truce request to %faction%";
+    public String truceRequestReceived = "%prefix% &7You have received an truce request from %player%";
+    public String cannotRelationshipYourFaction = "%prefix% &7You cannot change the relationship with your own Faction";
 }

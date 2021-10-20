@@ -4,16 +4,14 @@ import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionRelationshipRequest;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Command which reloads all configuration files.
@@ -48,17 +46,63 @@ public class TruceCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        IridiumFactions.getInstance().getFactionManager().setFactionRelationship(user.getFaction().get(), faction.get(), RelationshipType.TRUCE);
-        IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).forEach(user1 -> {
-            Player p = user1.getPlayer();
-            if (p != null) {
-                p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionTruced
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%player%", player.getName())
-                        .replace("%faction%", faction.get().getName())
-                ));
+        if(faction.get().getId()==user.getFactionID()){
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotRelationshipYourFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
+        RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user.getFaction().get(), faction.get());
+        if (relationshipType == RelationshipType.ALLY) {
+            IridiumFactions.getInstance().getFactionManager().setFactionRelationship(user.getFaction().get(), faction.get(), RelationshipType.TRUCE);
+            IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).forEach(user1 -> {
+                Player p = user1.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnAllied
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.get().getName())
+                    ));
+                }
+            });
+            IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).forEach(user1 -> {
+                Player p = user1.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().yourFactionAlianceRevoked
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", player.getName())
+                            .replace("%faction%", faction.get().getName())
+                    ));
+                }
+            });
+            return true;
+        }
+        if (relationshipType == RelationshipType.ENEMY) {
+            Optional<FactionRelationshipRequest> factionRelationshipRequest = IridiumFactions.getInstance().getFactionManager().getFactionRelationshipRequest(user.getFaction().get(), faction.get(), RelationshipType.TRUCE);
+            if (factionRelationshipRequest.isPresent()) {
+                factionRelationshipRequest.get().accept(user);
+            } else {
+                IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().addEntry(new FactionRelationshipRequest(user.getFaction().get(), faction.get(), RelationshipType.TRUCE, user));
+                IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
+                        p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().truceRequestSent
+                                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                                .replace("%player%", player.getName())
+                                .replace("%faction%", faction.get().getName())
+                        ))
+                );
+                IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
+                        p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().truceRequestReceived
+                                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                                .replace("%player%", player.getName())
+                                .replace("%faction%", user.getFaction().get().getName())
+                        ))
+                );
             }
-        });
+            return true;
+        }
+        player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyTruced
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%player%", player.getName())
+                .replace("%faction%", faction.get().getName())
+        ));
         return false;
     }
 
