@@ -51,8 +51,6 @@ public class IridiumFactions extends IridiumCore {
         this.userManager = new UserManager();
         this.factionManager = new FactionManager();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::saveData, 0L, 20);
-
         getLogger().info("----------------------------------------");
         getLogger().info("");
         getLogger().info(getDescription().getName() + " Enabled!");
