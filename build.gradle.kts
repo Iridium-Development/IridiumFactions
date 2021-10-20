@@ -28,6 +28,7 @@ dependencies {
     implementation("com.github.j256:ormlite-core:master-SNAPSHOT")
     implementation("com.j256.ormlite:ormlite-jdbc:5.6")
     implementation("de.jeff_media:SpigotUpdateChecker:1.2.4")
+    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
 
     // Other dependencies that are not required or already available at runtime
     compileOnly("org.projectlombok:lombok:1.18.20")
