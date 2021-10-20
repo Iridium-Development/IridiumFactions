@@ -321,6 +321,26 @@ public class FactionManager {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntry(new FactionRelationshipRequest(faction2, faction1, relationshipType, new User(UUID.randomUUID(), "")));
     }
 
+    public FactionRelationShipRequestResponse sendFactionRelationshipRequest(User user, Faction faction, RelationshipType newRelationship) {
+        Faction userFaction = user.getFaction().orElse(null);
+        if (userFaction == null) {
+            throw new UnsupportedOperationException("The user's faction cannot be null");
+        }
+        RelationshipType relationshipType = getFactionRelationship(user, faction);
+        if (relationshipType == newRelationship) return FactionRelationShipRequestResponse.SAME_RELATIONSHIP;
+        if (newRelationship.getRank() < relationshipType.getRank()) {
+            setFactionRelationship(userFaction, faction, newRelationship);
+            return FactionRelationShipRequestResponse.SET;
+        }
+        Optional<FactionRelationshipRequest> factionRelationshipRequest = getFactionRelationshipRequest(userFaction, faction, newRelationship);
+        if (factionRelationshipRequest.isPresent()) {
+            factionRelationshipRequest.get().accept(user);
+            return FactionRelationShipRequestResponse.REQUEST_ACCEPTED;
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().addEntry(new FactionRelationshipRequest(userFaction, faction, newRelationship, user));
+        return FactionRelationShipRequestResponse.REQUEST_SENT;
+    }
+
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntries().stream()
                 .filter(factionInvite -> factionInvite.getFactionID() == faction.getId())

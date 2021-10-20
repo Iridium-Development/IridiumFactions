@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum RelationshipType {
-    OWN("&a"),
-    ALLY("&d"),
-    TRUCE("&7"),
-    ENEMY("&c");
+    OWN("&a", 2),
+    ALLY("&d", 1),
+    TRUCE("&7", 0),
+    ENEMY("&c", -1);
 
     private String color;
+    private int rank;
 
     public String getColor() {
         return IridiumFactions.getInstance().getConfiguration().factionRelationshipColors.getOrDefault(this, getDefaultColor());
@@ -17,5 +18,9 @@ public enum RelationshipType {
 
     public String getDefaultColor() {
         return color;
+    }
+
+    public int getRank() {
+        return rank;
     }
 }
