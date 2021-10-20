@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
@@ -69,16 +70,18 @@ public class InfoCommand extends Command {
     }
 
     public void sendFactionInfo(Player player, Faction faction) {
-        player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().factionInfoTitle.replace("%faction%", "&a" + faction.getName()), IridiumFactions.getInstance().getConfiguration().factionInfoTitleFiller)));
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+        RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, faction);
+        player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().factionInfoTitle.replace("%faction%", relationshipType.getColor() + faction.getName()), IridiumFactions.getInstance().getConfiguration().factionInfoTitleFiller)));
         List<String> users = IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream()
                 .map(User::getName)
                 .collect(Collectors.toList());
         List<String> onlineUsers = IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream()
-                .filter(user -> user.getPlayer() != null)
+                .filter(u -> u.getPlayer() != null)
                 .map(User::getName)
                 .collect(Collectors.toList());
         List<String> offlineUsers = IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream()
-                .filter(user -> user.getPlayer() == null)
+                .filter(u -> u.getPlayer() == null)
                 .map(User::getName)
                 .collect(Collectors.toList());
         for (String line : IridiumFactions.getInstance().getConfiguration().factionInfo) {

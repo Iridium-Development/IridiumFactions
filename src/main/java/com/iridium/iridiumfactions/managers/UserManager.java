@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.utils.PlayerUtils;
@@ -54,7 +55,8 @@ public class UserManager {
         int currentChar = 0;
         Chunk centerChunk = player.getLocation().getChunk();
         Optional<Faction> currentFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk);
-        String factionName = (currentFaction.isPresent() && user.getFactionID() == currentFaction.get().getId() ? "&a" : "&7") + currentFaction.map(Faction::getName).orElse("&2Wilderness");
+        RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, currentFaction.orElse(null));
+        String factionName = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, currentFaction.orElse(null)).getColor() + currentFaction.map(Faction::getName).orElse("&2Wilderness");
         player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().mapTitle
                         .replace("%chunk_x%", String.valueOf(centerChunk.getX()))
                         .replace("%chunk_z%", String.valueOf(centerChunk.getZ()))
@@ -91,7 +93,7 @@ public class UserManager {
                                 currentChar = 0;
                             }
                         }
-                        stringBuilder.append(user.getFactionID() == faction.get().getId() ? "&a" : "&7").append(factionCharacterMap.get(faction.get().getId()));
+                        stringBuilder.append(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, faction.orElse(null)).getColor()).append(factionCharacterMap.get(faction.get().getId()));
                     } else {
                         stringBuilder.append("&7-");
                     }

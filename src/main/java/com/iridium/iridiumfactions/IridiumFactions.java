@@ -82,6 +82,14 @@ public class IridiumFactions extends IridiumCore {
         this.sql = getPersist().load(SQL.class);
         this.inventories = getPersist().load(Inventories.class);
         this.permissions = getPersist().load(Permissions.class);
+
+        for (FactionRank factionRank : FactionRank.values()) {
+            configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
+        }
+        for (RelationshipType relationshipType : RelationshipType.values()) {
+            configuration.factionRelationshipColors.putIfAbsent(relationshipType, relationshipType.getDefaultColor());
+        }
+
         initializePermissionsList();
     }
 
@@ -121,6 +129,7 @@ public class IridiumFactions extends IridiumCore {
     public void saveData() {
         getDatabaseManager().getUserTableManager().save();
         getDatabaseManager().getFactionTableManager().save();
+        getDatabaseManager().getFactionRelationshipTableManager().save();
         getDatabaseManager().getFactionClaimTableManager().save();
         getDatabaseManager().getFactionPermissionTableManager().save();
     }

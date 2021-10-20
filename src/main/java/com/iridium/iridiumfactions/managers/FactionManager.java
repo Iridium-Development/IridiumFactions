@@ -1,10 +1,7 @@
 package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionRank;
-import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.Permission;
-import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -15,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -56,7 +54,9 @@ public class FactionManager {
     public CompletableFuture<Faction> createFaction(@NotNull Player owner, @NotNull String name) {
         return CompletableFuture.supplyAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(owner);
-            Faction faction = IridiumFactions.getInstance().getDatabaseManager().registerFaction(new Faction(name)).join();
+            Faction faction = new Faction(name);
+
+            IridiumFactions.getInstance().getDatabaseManager().registerFaction(faction).join();
 
             user.setFaction(faction);
             user.setFactionRank(FactionRank.OWNER);
@@ -247,8 +247,7 @@ public class FactionManager {
     }
 
     public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull Permission permission, @NotNull String key) {
-        FactionRank factionRank = faction.equals(user.getFaction().orElse(null)) ? user.getFactionRank() : FactionRank.TRUCE;
-        return user.isBypassing() || getFactionPermission(faction, factionRank, permission, key);
+        return user.isBypassing() || getFactionPermission(faction, getFactionRank(user, faction), permission, key);
     }
 
     public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull PermissionType permissionType) {
@@ -262,6 +261,64 @@ public class FactionManager {
         } else {
             IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().addEntry(new FactionPermission(faction, key, factionRank, allowed));
         }
+    }
+
+    public RelationshipType getFactionRelationship(Faction a, Faction b) {
+        if (a == null || b == null) {
+            return RelationshipType.TRUCE;
+        }
+        if (a == b) {
+            return RelationshipType.OWN;
+        }
+        Optional<FactionRelationship> factionRelationshipA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(a, b));
+        if (factionRelationshipA.isPresent()) {
+            return factionRelationshipA.get().getRelationshipType();
+        }
+        Optional<FactionRelationship> factionRelationshipB = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(b, a));
+        if (factionRelationshipB.isPresent()) {
+            return factionRelationshipB.get().getRelationshipType();
+        }
+        return RelationshipType.TRUCE;
+    }
+
+    public RelationshipType getFactionRelationship(User user, Faction faction) {
+        return getFactionRelationship(user.getFaction().orElse(null), faction);
+    }
+
+    public void setFactionRelationship(Faction a, Faction b, RelationshipType relationshipType) {
+        Optional<FactionRelationship> factionRelationshipA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(a, b));
+        if (factionRelationshipA.isPresent()) {
+            factionRelationshipA.get().setRelationshipType(relationshipType);
+            return;
+        }
+        Optional<FactionRelationship> factionRelationshipB = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(b, a));
+        if (factionRelationshipB.isPresent()) {
+            factionRelationshipB.get().setRelationshipType(relationshipType);
+            return;
+        }
+        FactionRelationship factionRelationship = new FactionRelationship(a, b, relationshipType);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().addEntry(factionRelationship);
+    }
+
+    public FactionRank getFactionRank(User user, Faction faction) {
+        switch (getFactionRelationship(user, faction)) {
+            case ALLY:
+                return FactionRank.ALLY;
+            case TRUCE:
+                return FactionRank.TRUCE;
+            case ENEMY:
+                return FactionRank.ENEMY;
+            default:
+                return user.getFactionRank();
+        }
+    }
+
+    public Optional<FactionRelationshipRequest> getFactionRelationshipRequest(Faction faction1, Faction faction2, RelationshipType relationshipType) {
+        Optional<FactionRelationshipRequest> factionRelationshipRequestA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntry(new FactionRelationshipRequest(faction1, faction2, relationshipType, new User(UUID.randomUUID(), "")));
+        if (factionRelationshipRequestA.isPresent()) {
+            return factionRelationshipRequestA;
+        }
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntry(new FactionRelationshipRequest(faction2, faction1, relationshipType, new User(UUID.randomUUID(), "")));
     }
 
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
