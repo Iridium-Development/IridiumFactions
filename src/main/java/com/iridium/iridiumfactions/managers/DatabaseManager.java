@@ -47,15 +47,12 @@ public class DatabaseManager {
 
         DataPersisterManager.registerDataPersisters(XMaterialType.getSingleton());
 
-        try {
-            this.connectionSource = new JdbcConnectionSource(
-                    databaseURL,
-                    sqlConfig.username,
-                    sqlConfig.password,
-                    DatabaseTypeUtils.createDatabaseType(databaseURL)
-            );
-        } catch (Exception ignored) {
-        }
+        this.connectionSource = new JdbcConnectionSource(
+                databaseURL,
+                sqlConfig.username,
+                sqlConfig.password,
+                DatabaseTypeUtils.createDatabaseType(databaseURL)
+        );
 
         this.userTableManager = new UserTableManager(connectionSource);
         this.factionTableManager = new FactionTableManager(connectionSource);
