@@ -24,4 +24,5 @@ class FactionManagerTest {
     public void testTest() {
         assertEquals(1, 1);
     }
+
 }
