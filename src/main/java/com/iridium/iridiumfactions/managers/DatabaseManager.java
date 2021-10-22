@@ -54,16 +54,16 @@ public class DatabaseManager {
                     sqlConfig.password,
                     DatabaseTypeUtils.createDatabaseType(databaseURL)
             );
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
-        this.userTableManager = new UserTableManager(connectionSource, false);
-        this.factionTableManager = new FactionTableManager(connectionSource, false);
-        this.factionRelationshipTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationship.class, false, Comparator.comparing(FactionRelationship::getFactionID).thenComparing(FactionRelationship::getFaction2ID));
-        this.factionInviteTableManager = new ForeignFactionTableManager<>(connectionSource, FactionInvite.class, false, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
-        this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, false, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
-        this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, false, Comparator.comparing(FactionPermission::getFactionID).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
-        this.factionRelationshipRequestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationshipRequest.class, false, Comparator.comparing(FactionRelationshipRequest::getFactionID).thenComparing(FactionRelationshipRequest::getFaction2ID).thenComparing(FactionRelationshipRequest::getRelationshipType));
+        this.userTableManager = new UserTableManager(connectionSource);
+        this.factionTableManager = new FactionTableManager(connectionSource);
+        this.factionRelationshipTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationship.class, Comparator.comparing(FactionRelationship::getFactionID).thenComparing(FactionRelationship::getFaction2ID));
+        this.factionInviteTableManager = new ForeignFactionTableManager<>(connectionSource, FactionInvite.class, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
+        this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
+        this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, Comparator.comparing(FactionPermission::getFactionID).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
+        this.factionRelationshipRequestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationshipRequest.class, Comparator.comparing(FactionRelationshipRequest::getFactionID).thenComparing(FactionRelationshipRequest::getFaction2ID).thenComparing(FactionRelationshipRequest::getRelationshipType));
     }
 
     /**

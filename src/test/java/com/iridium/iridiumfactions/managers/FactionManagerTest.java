@@ -21,7 +21,7 @@ class FactionManagerTest {
     @BeforeEach
     public void setup() throws SQLException {
         DatabaseManager databaseManager = mock(DatabaseManager.class);
-        when(databaseManager.getFactionTableManager()).thenReturn(new FactionTableManager(null, false));
+        when(databaseManager.getFactionTableManager()).thenReturn(new FactionTableManager(null));
 
         IridiumFactions iridiumFactions = mock(IridiumFactions.class);
         when(iridiumFactions.getFactionManager()).thenReturn(new FactionManager());

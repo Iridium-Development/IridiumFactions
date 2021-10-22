@@ -23,7 +23,7 @@ class UserManagerTest {
     @BeforeEach
     public void setup() throws SQLException {
         DatabaseManager databaseManager = mock(DatabaseManager.class);
-        when(databaseManager.getUserTableManager()).thenReturn(new UserTableManager(null, false));
+        when(databaseManager.getUserTableManager()).thenReturn(new UserTableManager(null));
 
         IridiumFactions iridiumFactions = mock(IridiumFactions.class);
         when(iridiumFactions.getUserManager()).thenReturn(new UserManager());

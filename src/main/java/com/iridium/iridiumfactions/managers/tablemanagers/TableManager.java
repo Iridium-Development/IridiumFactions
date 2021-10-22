@@ -25,16 +25,14 @@ public class TableManager<T, S> {
     private Dao<T, S> dao;
     private final Class<T> clazz;
 
-    private final boolean autoCommit;
     private final ConnectionSource connectionSource;
 
-    public TableManager(ConnectionSource connectionSource, Class<T> clazz, boolean autoCommit, Comparator<T> comparator) throws SQLException {
+    public TableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
         this.connectionSource = connectionSource;
-        this.autoCommit = autoCommit;
         if (connectionSource != null) {
             TableUtils.createTableIfNotExists(connectionSource, clazz);
             this.dao = DaoManager.createDao(connectionSource, clazz);
-            this.dao.setAutoCommit(getDatabaseConnection(), autoCommit);
+            this.dao.setAutoCommit(getDatabaseConnection(), false);
         }
         this.entries = new SortedList<T>(comparator);
         if (connectionSource != null) this.entries.addAll(dao.queryForAll());
@@ -50,9 +48,7 @@ public class TableManager<T, S> {
             for (T t : entryList) {
                 dao.createOrUpdate(t);
             }
-            if (!autoCommit) {
-                dao.commit(getDatabaseConnection());
-            }
+            dao.commit(getDatabaseConnection());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -86,9 +82,7 @@ public class TableManager<T, S> {
             try {
                 dao.delete(t);
                 entries.remove(t);
-                if (!autoCommit) {
-                    dao.commit(getDatabaseConnection());
-                }
+                dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -105,9 +99,7 @@ public class TableManager<T, S> {
             try {
                 dao.delete(t);
                 entries.removeAll(t);
-                if (!autoCommit) {
-                    dao.commit(getDatabaseConnection());
-                }
+                dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -130,9 +122,7 @@ public class TableManager<T, S> {
     public void clear() {
         try {
             TableUtils.clearTable(connectionSource, clazz);
-            if (!autoCommit) {
-                dao.commit(getDatabaseConnection());
-            }
+            dao.commit(getDatabaseConnection());
             entries.clear();
         } catch (SQLException throwables) {
             throwables.printStackTrace();

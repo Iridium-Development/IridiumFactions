@@ -14,8 +14,8 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
     private final Comparator<T> comparator;
     private final SortedList<T> factionsSortedList;
 
-    public ForeignFactionTableManager(ConnectionSource connectionSource, Class<T> clazz, boolean autoCommit, Comparator<T> comparator) throws SQLException {
-        super(connectionSource, clazz, autoCommit, comparator);
+    public ForeignFactionTableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
+        super(connectionSource, clazz, comparator);
         this.comparator = comparator;
         this.factionsSortedList = new SortedList<>(Comparator.comparing(FactionData::getFactionID));
         this.factionsSortedList.addAll(getEntries());
