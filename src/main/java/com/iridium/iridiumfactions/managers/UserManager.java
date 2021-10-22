@@ -2,7 +2,6 @@ package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.utils.PlayerUtils;
@@ -55,7 +54,6 @@ public class UserManager {
         int currentChar = 0;
         Chunk centerChunk = player.getLocation().getChunk();
         Optional<Faction> currentFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk);
-        RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, currentFaction.orElse(null));
         String factionName = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, currentFaction.orElse(null)).getColor() + currentFaction.map(Faction::getName).orElse("&2Wilderness");
         player.sendMessage(StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().mapTitle
                         .replace("%chunk_x%", String.valueOf(centerChunk.getX()))
