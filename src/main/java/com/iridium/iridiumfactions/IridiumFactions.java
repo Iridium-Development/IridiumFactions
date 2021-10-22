@@ -9,7 +9,10 @@ import com.iridium.iridiumfactions.managers.FactionManager;
 import com.iridium.iridiumfactions.managers.UserManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,11 @@ public class IridiumFactions extends IridiumCore {
     private Permissions permissions;
 
     private Map<String, Permission> permissionList;
+
+    public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+        instance = this;
+    }
 
     @Override
     public void onEnable() {

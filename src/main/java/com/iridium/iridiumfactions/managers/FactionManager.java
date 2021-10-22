@@ -49,7 +49,9 @@ public class FactionManager {
 
     public CompletableFuture<Faction> createFaction(@NotNull Player owner, @NotNull String name) {
         return CompletableFuture.supplyAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(owner);
+            IridiumFactions iridiumFactions = IridiumFactions.getInstance();
+            UserManager userManager = iridiumFactions.getUserManager();
+            User user = userManager.getUser(owner);
             Faction faction = new Faction(name);
 
             IridiumFactions.getInstance().getDatabaseManager().registerFaction(faction).join();
@@ -330,6 +332,9 @@ public class FactionManager {
         }
         Optional<FactionRelationshipRequest> factionRelationshipRequest = getFactionRelationshipRequest(userFaction, faction, newRelationship);
         if (factionRelationshipRequest.isPresent()) {
+            if (user.equals(factionRelationshipRequest.get().getUser().orElse(null))) {
+                return FactionRelationShipRequestResponse.ALREADY_SENT_REQUEST;
+            }
             factionRelationshipRequest.get().accept(user);
             return FactionRelationShipRequestResponse.REQUEST_ACCEPTED;
         }

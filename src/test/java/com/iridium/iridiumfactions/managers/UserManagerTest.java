@@ -1,7 +1,9 @@
 package com.iridium.iridiumfactions.managers;
 
+import be.seeseemelk.mockbukkit.MockBukkit;
+import be.seeseemelk.mockbukkit.ServerMock;
 import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.configs.SQL;
+import com.iridium.iridiumfactions.TestingUtils;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
@@ -9,50 +11,41 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mockStatic;
 
 class UserManagerTest {
 
     private MockedStatic<IridiumFactions> iridiumFactionsMockedStatic;
+    private ServerMock serverMock;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
-    public void setup() throws SQLException {
-        DatabaseManager databaseManager = new DatabaseManager();
-        IridiumFactions iridiumFactions = mock(IridiumFactions.class);
-
-        when(iridiumFactions.getSql()).thenReturn(new SQL());
-        when(iridiumFactions.getUserManager()).thenReturn(new UserManager());
-        when(iridiumFactions.getDatabaseManager()).thenReturn(databaseManager);
+    public void setup() {
+        IridiumFactions iridiumFactions = TestingUtils.createIridiumFactionsMock();
 
         this.iridiumFactionsMockedStatic = mockStatic(IridiumFactions.class);
         iridiumFactionsMockedStatic.when(IridiumFactions::getInstance).thenReturn(iridiumFactions);
 
-        databaseManager.init();
+        this.serverMock = MockBukkit.mock();
     }
 
     @AfterEach
     public void tearDown() {
         this.iridiumFactionsMockedStatic.close();
+        MockBukkit.unmock();
     }
 
     @Test
     public void getUser() {
-        Player player1 = mock(Player.class);
-        Player player2 = mock(Player.class);
+        Player player1 = serverMock.addPlayer("Player 1");
+        Player player2 = serverMock.addPlayer("Player 2");
 
-        when(player1.getUniqueId()).thenReturn(UUID.randomUUID());
-        when(player1.getName()).thenReturn("Player 1");
-
-        User user = new User(UUID.randomUUID(), "User 2");
+        User user = new User(player2.getUniqueId(), "User 2");
 
         IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().addEntry(user);
-
-        when(player2.getUniqueId()).thenReturn(user.getUuid());
 
         assertEquals(IridiumFactions.getInstance().getUserManager().getUser(player1).getName(), "Player 1");
         assertEquals(IridiumFactions.getInstance().getUserManager().getUser(player2), user);
