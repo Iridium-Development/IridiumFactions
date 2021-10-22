@@ -7,15 +7,17 @@ import com.iridium.iridiumfactions.listeners.*;
 import com.iridium.iridiumfactions.managers.DatabaseManager;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.iridium.iridiumfactions.managers.UserManager;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IridiumFactions extends IridiumCore implements IridiumnFactionsInterface {
+@Getter
+public class IridiumFactions extends IridiumCore {
 
-    private static IridiumnFactionsInterface instance;
+    private static IridiumFactions instance;
 
     private CommandManager commandManager;
     private DatabaseManager databaseManager;
@@ -132,55 +134,7 @@ public class IridiumFactions extends IridiumCore implements IridiumnFactionsInte
         getDatabaseManager().getFactionPermissionTableManager().save();
     }
 
-    public CommandManager getCommandManager() {
-        return this.commandManager;
-    }
-
-    public DatabaseManager getDatabaseManager() {
-        return this.databaseManager;
-    }
-
-    public UserManager getUserManager() {
-        return this.userManager;
-    }
-
-    public FactionManager getFactionManager() {
-        return this.factionManager;
-    }
-
-    public Configuration getConfiguration() {
-        return this.configuration;
-    }
-
-    public Messages getMessages() {
-        return this.messages;
-    }
-
-    public Commands getCommands() {
-        return this.commands;
-    }
-
-    public SQL getSql() {
-        return this.sql;
-    }
-
-    public Inventories getInventories() {
-        return this.inventories;
-    }
-
-    public Permissions getPermissions() {
-        return this.permissions;
-    }
-
-    public Map<String, Permission> getPermissionList() {
-        return this.permissionList;
-    }
-
-    public static IridiumnFactionsInterface getInstance() {
+    public static IridiumFactions getInstance() {
         return instance;
-    }
-
-    public static void setInstance(IridiumnFactionsInterface instance) {
-        IridiumFactions.instance = instance;
     }
 }
