@@ -3,8 +3,10 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.sql.SQLException;
 
@@ -12,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class FactionManagerTest {
+
+    private MockedStatic<IridiumFactions> iridiumFactionsMockedStatic;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
@@ -23,7 +27,13 @@ class FactionManagerTest {
         when(iridiumFactions.getFactionManager()).thenReturn(new FactionManager());
         when(iridiumFactions.getDatabaseManager()).thenReturn(databaseManager);
 
-        mockStatic(IridiumFactions.class).when(IridiumFactions::getInstance).thenReturn(iridiumFactions);
+        this.iridiumFactionsMockedStatic = mockStatic(IridiumFactions.class);
+        iridiumFactionsMockedStatic.when(IridiumFactions::getInstance).thenReturn(iridiumFactions);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        this.iridiumFactionsMockedStatic.close();
     }
 
     @Test

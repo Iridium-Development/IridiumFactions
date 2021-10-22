@@ -35,11 +35,7 @@ public class FactionManager {
     }
 
     public Optional<Faction> getFactionViaChunk(World world, int x, int z) {
-        int factionID = IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager()
-                .getEntry(new FactionClaim(new Faction(""), world.getName(), x, z))
-                .map(FactionData::getFactionID)
-                .orElse(0);
-        return getFactionViaId(factionID);
+        return getFactionViaId(getFactionClaimViaChunk(world, x, z).map(FactionData::getFactionID).orElse(0));
     }
 
     private Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
