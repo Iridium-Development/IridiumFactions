@@ -20,6 +20,14 @@ public class UserTableManager extends TableManager<User, Integer> {
     }
 
     /**
+     * Constructor used for testing
+     */
+    public UserTableManager() {
+        super(User.class, Comparator.comparing(User::getUuid));
+        sort();
+    }
+
+    /**
      * Sort the list of entries by UUID
      */
     public void sort() {

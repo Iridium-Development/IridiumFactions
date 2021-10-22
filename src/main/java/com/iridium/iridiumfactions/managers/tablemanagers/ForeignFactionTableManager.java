@@ -22,6 +22,20 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
         sort();
     }
 
+    /**
+     * Constructor used for testing
+     *
+     * @param clazz      The class
+     * @param comparator The comparator
+     */
+    public ForeignFactionTableManager(Class<T> clazz, Comparator<T> comparator) {
+        super(clazz, comparator);
+        this.comparator = comparator;
+        this.factionsSortedList = new SortedList<>(Comparator.comparing(FactionData::getFactionID));
+        this.factionsSortedList.addAll(getEntries());
+        sort();
+    }
+
     @Override
     public void addEntry(T t) {
         super.addEntry(t);
@@ -54,7 +68,7 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
                 currentIndex--;
                 continue;
             }
-            if (faction.getId() == factionData.getFactionID()){
+            if (faction.getId() == factionData.getFactionID()) {
                 result.add(getEntries().get(currentIndex));
                 currentIndex--;
             } else {
@@ -71,7 +85,7 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
                 currentIndex++;
                 continue;
             }
-            if (faction.getId() == factionData.getFactionID()){
+            if (faction.getId() == factionData.getFactionID()) {
                 result.add(getEntries().get(currentIndex));
                 currentIndex++;
             } else {

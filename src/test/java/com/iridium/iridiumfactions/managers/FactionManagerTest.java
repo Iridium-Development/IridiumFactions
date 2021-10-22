@@ -8,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -19,9 +17,9 @@ class FactionManagerTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
-    public void setup() throws SQLException {
+    public void setup() {
         DatabaseManager databaseManager = mock(DatabaseManager.class);
-        when(databaseManager.getFactionTableManager()).thenReturn(new FactionTableManager(null));
+        when(databaseManager.getFactionTableManager()).thenReturn(new FactionTableManager());
 
         IridiumFactions iridiumFactions = mock(IridiumFactions.class);
         when(iridiumFactions.getFactionManager()).thenReturn(new FactionManager());

@@ -29,13 +29,23 @@ public class TableManager<T, S> {
 
     public TableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
         this.connectionSource = connectionSource;
-        if (connectionSource != null) {
-            TableUtils.createTableIfNotExists(connectionSource, clazz);
-            this.dao = DaoManager.createDao(connectionSource, clazz);
-            this.dao.setAutoCommit(getDatabaseConnection(), false);
-        }
-        this.entries = new SortedList<T>(comparator);
-        if (connectionSource != null) this.entries.addAll(dao.queryForAll());
+        TableUtils.createTableIfNotExists(connectionSource, clazz);
+        this.dao = DaoManager.createDao(connectionSource, clazz);
+        this.dao.setAutoCommit(getDatabaseConnection(), false);
+        this.entries = new SortedList<>(comparator);
+        this.entries.addAll(dao.queryForAll());
+        this.clazz = clazz;
+    }
+
+    /**
+     * A TableManager used for UnitTesting
+     *
+     * @param clazz      The class
+     * @param comparator The comparator
+     */
+    public TableManager(Class<T> clazz, Comparator<T> comparator) {
+        this.connectionSource = null;
+        this.entries = new SortedList<>(comparator);
         this.clazz = clazz;
     }
 
