@@ -5,6 +5,7 @@ import com.iridium.iridiumfactions.CooldownProvider;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.Commands;
 import com.iridium.iridiumfactions.utils.TimeUtils;
+import lombok.NoArgsConstructor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -20,6 +21,7 @@ import java.util.List;
 /**
  * Handles command executions and tab-completions for all commands of this plugin.
  */
+@NoArgsConstructor
 public class CommandManager implements CommandExecutor, TabCompleter {
 
     public final List<Command> commands = new ArrayList<>();

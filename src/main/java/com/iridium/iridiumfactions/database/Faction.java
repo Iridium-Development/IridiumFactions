@@ -43,9 +43,22 @@ public final class Faction {
     /**
      * The default constructor.
      *
-     * @param name The name of the Player
+     * @param name The name of the Faction
      */
     public Faction(final @NotNull String name) {
+        this.name = name;
+        this.description = "Default Faction Description";
+        this.time = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    /**
+     * The constructor used for testing.
+     *
+     * @param name The name of the Faction
+     * @param id   The id of the Faction
+     */
+    public Faction(final @NotNull String name, int id) {
+        this.id = id;
         this.name = name;
         this.description = "Default Faction Description";
         this.time = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()).toInstant().toEpochMilli();

@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class TableManager<T, S> {
     private final SortedList<T> entries;
-    private final Dao<T, S> dao;
+    private Dao<T, S> dao;
     private final Class<T> clazz;
 
     private final boolean autoCommit;
@@ -31,11 +31,13 @@ public class TableManager<T, S> {
     public TableManager(ConnectionSource connectionSource, Class<T> clazz, boolean autoCommit, Comparator<T> comparator) throws SQLException {
         this.connectionSource = connectionSource;
         this.autoCommit = autoCommit;
-        TableUtils.createTableIfNotExists(connectionSource, clazz);
-        this.dao = DaoManager.createDao(connectionSource, clazz);
-        this.dao.setAutoCommit(getDatabaseConnection(), autoCommit);
+        if (connectionSource != null) {
+            TableUtils.createTableIfNotExists(connectionSource, clazz);
+            this.dao = DaoManager.createDao(connectionSource, clazz);
+            this.dao.setAutoCommit(getDatabaseConnection(), autoCommit);
+        }
         this.entries = new SortedList<T>(comparator);
-        this.entries.addAll(dao.queryForAll());
+        if (connectionSource != null) this.entries.addAll(dao.queryForAll());
         this.clazz = clazz;
     }
 
