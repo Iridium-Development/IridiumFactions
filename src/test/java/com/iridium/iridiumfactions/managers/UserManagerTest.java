@@ -1,14 +1,15 @@
 package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.User;
-import com.iridium.iridiumfactions.managers.tablemanagers.UserTableManager;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,16 +21,18 @@ class UserManagerTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
-    public void setup() {
-        DatabaseManager databaseManager = mock(DatabaseManager.class);
-        when(databaseManager.getUserTableManager()).thenReturn(new UserTableManager());
-
+    public void setup() throws SQLException {
+        DatabaseManager databaseManager = new DatabaseManager();
         IridiumFactions iridiumFactions = mock(IridiumFactions.class);
+
+        when(iridiumFactions.getSql()).thenReturn(new SQL());
         when(iridiumFactions.getUserManager()).thenReturn(new UserManager());
         when(iridiumFactions.getDatabaseManager()).thenReturn(databaseManager);
 
         this.iridiumFactionsMockedStatic = mockStatic(IridiumFactions.class);
         iridiumFactionsMockedStatic.when(IridiumFactions::getInstance).thenReturn(iridiumFactions);
+
+        databaseManager.init();
     }
 
     @AfterEach
