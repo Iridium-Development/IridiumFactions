@@ -41,4 +41,22 @@ class FactionManagerTest {
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(2).orElse(null), faction2);
     }
 
+    @Test
+    public void getFactionViaName() {
+        Faction faction1 = new Faction("Faction 1", 1);
+        Faction faction2 = new Faction("Faction 2", 2);
+
+        DatabaseManager databaseManager = IridiumFactions.getInstance().getDatabaseManager();
+        FactionTableManager factionTableManager = databaseManager.getFactionTableManager();
+
+        factionTableManager.addEntry(faction1);
+        factionTableManager.addEntry(faction2);
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Faction 1").orElse(null), faction1);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Faction 2").orElse(null), faction2);
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("faction 1").orElse(null), faction1);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("FACTION 2").orElse(null), faction2);
+    }
+
 }
