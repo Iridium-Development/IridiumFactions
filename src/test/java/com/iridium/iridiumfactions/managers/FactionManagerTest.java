@@ -10,33 +10,26 @@ import org.bukkit.World;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FactionManagerTest {
 
-
-    private MockedStatic<IridiumFactions> iridiumFactionsMockedStatic;
     private ServerMock serverMock;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setup() {
-        IridiumFactions iridiumFactions = TestingUtils.createIridiumFactionsMock();
-
-        this.iridiumFactionsMockedStatic = mockStatic(IridiumFactions.class);
-        iridiumFactionsMockedStatic.when(IridiumFactions::getInstance).thenReturn(iridiumFactions);
-
         this.serverMock = MockBukkit.mock();
+        MockBukkit.load(IridiumFactions.class);
     }
 
     @AfterEach
     public void tearDown() {
-        this.iridiumFactionsMockedStatic.close();
         MockBukkit.unmock();
     }
 
@@ -94,7 +87,6 @@ class FactionManagerTest {
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location).orElse(null), faction2);
     }
 
-//    Mockito cant mock static stuff in different threads
 //    @Test
 //    public void createFaction() {
 //        Player player = serverMock.addPlayer("Player");

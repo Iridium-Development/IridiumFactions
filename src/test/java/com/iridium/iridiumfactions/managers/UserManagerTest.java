@@ -3,38 +3,29 @@ package com.iridium.iridiumfactions.managers;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.TestingUtils;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mockStatic;
 
 class UserManagerTest {
 
-    private MockedStatic<IridiumFactions> iridiumFactionsMockedStatic;
     private ServerMock serverMock;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setup() {
-        IridiumFactions iridiumFactions = TestingUtils.createIridiumFactionsMock();
-
-        this.iridiumFactionsMockedStatic = mockStatic(IridiumFactions.class);
-        iridiumFactionsMockedStatic.when(IridiumFactions::getInstance).thenReturn(iridiumFactions);
-
         this.serverMock = MockBukkit.mock();
+        MockBukkit.load(IridiumFactions.class);
     }
 
     @AfterEach
     public void tearDown() {
-        this.iridiumFactionsMockedStatic.close();
         MockBukkit.unmock();
     }
 
@@ -42,6 +33,8 @@ class UserManagerTest {
     public void getUser() {
         Player player1 = serverMock.addPlayer("Player 1");
         Player player2 = serverMock.addPlayer("Player 2");
+        // serverMock.addPlayer also calls PlayerJoinListener which adds the user to the DB
+        IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().getEntries().clear();
 
         User user = new User(player2.getUniqueId(), "User 2");
 
