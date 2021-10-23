@@ -49,9 +49,7 @@ public class FactionManager {
 
     public CompletableFuture<Faction> createFaction(@NotNull Player owner, @NotNull String name) {
         return CompletableFuture.supplyAsync(() -> {
-            IridiumFactions iridiumFactions = IridiumFactions.getInstance();
-            UserManager userManager = iridiumFactions.getUserManager();
-            User user = userManager.getUser(owner);
+            User user = IridiumFactions.getInstance().getUserManager().getUser(owner);
             Faction faction = new Faction(name);
 
             IridiumFactions.getInstance().getDatabaseManager().registerFaction(faction).join();

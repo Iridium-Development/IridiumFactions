@@ -96,8 +96,12 @@ public class DatabaseManager {
     public CompletableFuture<Void> registerFaction(Faction faction) {
         return CompletableFuture.runAsync(() -> {
             factionTableManager.addEntry(faction);
-            // Saving the object will also assign the Faction's ID
-            factionTableManager.save();
+            if (connectionSource != null) {
+                // Saving the object will also assign the Faction's ID
+                factionTableManager.save();
+            } else {
+                faction.setId(1);
+            }
             // Since the FactionID was null before we need to resort
             factionTableManager.sort();
         });

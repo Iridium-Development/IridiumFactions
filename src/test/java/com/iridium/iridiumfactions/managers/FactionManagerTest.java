@@ -7,6 +7,7 @@ import com.iridium.iridiumfactions.database.*;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,14 +88,83 @@ class FactionManagerTest {
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location).orElse(null), faction2);
     }
 
-//    @Test
-//    public void createFaction() {
-//        Player player = serverMock.addPlayer("Player");
-//        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-//        Faction faction = IridiumFactions.getInstance().getFactionManager().createFaction(player, "Faction").join();
-//        assertEquals(user.getFaction().orElse(null), faction);
-//        assertEquals(user.getFactionRank(), FactionRank.OWNER);
-//    }
+    @Test
+    public void createFaction() {
+        Player player = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+        Faction faction = IridiumFactions.getInstance().getFactionManager().createFaction(player, "Faction").join();
+        assertEquals(user.getFaction().orElse(null), faction);
+        assertEquals(user.getFactionRank(), FactionRank.OWNER);
+    }
+
+    @Test
+    public void claimFactionLand() {
+        Faction faction = mock(Faction.class);
+        when(faction.getId()).thenReturn(1);
+        when(faction.getName()).thenReturn("Faction");
+        when(faction.getRemainingPower()).thenReturn(9999.00).thenReturn(0.00).thenReturn(99999.00);
+        Player player = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+
+        World world = mock(World.class);
+        when(world.getName()).thenReturn("world");
+
+        Chunk chunk = mock(Chunk.class);
+        when(chunk.getWorld()).thenReturn(world);
+        when(chunk.getX()).thenReturn(0);
+        when(chunk.getZ()).thenReturn(0);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
+
+        user.setFactionRank(FactionRank.OWNER);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
+
+        user.setBypassing(true);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+
+        // Should still have size 1 since we cant claim land twice
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+    }
+
+    @Test
+    public void claimFactionLandRadius() {
+        Faction faction = new Faction("Faction", 1);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+
+        Player player = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+
+        user.setBypassing(true);
+
+        World world = mock(World.class);
+        when(world.getName()).thenReturn("world");
+
+        Chunk chunk = mock(Chunk.class);
+        when(chunk.getWorld()).thenReturn(world);
+        when(chunk.getX()).thenReturn(0);
+        when(chunk.getZ()).thenReturn(0);
+
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 0);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 1, player).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 2, player).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 9);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 3, player).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 25);
+    }
 
     @Test
     public void getFactionPermission() {
