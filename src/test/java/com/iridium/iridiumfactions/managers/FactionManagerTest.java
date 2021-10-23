@@ -2,6 +2,8 @@ package com.iridium.iridiumfactions.managers;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
+import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
 import org.bukkit.Chunk;
@@ -102,9 +104,9 @@ class FactionManagerTest {
         Faction faction = mock(Faction.class);
         when(faction.getId()).thenReturn(1);
         when(faction.getName()).thenReturn("Faction");
-        when(faction.getRemainingPower()).thenReturn(9999.00).thenReturn(0.00).thenReturn(99999.00);
-        Player player = serverMock.addPlayer("Player");
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+        when(faction.getRemainingPower()).thenReturn(9999.00);
+        PlayerMock playerMock = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
 
         World world = mock(World.class);
         when(world.getName()).thenReturn("world");
@@ -116,22 +118,45 @@ class FactionManagerTest {
 
         IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
 
-        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        // Cannot Claim land Due to permissions
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
         assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
 
         user.setFactionRank(FactionRank.OWNER);
+        user.setFaction(faction);
 
-        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        when(faction.getRemainingPower()).thenReturn(0.00);
+
+        // Cannot Claim land due to lack of power
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
         assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
 
         user.setBypassing(true);
 
-        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        // Can successfully claim land
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%player%", user.getName())
+                .replace("%faction%", faction.getName())
+                .replace("%x%", String.valueOf(0))
+                .replace("%z%", String.valueOf(0))
+        ));
         assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
 
-        // Should still have size 1 since we cant claim land twice
-        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, player).join();
+        // Cant claim the same land twice
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%faction%", faction.getName())
+        ));
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
     }
 

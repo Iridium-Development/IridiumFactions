@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.listeners;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionClaim;
@@ -13,8 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BlockBreakListenerTest {
 
@@ -46,6 +46,9 @@ class BlockBreakListenerTest {
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim);
 
         assertTrue(playerMock.simulateBlockBreak(location.getBlock()).isCancelled());
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotBreakBlocks
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
 
         user.setBypassing(true);
 
