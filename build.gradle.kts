@@ -46,8 +46,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation("org.mockito:mockito-inline:4.0.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.16:1.5.2")
-    testImplementation("com.iridium:IridiumCore:1.3.3")
-    testImplementation("com.j256.ormlite:ormlite-jdbc:5.6")
 }
 
 tasks {
