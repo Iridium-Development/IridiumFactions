@@ -6,6 +6,7 @@ import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
+import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -166,9 +167,10 @@ class FactionManagerTest {
 
         IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
 
-        Player player = serverMock.addPlayer("Player");
+        PlayerMock player = serverMock.addPlayer("Player");
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
 
+        user.setFaction(faction);
         user.setBypassing(true);
 
         World world = mock(World.class);
@@ -189,6 +191,22 @@ class FactionManagerTest {
 
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 3, player).join();
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 25);
+
+        while(true){
+            if (player.nextMessage() == null) break;
+        }
+
+        user.setBypassing(false);
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 1, player).join();
+        assertEquals(player.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+
+        user.setFactionRank(FactionRank.OWNER);
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 1, player).join();
+        assertEquals(player.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
     }
 
     @Test
@@ -327,6 +345,53 @@ class FactionManagerTest {
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(userB, factionA, RelationshipType.ALLY), FactionRelationShipRequestResponse.REQUEST_ACCEPTED);
         assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionRelationshipRequest(factionA, factionB, RelationshipType.ALLY).isPresent());
+    }
+
+    @Test
+    public void getFactionInvites() {
+        User user = new User(UUID.randomUUID(), "User");
+        User inviter = new User(UUID.randomUUID(), "Inviter");
+        Faction faction = new Faction("Faction", 1);
+        ForeignFactionTableManager<FactionInvite, Integer> factionInviteTableManager = IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager();
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+
+        FactionInvite factionInvite = new FactionInvite(faction, user, inviter);
+        factionInviteTableManager.addEntry(factionInvite);
+        factionInviteTableManager.addEntry(new FactionInvite(faction, new User(UUID.randomUUID(), ""), new User(UUID.randomUUID(), "")));
+        factionInviteTableManager.addEntry(new FactionInvite(faction, new User(UUID.randomUUID(), ""), new User(UUID.randomUUID(), "")));
+        factionInviteTableManager.addEntry(new FactionInvite(faction, new User(UUID.randomUUID(), ""), new User(UUID.randomUUID(), "")));
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionInvite(faction, user).orElse(null), factionInvite);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionInvites(faction).size(), 4);
+
+    }
+
+    @Test
+    public void getFactionMembers() {
+        Faction faction = new Faction("Faction", 1);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+
+        PlayerMock playerMock1 = serverMock.addPlayer("Player1");
+        PlayerMock playerMock2 = serverMock.addPlayer("Player2");
+        PlayerMock playerMock3 = serverMock.addPlayer("Player3");
+
+        User user1 = IridiumFactions.getInstance().getUserManager().getUser(playerMock1);
+        User user2 = IridiumFactions.getInstance().getUserManager().getUser(playerMock2);
+        User user3 = IridiumFactions.getInstance().getUserManager().getUser(playerMock3);
+
+        user1.setFaction(faction);
+        user2.setFaction(faction);
+        user3.setFaction(faction);
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).size(), 3);
+
+        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).contains(user1));
+        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).contains(user2));
+        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).contains(user3));
+
+        user3.setFaction(null);
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).contains(user3));
     }
 
 }
