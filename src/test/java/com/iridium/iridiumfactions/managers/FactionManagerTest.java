@@ -210,6 +210,91 @@ class FactionManagerTest {
     }
 
     @Test
+    public void unClaimFactionLand() {
+        Faction faction = new Faction("Faction", 1);
+        PlayerMock playerMock = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        user.setFaction(faction);
+        user.setFactionRank(FactionRank.MEMBER);
+
+        World world = mock(World.class);
+        when(world.getName()).thenReturn("world");
+
+        Chunk chunk = mock(Chunk.class);
+        when(chunk.getWorld()).thenReturn(world);
+        when(chunk.getX()).thenReturn(0);
+        when(chunk.getZ()).thenReturn(0);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, chunk));
+
+        IridiumFactions.getInstance().getFactionManager().unClaimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size(), 1);
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnClaimLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+
+        user.setFactionRank(FactionRank.OWNER);
+
+        when(chunk.getZ()).thenReturn(1);
+
+        IridiumFactions.getInstance().getFactionManager().unClaimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size(), 1);
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaim
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%faction%", faction.getName())
+        ));
+
+        when(chunk.getZ()).thenReturn(0);
+
+        IridiumFactions.getInstance().getFactionManager().unClaimFactionLand(faction, chunk, playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size(), 0);
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%player%", user.getName())
+                .replace("%faction%", faction.getName())
+                .replace("%x%", String.valueOf(0))
+                .replace("%z%", String.valueOf(0))
+        ));
+    }
+
+    @Test
+    public void unClaimAllFactionLand() {
+        Faction faction = new Faction("Faction", 1);
+        PlayerMock playerMock = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        user.setFaction(faction);
+        user.setFactionRank(FactionRank.MEMBER);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "world", 0, 0));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "world", 0, 1));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "world", 1, 0));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "world", 1, 1));
+
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size(), 4);
+
+        IridiumFactions.getInstance().getFactionManager().unClaimAllFactionLand(faction, playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size(), 4);
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnClaimLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+
+        user.setFactionRank(FactionRank.OWNER);
+
+        IridiumFactions.getInstance().getFactionManager().unClaimAllFactionLand(faction, playerMock).join();
+
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%player%", playerMock.getName())
+                .replace("%faction%", faction.getName())
+        ));
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size(), 0);
+    }
+
+    @Test
     public void deleteFaction() {
         Faction faction = new Faction("Faction", 1);
         PlayerMock playerMock = serverMock.addPlayer("Player");
