@@ -192,7 +192,7 @@ class FactionManagerTest {
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 3, player).join();
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 25);
 
-        while(true){
+        while (true) {
             if (player.nextMessage() == null) break;
         }
 
@@ -207,6 +207,32 @@ class FactionManagerTest {
         assertEquals(player.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
         ));
+    }
+
+    @Test
+    public void deleteFaction() {
+        Faction faction = new Faction("Faction", 1);
+        PlayerMock playerMock = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        user.setFaction(faction);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "world", 0, 0));
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+
+        IridiumFactions.getInstance().getFactionManager().deleteFaction(faction, user).join();
+
+        assertEquals(user.getFactionID(), 0);
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries().size(), 0);
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 0);
+
+        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().factionDisbanded
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%player%", user.getName())
+                .replace("%faction%", faction.getName())
+        ));
+
+        user.setBypassing(true);
     }
 
     @Test
@@ -344,7 +370,8 @@ class FactionManagerTest {
         assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionRelationshipRequest(factionA, factionB, RelationshipType.ALLY).isPresent());
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(userB, factionA, RelationshipType.ALLY), FactionRelationShipRequestResponse.REQUEST_ACCEPTED);
-        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionRelationshipRequest(factionA, factionB, RelationshipType.ALLY).isPresent());
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionRelationshipRequest(factionA, factionB, RelationshipType.ALLY).isPresent());
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(userA, factionB), RelationshipType.ALLY);
     }
 
     @Test

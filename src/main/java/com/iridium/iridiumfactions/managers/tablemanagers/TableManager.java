@@ -88,10 +88,10 @@ public class TableManager<T, S> {
      * @param t the variable we are deleting
      */
     public CompletableFuture<Void> delete(T t) {
+        entries.remove(t);
         return CompletableFuture.runAsync(() -> {
             try {
                 dao.delete(t);
-                entries.remove(t);
                 dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -105,10 +105,10 @@ public class TableManager<T, S> {
      * @param t The collection of variables we are deleting
      */
     public CompletableFuture<Void> delete(Collection<T> t) {
+        entries.removeAll(t);
         return CompletableFuture.runAsync(() -> {
             try {
                 dao.delete(t);
-                entries.removeAll(t);
                 dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
