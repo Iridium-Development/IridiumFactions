@@ -32,4 +32,5 @@ public class Commands {
     public AllyCommand allyCommand = new AllyCommand();
     public EnemyCommand enemyCommand = new EnemyCommand();
     public TruceCommand truceCommand = new TruceCommand();
+    public ValueCommand valueCommand = new ValueCommand();
 }

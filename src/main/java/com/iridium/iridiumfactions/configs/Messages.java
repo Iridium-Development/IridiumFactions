@@ -86,4 +86,5 @@ public class Messages {
     public String truceRequestSent = "%prefix% &7%player% has sent an truce request to %faction%";
     public String truceRequestReceived = "%prefix% &7You have received an truce request from %player%";
     public String cannotRelationshipYourFaction = "%prefix% &7You cannot change the relationship with your own Faction";
+    public String islandValue = "%prefix% &c&l * &7%rank%: &c%value%";
 }

@@ -349,6 +349,7 @@ public class FactionManager {
 
     public CompletableFuture<Double> getFactionValue(@NotNull Faction faction) {
         return CompletableFuture.supplyAsync(() -> {
+            long startTime = System.nanoTime();
             double total = 0.00;
             for (Chunk chunk : getFactionChunks(faction).join()) {
                 ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
@@ -371,6 +372,7 @@ public class FactionManager {
                     total += IridiumFactions.getInstance().getBlockValues().spawnerValues.getOrDefault(creatureSpawner.getSpawnedType(), new BlockValues.ValuableBlock(0, "", 0, 0)).value;
                 }
             }
+            IridiumFactions.getInstance().getLogger().info("Finished Calculating Faction Value, took " + (System.nanoTime() - startTime) / 1000000 + "ms");
             return total;
         });
     }

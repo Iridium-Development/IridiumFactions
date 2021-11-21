@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions.database;
 
+import com.iridium.iridiumfactions.Cache;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a Faction of IridiumFactions.
@@ -39,6 +41,8 @@ public final class Faction {
 
     @DatabaseField(columnName = "home")
     private String home;
+
+    private Cache<Double> valueCache = new Cache<>(500);
 
     /**
      * The default constructor.
@@ -98,6 +102,10 @@ public final class Faction {
             String world = location.getWorld() != null ? location.getWorld().getName() : "";
             this.home = world + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getPitch() + "," + location.getYaw();
         }
+    }
+
+    public CompletableFuture<Double> getValue() {
+        return valueCache.getCacheAsync(() -> IridiumFactions.getInstance().getFactionManager().getFactionValue(this));
     }
 
     /**
