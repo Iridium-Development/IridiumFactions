@@ -30,6 +30,7 @@ public class IridiumFactions extends IridiumCore {
     private SQL sql;
     private Inventories inventories;
     private Permissions permissions;
+    private BlockValues blockValues;
 
     private Map<String, Permission> permissionList;
 
@@ -82,6 +83,7 @@ public class IridiumFactions extends IridiumCore {
         this.sql = getPersist().load(SQL.class);
         this.inventories = getPersist().load(Inventories.class);
         this.permissions = getPersist().load(Permissions.class);
+        this.blockValues = getPersist().load(BlockValues.class);
 
         for (FactionRank factionRank : FactionRank.values()) {
             configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
@@ -123,6 +125,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(sql);
         getPersist().save(inventories);
         getPersist().save(permissions);
+        getPersist().save(blockValues);
     }
 
     @Override

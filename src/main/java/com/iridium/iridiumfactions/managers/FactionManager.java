@@ -1,11 +1,17 @@
 package com.iridium.iridiumfactions.managers;
 
+import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
+import com.iridium.iridiumfactions.configs.BlockValues;
 import com.iridium.iridiumfactions.database.*;
+import com.iridium.iridiumfactions.utils.LocationUtils;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -339,6 +345,42 @@ public class FactionManager {
         }
         IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().addEntry(new FactionRelationshipRequest(userFaction, faction, newRelationship, user));
         return FactionRelationShipRequestResponse.REQUEST_SENT;
+    }
+
+    public CompletableFuture<Double> getFactionValue(@NotNull Faction faction) {
+        return CompletableFuture.supplyAsync(() -> {
+            double total = 0.00;
+            for (Chunk chunk : getFactionChunks(faction).join()) {
+                ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
+                World world = chunk.getWorld();
+                int maxHeight = world.getMaxHeight() - 1;
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        final int maxy = Math.min(maxHeight, chunkSnapshot.getHighestBlockYAt(x, z));
+                        for (int y = LocationUtils.getMinHeight(world); y <= maxy; y++) {
+                            XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
+                            if (material.equals(XMaterial.AIR)) continue;
+                            total += IridiumFactions.getInstance().getBlockValues().blockValues.getOrDefault(material, new BlockValues.ValuableBlock(0, "", 0, 0)).value;
+                        }
+                    }
+                }
+
+                for (BlockState blockState : chunk.getTileEntities()) {
+                    if (!(blockState instanceof CreatureSpawner)) continue;
+                    CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
+                    total += IridiumFactions.getInstance().getBlockValues().spawnerValues.getOrDefault(creatureSpawner.getSpawnedType(), new BlockValues.ValuableBlock(0, "", 0, 0)).value;
+                }
+            }
+            return total;
+        });
+    }
+
+    public CompletableFuture<List<Chunk>> getFactionChunks(@NotNull Faction faction) {
+        return CompletableFuture.supplyAsync(() ->
+                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).stream()
+                        .map(FactionClaim::getChunk)
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()));
     }
 
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
