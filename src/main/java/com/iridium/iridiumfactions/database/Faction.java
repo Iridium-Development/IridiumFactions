@@ -1,6 +1,8 @@
 package com.iridium.iridiumfactions.database;
 
+import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumfactions.Cache;
+import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.j256.ormlite.field.DatabaseField;
@@ -11,12 +13,16 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -45,6 +51,9 @@ public final class Faction {
 
     private Cache<Double> valueCache = new Cache<>(500);
 
+    private Map<XMaterial, Integer> blockCountCache = new HashMap<>();
+    private Map<EntityType, Integer> spawnerCountCache = new HashMap<>();
+
     /**
      * The default constructor.
      *
@@ -54,6 +63,12 @@ public final class Faction {
         this.name = name;
         this.description = "Default Faction Description";
         this.time = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public User getOwner() {
+        return IridiumFactions.getInstance().getFactionManager().getFactionMembers(this).stream().filter(user ->
+                user.getFactionRank().equals(FactionRank.OWNER)
+        ).findFirst().orElse(new User(UUID.randomUUID(), ""));
     }
 
     /**

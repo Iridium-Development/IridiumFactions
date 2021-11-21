@@ -348,6 +348,8 @@ public class FactionManager {
         return CompletableFuture.supplyAsync(() -> {
             long startTime = System.nanoTime();
             double total = 0.00;
+            faction.getBlockCountCache().clear();
+            faction.getSpawnerCountCache().clear();
             for (Chunk chunk : getFactionChunks(faction).join()) {
                 ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
                 World world = chunk.getWorld();
@@ -359,6 +361,7 @@ public class FactionManager {
                             XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
                             if (material.equals(XMaterial.AIR)) continue;
                             total += IridiumFactions.getInstance().getBlockValues().blockValues.getOrDefault(material, new BlockValues.ValuableBlock(0, "", 0, 0)).value;
+                            faction.getBlockCountCache().put(material, faction.getBlockCountCache().getOrDefault(material, 0) + 1);
                         }
                     }
                 }
@@ -367,6 +370,7 @@ public class FactionManager {
                     if (!(blockState instanceof CreatureSpawner)) continue;
                     CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
                     total += IridiumFactions.getInstance().getBlockValues().spawnerValues.getOrDefault(creatureSpawner.getSpawnedType(), new BlockValues.ValuableBlock(0, "", 0, 0)).value;
+                    faction.getSpawnerCountCache().put(creatureSpawner.getSpawnedType(), faction.getSpawnerCountCache().getOrDefault(creatureSpawner.getSpawnedType(), 0) + 1);
                 }
             }
             IridiumFactions.getInstance().getLogger().info("Finished Calculating Faction Value, took " + (System.nanoTime() - startTime) / 1000000 + "ms");
