@@ -346,7 +346,6 @@ public class FactionManager {
 
     public CompletableFuture<Double> getFactionValue(@NotNull Faction faction) {
         return CompletableFuture.supplyAsync(() -> {
-            long startTime = System.nanoTime();
             double total = 0.00;
             faction.getBlockCountCache().clear();
             faction.getSpawnerCountCache().clear();
@@ -373,7 +372,6 @@ public class FactionManager {
                     faction.getSpawnerCountCache().put(creatureSpawner.getSpawnedType(), faction.getSpawnerCountCache().getOrDefault(creatureSpawner.getSpawnedType(), 0) + 1);
                 }
             }
-            IridiumFactions.getInstance().getLogger().info("Finished Calculating Faction Value, took " + (System.nanoTime() - startTime) / 1000000 + "ms");
             return total;
         });
     }
