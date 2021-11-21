@@ -15,10 +15,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -383,6 +380,39 @@ public class FactionManager {
                         .map(FactionClaim::getChunk)
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a list of all Factions sorted by SortType
+     *
+     * @param sortType How we are sorting the Factions
+     * @return The sorted list of all Factions
+     */
+    public CompletableFuture<List<Faction>> getFactions(SortType sortType) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (sortType == SortType.VALUE) {
+                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries().stream()
+                        .sorted(Comparator.<Faction, Double>comparing(faction -> faction.getValue().join()).reversed())
+                        .collect(Collectors.toList());
+            }
+            return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
+        });
+    }
+
+    /**
+     * Gets a list of all Factions
+     *
+     * @return The list of all Factions
+     */
+    public List<Faction> getFactions() {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
+    }
+
+    /**
+     * Represents a way of ordering Islands.
+     */
+    public enum SortType {
+        VALUE
     }
 
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {

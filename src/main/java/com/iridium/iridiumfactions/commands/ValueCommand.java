@@ -41,12 +41,13 @@ public class ValueCommand extends Command {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        faction.get().getValue().thenAccept(value ->
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().islandValue
-                        .replace("%rank%", String.valueOf(0))
-                        .replace("%value%", String.valueOf(value))
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ))
+        faction.get().getValue().thenAccept(value -> faction.get().getRank().thenAccept(rank ->
+                        player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().islandValue
+                                .replace("%rank%", String.valueOf(rank))
+                                .replace("%value%", String.valueOf(value))
+                                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        ))
+                )
         );
         return true;
     }

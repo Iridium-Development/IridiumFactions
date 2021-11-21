@@ -84,7 +84,7 @@ public class InfoCommand extends Command {
                 .filter(u -> u.getPlayer() == null)
                 .map(User::getName)
                 .collect(Collectors.toList());
-        faction.getValue().thenAccept(value -> {
+        faction.getValue().thenAccept(value -> faction.getRank().thenAccept(rank -> {
             for (String line : IridiumFactions.getInstance().getConfiguration().factionInfo) {
                 player.sendMessage(StringUtils.color(line
                         .replace("%faction_description%", faction.getDescription())
@@ -97,9 +97,10 @@ public class InfoCommand extends Command {
                         .replace("%faction_members_offline_count%", String.valueOf(offlineUsers.size()))
                         .replace("%faction_members_count%", String.valueOf(users.size()))
                         .replace("%faction_value%", String.valueOf(value))
+                        .replace("%faction_rank%", String.valueOf(rank))
                 ));
             }
-        });
+        }));
     }
 
     /**

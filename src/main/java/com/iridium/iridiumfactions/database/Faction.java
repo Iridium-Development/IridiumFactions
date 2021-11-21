@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.database;
 
 import com.iridium.iridiumfactions.Cache;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.managers.FactionManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
@@ -106,6 +107,10 @@ public final class Faction {
 
     public CompletableFuture<Double> getValue() {
         return valueCache.getCacheAsync(() -> IridiumFactions.getInstance().getFactionManager().getFactionValue(this));
+    }
+
+    public CompletableFuture<Integer> getRank() {
+        return CompletableFuture.supplyAsync(() -> IridiumFactions.getInstance().getFactionManager().getFactions(FactionManager.SortType.VALUE).join().indexOf(this) + 1);
     }
 
     /**
