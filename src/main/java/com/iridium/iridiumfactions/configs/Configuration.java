@@ -40,6 +40,7 @@ public class Configuration {
     public List<String> factionInfo = Arrays.asList(
             "&cDescription: &7%faction_description%",
             "&cLand / Remaining Power / Total Power: &7%faction_land% / %faction_remaining_power% / %faction_total_power%",
+            "&cValue: &7%faction_value%",
             "&cOnline Members(%faction_members_online_count%/%faction_members_count%): &7%faction_members_online%",
             "&cOffline Members(%faction_members_offline_count%/%faction_members_count%): &7%faction_members_offline%"
     );
