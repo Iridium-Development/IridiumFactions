@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.managers.tablemanagers;
 
 import com.iridium.iridiumcore.utils.SortedList;
+import com.iridium.iridiumfactions.IridiumFactions;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
@@ -29,11 +30,13 @@ public class TableManager<T, S> {
 
     public TableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
         this.connectionSource = connectionSource;
-        TableUtils.createTableIfNotExists(connectionSource, clazz);
-        this.dao = DaoManager.createDao(connectionSource, clazz);
-        this.dao.setAutoCommit(getDatabaseConnection(), false);
         this.entries = new SortedList<>(comparator);
-        this.entries.addAll(dao.queryForAll());
+        if (!IridiumFactions.getInstance().isTesting()) {
+            TableUtils.createTableIfNotExists(connectionSource, clazz);
+            this.dao = DaoManager.createDao(connectionSource, clazz);
+            this.dao.setAutoCommit(getDatabaseConnection(), false);
+            this.entries.addAll(dao.queryForAll());
+        }
         this.clazz = clazz;
     }
 
@@ -53,6 +56,7 @@ public class TableManager<T, S> {
      * Saves everything to the Database
      */
     public void save() {
+        if (IridiumFactions.getInstance().isTesting()) return;
         try {
             List<T> entryList = new ArrayList<>(entries);
             for (T t : entryList) {
@@ -90,6 +94,7 @@ public class TableManager<T, S> {
     public CompletableFuture<Void> delete(T t) {
         entries.remove(t);
         return CompletableFuture.runAsync(() -> {
+            if (IridiumFactions.getInstance().isTesting()) return;
             try {
                 dao.delete(t);
                 dao.commit(getDatabaseConnection());
@@ -107,6 +112,7 @@ public class TableManager<T, S> {
     public CompletableFuture<Void> delete(Collection<T> t) {
         entries.removeAll(t);
         return CompletableFuture.runAsync(() -> {
+            if (IridiumFactions.getInstance().isTesting()) return;
             try {
                 dao.delete(t);
                 dao.commit(getDatabaseConnection());

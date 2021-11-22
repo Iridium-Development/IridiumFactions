@@ -7,6 +7,7 @@ import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
 import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -34,6 +35,7 @@ class FactionManagerTest {
 
     @AfterEach
     public void tearDown() {
+        Bukkit.getScheduler().cancelTasks(IridiumFactions.getInstance());
         MockBukkit.unmock();
     }
 

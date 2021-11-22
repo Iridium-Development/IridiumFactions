@@ -8,6 +8,7 @@ import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.database.User;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.junit.jupiter.api.AfterEach;
@@ -29,6 +30,7 @@ class BlockBreakListenerTest {
 
     @AfterEach
     public void tearDown() {
+        Bukkit.getScheduler().cancelTasks(IridiumFactions.getInstance());
         MockBukkit.unmock();
     }
 
