@@ -14,8 +14,22 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
     private final Comparator<T> comparator;
     private final SortedList<T> factionsSortedList;
 
-    public ForeignFactionTableManager(ConnectionSource connectionSource, Class<T> clazz, boolean autoCommit, Comparator<T> comparator) throws SQLException {
-        super(connectionSource, clazz, autoCommit, comparator);
+    public ForeignFactionTableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
+        super(connectionSource, clazz, comparator);
+        this.comparator = comparator;
+        this.factionsSortedList = new SortedList<>(Comparator.comparing(FactionData::getFactionID));
+        this.factionsSortedList.addAll(getEntries());
+        sort();
+    }
+
+    /**
+     * Constructor used for testing
+     *
+     * @param clazz      The class
+     * @param comparator The comparator
+     */
+    public ForeignFactionTableManager(Class<T> clazz, Comparator<T> comparator) {
+        super(clazz, comparator);
         this.comparator = comparator;
         this.factionsSortedList = new SortedList<>(Comparator.comparing(FactionData::getFactionID));
         this.factionsSortedList.addAll(getEntries());
@@ -54,7 +68,7 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
                 currentIndex--;
                 continue;
             }
-            if (faction.getId() == factionData.getFactionID()){
+            if (faction.getId() == factionData.getFactionID()) {
                 result.add(getEntries().get(currentIndex));
                 currentIndex--;
             } else {
@@ -71,7 +85,7 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
                 currentIndex++;
                 continue;
             }
-            if (faction.getId() == factionData.getFactionID()){
+            if (faction.getId() == factionData.getFactionID()) {
                 result.add(getEntries().get(currentIndex));
                 currentIndex++;
             } else {

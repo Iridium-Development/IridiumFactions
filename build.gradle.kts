@@ -39,7 +39,13 @@ dependencies {
     }
 
     // Enable lombok annotation processing
-    annotationProcessor("org.projectlombok:lombok:1.18.20")
+    annotationProcessor("org.projectlombok:lombok:1.18.22")
+
+    // Test dependencies
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.mockito:mockito-inline:4.0.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.16:1.5.2")
 }
 
 tasks {
@@ -77,6 +83,10 @@ tasks {
 
         // Always re-run this task
         outputs.upToDateWhen { false }
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
 

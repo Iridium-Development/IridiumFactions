@@ -4,15 +4,26 @@ import com.iridium.iridiumfactions.database.User;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Used for handling Crud operations on a table + handling cache
  */
 public class UserTableManager extends TableManager<User, Integer> {
 
-    public UserTableManager(ConnectionSource connectionSource, boolean autoCommit) throws SQLException {
-        super(connectionSource, User.class, autoCommit, Comparator.comparing(User::getUuid));
+    public UserTableManager(ConnectionSource connectionSource) throws SQLException {
+        super(connectionSource, User.class, Comparator.comparing(User::getUuid));
+        sort();
+    }
+
+    /**
+     * Constructor used for testing
+     */
+    public UserTableManager() {
+        super(User.class, Comparator.comparing(User::getUuid));
         sort();
     }
 

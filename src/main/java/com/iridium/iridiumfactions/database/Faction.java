@@ -53,7 +53,7 @@ public final class Faction {
     /**
      * The default constructor.
      *
-     * @param name The name of the Player
+     * @param name The name of the Faction
      */
     public Faction(final @NotNull String name) {
         this.name = name;
@@ -65,6 +65,19 @@ public final class Faction {
         return IridiumFactions.getInstance().getFactionManager().getFactionMembers(this).stream().filter(user ->
                 user.getFactionRank().equals(FactionRank.OWNER)
         ).findFirst().orElse(new User(UUID.randomUUID(), ""));
+    }
+
+    /**
+     * The constructor used for testing.
+     *
+     * @param name The name of the Faction
+     * @param id   The id of the Faction
+     */
+    public Faction(final @NotNull String name, int id) {
+        this.id = id;
+        this.name = name;
+        this.description = "Default Faction Description";
+        this.time = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**

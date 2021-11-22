@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.managers.tablemanagers;
 
 import com.iridium.iridiumcore.utils.SortedList;
+import com.iridium.iridiumfactions.IridiumFactions;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
@@ -22,20 +23,32 @@ import java.util.concurrent.CompletableFuture;
  */
 public class TableManager<T, S> {
     private final SortedList<T> entries;
-    private final Dao<T, S> dao;
+    private Dao<T, S> dao;
     private final Class<T> clazz;
 
-    private final boolean autoCommit;
     private final ConnectionSource connectionSource;
 
-    public TableManager(ConnectionSource connectionSource, Class<T> clazz, boolean autoCommit, Comparator<T> comparator) throws SQLException {
+    public TableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
         this.connectionSource = connectionSource;
-        this.autoCommit = autoCommit;
-        TableUtils.createTableIfNotExists(connectionSource, clazz);
-        this.dao = DaoManager.createDao(connectionSource, clazz);
-        this.dao.setAutoCommit(getDatabaseConnection(), autoCommit);
-        this.entries = new SortedList<T>(comparator);
-        this.entries.addAll(dao.queryForAll());
+        this.entries = new SortedList<>(comparator);
+        if (!IridiumFactions.getInstance().isTesting()) {
+            TableUtils.createTableIfNotExists(connectionSource, clazz);
+            this.dao = DaoManager.createDao(connectionSource, clazz);
+            this.dao.setAutoCommit(getDatabaseConnection(), false);
+            this.entries.addAll(dao.queryForAll());
+        }
+        this.clazz = clazz;
+    }
+
+    /**
+     * A TableManager used for UnitTesting
+     *
+     * @param clazz      The class
+     * @param comparator The comparator
+     */
+    public TableManager(Class<T> clazz, Comparator<T> comparator) {
+        this.connectionSource = null;
+        this.entries = new SortedList<>(comparator);
         this.clazz = clazz;
     }
 
@@ -43,14 +56,13 @@ public class TableManager<T, S> {
      * Saves everything to the Database
      */
     public void save() {
+        if (IridiumFactions.getInstance().isTesting()) return;
         try {
             List<T> entryList = new ArrayList<>(entries);
             for (T t : entryList) {
                 dao.createOrUpdate(t);
             }
-            if (!autoCommit) {
-                dao.commit(getDatabaseConnection());
-            }
+            dao.commit(getDatabaseConnection());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -80,13 +92,12 @@ public class TableManager<T, S> {
      * @param t the variable we are deleting
      */
     public CompletableFuture<Void> delete(T t) {
+        entries.remove(t);
         return CompletableFuture.runAsync(() -> {
+            if (IridiumFactions.getInstance().isTesting()) return;
             try {
                 dao.delete(t);
-                entries.remove(t);
-                if (!autoCommit) {
-                    dao.commit(getDatabaseConnection());
-                }
+                dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -99,13 +110,12 @@ public class TableManager<T, S> {
      * @param t The collection of variables we are deleting
      */
     public CompletableFuture<Void> delete(Collection<T> t) {
+        entries.removeAll(t);
         return CompletableFuture.runAsync(() -> {
+            if (IridiumFactions.getInstance().isTesting()) return;
             try {
                 dao.delete(t);
-                entries.removeAll(t);
-                if (!autoCommit) {
-                    dao.commit(getDatabaseConnection());
-                }
+                dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -128,9 +138,7 @@ public class TableManager<T, S> {
     public void clear() {
         try {
             TableUtils.clearTable(connectionSource, clazz);
-            if (!autoCommit) {
-                dao.commit(getDatabaseConnection());
-            }
+            dao.commit(getDatabaseConnection());
             entries.clear();
         } catch (SQLException throwables) {
             throwables.printStackTrace();

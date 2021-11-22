@@ -17,8 +17,18 @@ import java.util.concurrent.CompletableFuture;
 public class FactionTableManager extends TableManager<Faction, Integer> {
     private final SortedList<Faction> factionNameEntries;
 
-    public FactionTableManager(ConnectionSource connectionSource, boolean autoCommit) throws SQLException {
-        super(connectionSource, Faction.class, autoCommit, Comparator.comparing(Faction::getId));
+    public FactionTableManager(ConnectionSource connectionSource) throws SQLException {
+        super(connectionSource, Faction.class, Comparator.comparing(Faction::getId));
+        this.factionNameEntries = new SortedList<>(Comparator.comparing(Faction::getName, String.CASE_INSENSITIVE_ORDER));
+        this.factionNameEntries.addAll(getEntries());
+        sort();
+    }
+
+    /**
+     * A constructor used for testing
+     */
+    public FactionTableManager() {
+        super(Faction.class, Comparator.comparing(Faction::getId));
         this.factionNameEntries = new SortedList<>(Comparator.comparing(Faction::getName, String.CASE_INSENSITIVE_ORDER));
         this.factionNameEntries.addAll(getEntries());
         sort();
