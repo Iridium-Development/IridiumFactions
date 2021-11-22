@@ -117,17 +117,19 @@ public final class Faction {
     }
 
     public double getValue() {
-        double totalValue = 0.00;
+        return valueCache.getCache(() -> {
+            double totalValue = 0.00;
 
-        for (Map.Entry<XMaterial, BlockValues.ValuableBlock> valuableBlocks : IridiumFactions.getInstance().getBlockValues().blockValues.entrySet()) {
-            totalValue += IridiumFactions.getInstance().getFactionManager().getFactionBlockAmount(this, valuableBlocks.getKey()) * valuableBlocks.getValue().value;
-        }
+            for (Map.Entry<XMaterial, BlockValues.ValuableBlock> valuableBlocks : IridiumFactions.getInstance().getBlockValues().blockValues.entrySet()) {
+                totalValue += IridiumFactions.getInstance().getFactionManager().getFactionBlockAmount(this, valuableBlocks.getKey()) * valuableBlocks.getValue().value;
+            }
 
-        for (Map.Entry<EntityType, BlockValues.ValuableBlock> valuableSpawners : IridiumFactions.getInstance().getBlockValues().spawnerValues.entrySet()) {
-            totalValue += IridiumFactions.getInstance().getFactionManager().getFactionSpawnerAmount(this, valuableSpawners.getKey()) * valuableSpawners.getValue().value;
-        }
-        
-        return totalValue;
+            for (Map.Entry<EntityType, BlockValues.ValuableBlock> valuableSpawners : IridiumFactions.getInstance().getBlockValues().spawnerValues.entrySet()) {
+                totalValue += IridiumFactions.getInstance().getFactionManager().getFactionSpawnerAmount(this, valuableSpawners.getKey()) * valuableSpawners.getValue().value;
+            }
+
+            return totalValue;
+        });
     }
 
     public int getRank() {
