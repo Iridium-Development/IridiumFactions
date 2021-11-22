@@ -344,18 +344,52 @@ public class FactionManager {
         return FactionRelationShipRequestResponse.REQUEST_SENT;
     }
 
+    /**
+     * Gets the FactionBlocks for a specific island and material.
+     *
+     * @param faction  The specified Faction
+     * @param material The specified Material
+     * @return The IslandBlock
+     */
+    public synchronized FactionBlocks getFactionBlock(@NotNull Faction faction, @NotNull XMaterial material) {
+        FactionBlocks factionBlocks = new FactionBlocks(faction, material);
+        Optional<FactionBlocks> factionBlocksOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().getEntry(factionBlocks);
+        if (factionBlocksOptional.isPresent()) {
+            return factionBlocksOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().addEntry(factionBlocks);
+        return factionBlocks;
+    }
+
+    /**
+     * Gets the FactionSpawners for a specific island and material.
+     *
+     * @param faction     The specified Faction
+     * @param spawnerType The specified spawner type
+     * @return The IslandBlock
+     */
+    public synchronized FactionSpawners getFactionSpawners(@NotNull Faction faction, @NotNull EntityType spawnerType) {
+        FactionSpawners factionSpawners = new FactionSpawners(faction, spawnerType);
+        Optional<FactionSpawners> factionSpawnersOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().getEntry(factionSpawners);
+        if (factionSpawnersOptional.isPresent()) {
+            return factionSpawnersOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().addEntry(factionSpawners);
+        return factionSpawners;
+    }
+
     public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {
-        // TODO
-        return 0;
+        return getFactionSpawners(faction, entityType).getAmount();
     }
 
     public int getFactionBlockAmount(@NotNull Faction faction, XMaterial xMaterial) {
-        // TODO
-        return 0;
+        return getFactionBlock(faction, xMaterial).getAmount();
     }
 
     public CompletableFuture<Void> recalculateFactionValue(@NotNull Faction faction) {
         return CompletableFuture.runAsync(() -> {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().getEntries(faction).forEach(factionSpawners -> factionSpawners.setAmount(0));
+            IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().getEntries(faction).forEach(factionBlocks -> factionBlocks.setAmount(0));
             for (Chunk chunk : getFactionChunks(faction).join()) {
                 ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
                 World world = chunk.getWorld();
@@ -366,7 +400,8 @@ public class FactionManager {
                         for (int y = LocationUtils.getMinHeight(world); y <= maxy; y++) {
                             XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
                             if (material.equals(XMaterial.AIR)) continue;
-                            //TODO add block support
+                            FactionBlocks factionBlocks = getFactionBlock(faction, material);
+                            factionBlocks.setAmount(factionBlocks.getAmount() + 1);
                         }
                     }
                 }
@@ -374,7 +409,8 @@ public class FactionManager {
                 for (BlockState blockState : chunk.getTileEntities()) {
                     if (!(blockState instanceof CreatureSpawner)) continue;
                     CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
-                    //TODO add spawner support
+                    FactionSpawners factionSpawners = getFactionSpawners(faction, creatureSpawner.getSpawnedType());
+                    factionSpawners.setAmount(factionSpawners.getAmount() + 1);
                 }
             }
         });

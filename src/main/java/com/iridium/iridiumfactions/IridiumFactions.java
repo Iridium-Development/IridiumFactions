@@ -93,6 +93,9 @@ public class IridiumFactions extends IridiumCore {
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerBucketListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockExplodeListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockPistonListener(), this);
     }
 
     @Override

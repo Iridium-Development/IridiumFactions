@@ -38,6 +38,8 @@ public class DatabaseManager {
     private ForeignFactionTableManager<FactionPermission, Integer> factionPermissionTableManager;
     private ForeignFactionTableManager<FactionRelationship, Integer> factionRelationshipTableManager;
     private ForeignFactionTableManager<FactionRelationshipRequest, Integer> factionRelationshipRequestTableManager;
+    private ForeignFactionTableManager<FactionBlocks, Integer> factionBlocksTableManager;
+    private ForeignFactionTableManager<FactionSpawners, Integer> factionSpawnersTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -61,6 +63,8 @@ public class DatabaseManager {
         this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, false, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
         this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, false, Comparator.comparing(FactionPermission::getFactionID).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
         this.factionRelationshipRequestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationshipRequest.class, false, Comparator.comparing(FactionRelationshipRequest::getFactionID).thenComparing(FactionRelationshipRequest::getFaction2ID).thenComparing(FactionRelationshipRequest::getRelationshipType));
+        factionBlocksTableManager = new ForeignFactionTableManager<>(connectionSource, FactionBlocks.class, false, Comparator.comparing(FactionBlocks::getFactionID).thenComparing(FactionBlocks::getMaterial));
+        factionSpawnersTableManager = new ForeignFactionTableManager<>(connectionSource, FactionSpawners.class, false, Comparator.comparing(FactionSpawners::getFactionID).thenComparing(FactionSpawners::getSpawnerType));
     }
 
     /**
