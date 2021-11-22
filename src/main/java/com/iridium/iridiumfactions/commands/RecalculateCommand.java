@@ -42,7 +42,7 @@ public class RecalculateCommand extends Command {
             return false;
         }
 
-        int interval = 5;
+        int interval = 1;
         List<Faction> factionList = IridiumFactions.getInstance().getFactionManager().getFactions();
         int seconds = (factionList.size() * interval / 20) % 60;
         int minutes = (factionList.size() * interval / 20) / 60;
