@@ -15,6 +15,8 @@ public class Configuration {
 
     public int mapWidth = 52;
     public int mapHeight = 10;
+    public int factionRecalculateInterval = 5;
+
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
@@ -40,7 +42,22 @@ public class Configuration {
     public List<String> factionInfo = Arrays.asList(
             "&cDescription: &7%faction_description%",
             "&cLand / Remaining Power / Total Power: &7%faction_land% / %faction_remaining_power% / %faction_total_power%",
+            "&cRank: &7#%faction_rank%",
+            "&cValue: &7%faction_value%",
             "&cOnline Members(%faction_members_online_count%/%faction_members_count%): &7%faction_members_online%",
             "&cOffline Members(%faction_members_offline_count%/%faction_members_count%): &7%faction_members_offline%"
     );
+
+    public Map<Integer, Integer> factionTopSlots = ImmutableMap.<Integer, Integer>builder()
+            .put(1, 4)
+            .put(2, 12)
+            .put(3, 14)
+            .put(4, 19)
+            .put(5, 20)
+            .put(6, 21)
+            .put(7, 22)
+            .put(8, 23)
+            .put(9, 24)
+            .put(10, 25)
+            .build();
 }

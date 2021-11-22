@@ -17,7 +17,7 @@ repositories {
     maven("https://nexus.iridiumdevelopment.net/repository/maven-releases/")
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://repo.rosewooddev.io/repository/public/")
-    maven("https://repo.jeff-media.de/maven2/")
+    maven("https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
     mavenCentral()
 }
 

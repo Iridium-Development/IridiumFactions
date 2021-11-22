@@ -5,10 +5,7 @@ import com.iridium.iridiumcore.Background;
 import com.iridium.iridiumcore.Item;
 import com.iridium.iridiumcore.dependencies.fasterxml.annotation.JsonIgnore;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
-import com.iridium.iridiumfactions.configs.inventories.ConfirmationInventoryConfig;
-import com.iridium.iridiumfactions.configs.inventories.FactionRanksInventoryConfig;
-import com.iridium.iridiumfactions.configs.inventories.NoItemGUI;
-import com.iridium.iridiumfactions.configs.inventories.SingleItemGUI;
+import com.iridium.iridiumfactions.configs.inventories.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,6 +43,20 @@ public class Inventories {
             new Item(XMaterial.GOLDEN_APPLE, 15, 1, "&c&lAlly", Collections.emptyList()),
             new Item(XMaterial.BARRIER, 16, 1, "&c&lEnemy", Collections.emptyList())
     );
+
+    public FactionTopInventoryConfig factionTopGUI = new FactionTopInventoryConfig(27, "&7Top Factions", background1, new Item(XMaterial.PLAYER_HEAD, 1, "&b&lFaction Owner: &f%faction_owner% &7(#%faction_rank%)", "%faction_owner%", Arrays.asList(
+            "",
+            "&b&l * &7Faction Name: &b%faction_name%",
+            "&b&l * &7Faction Rank: &b%faction_rank%",
+            "&b&l * &7Faction Value: &b%faction_value%",
+            "&b&l * &7Netherite Blocks: &b%NETHERITE_BLOCK_AMOUNT%",
+            "&b&l * &7Emerald Blocks: &b%EMERALD_BLOCK_AMOUNT%",
+            "&b&l * &7Diamond Blocks: &b%DIAMOND_BLOCK_AMOUNT%",
+            "&b&l * &7Gold Blocks: &b%GOLD_BLOCK_AMOUNT%",
+            "&b&l * &7Iron Blocks: &b%IRON_BLOCK_AMOUNT%",
+            "&b&l * &7Hopper Blocks: &b%HOPPER_AMOUNT%",
+            "&b&l * &7Beacon Blocks: &b%BEACON_AMOUNT%"
+    )), new Item(XMaterial.BARRIER, 1, " ", Collections.emptyList()));
 
     public NoItemGUI factionPermissionsGUI = new NoItemGUI(54, "&7Faction Permissions", background1);
 
