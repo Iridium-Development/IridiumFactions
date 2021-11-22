@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions;
 import com.iridium.iridiumcore.IridiumCore;
 import com.iridium.iridiumfactions.commands.CommandManager;
 import com.iridium.iridiumfactions.configs.*;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.listeners.*;
 import com.iridium.iridiumfactions.managers.DatabaseManager;
 import com.iridium.iridiumfactions.managers.FactionManager;
@@ -15,7 +16,9 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 public class IridiumFactions extends IridiumCore {
@@ -33,6 +36,7 @@ public class IridiumFactions extends IridiumCore {
     private SQL sql;
     private Inventories inventories;
     private Permissions permissions;
+    private BlockValues blockValues;
 
     private Map<String, Permission> permissionList;
 
@@ -59,6 +63,23 @@ public class IridiumFactions extends IridiumCore {
         this.userManager = new UserManager();
         this.factionManager = new FactionManager();
 
+        // Auto Recalculate Factions
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            ListIterator<Integer> factions = getDatabaseManager().getFactionTableManager().getEntries().stream().map(Faction::getId).collect(Collectors.toList()).listIterator();
+
+            @Override
+            public void run() {
+                if (!factions.hasNext()) {
+                    factions = getDatabaseManager().getFactionTableManager().getEntries().stream().map(Faction::getId).collect(Collectors.toList()).listIterator();
+                } else {
+                    getFactionManager().getFactionViaId(factions.next()).ifPresent(faction ->
+                            getFactionManager().recalculateFactionValue(faction)
+                    );
+                }
+            }
+
+        }, 0, getConfiguration().factionRecalculateInterval * 20L);
+
         getLogger().info("----------------------------------------");
         getLogger().info("");
         getLogger().info(getDescription().getName() + " Enabled!");
@@ -80,6 +101,9 @@ public class IridiumFactions extends IridiumCore {
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerBucketListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockExplodeListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockPistonListener(), this);
     }
 
     @Override
@@ -90,6 +114,7 @@ public class IridiumFactions extends IridiumCore {
         this.sql = getPersist().load(SQL.class);
         this.inventories = getPersist().load(Inventories.class);
         this.permissions = getPersist().load(Permissions.class);
+        this.blockValues = getPersist().load(BlockValues.class);
 
         for (FactionRank factionRank : FactionRank.values()) {
             configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
@@ -131,6 +156,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(sql);
         getPersist().save(inventories);
         getPersist().save(permissions);
+        getPersist().save(blockValues);
     }
 
     @Override

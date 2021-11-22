@@ -1,18 +1,21 @@
 package com.iridium.iridiumfactions.managers;
 
+import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
+import com.iridium.iridiumfactions.utils.LocationUtils;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -338,6 +341,117 @@ public class FactionManager {
         }
         IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().addEntry(new FactionRelationshipRequest(userFaction, faction, newRelationship, user));
         return FactionRelationShipRequestResponse.REQUEST_SENT;
+    }
+
+    /**
+     * Gets the FactionBlocks for a specific island and material.
+     *
+     * @param faction  The specified Faction
+     * @param material The specified Material
+     * @return The IslandBlock
+     */
+    public synchronized FactionBlocks getFactionBlock(@NotNull Faction faction, @NotNull XMaterial material) {
+        FactionBlocks factionBlocks = new FactionBlocks(faction, material);
+        Optional<FactionBlocks> factionBlocksOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().getEntry(factionBlocks);
+        if (factionBlocksOptional.isPresent()) {
+            return factionBlocksOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().addEntry(factionBlocks);
+        return factionBlocks;
+    }
+
+    /**
+     * Gets the FactionSpawners for a specific island and material.
+     *
+     * @param faction     The specified Faction
+     * @param spawnerType The specified spawner type
+     * @return The IslandBlock
+     */
+    public synchronized FactionSpawners getFactionSpawners(@NotNull Faction faction, @NotNull EntityType spawnerType) {
+        FactionSpawners factionSpawners = new FactionSpawners(faction, spawnerType);
+        Optional<FactionSpawners> factionSpawnersOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().getEntry(factionSpawners);
+        if (factionSpawnersOptional.isPresent()) {
+            return factionSpawnersOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().addEntry(factionSpawners);
+        return factionSpawners;
+    }
+
+    public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {
+        return getFactionSpawners(faction, entityType).getAmount();
+    }
+
+    public int getFactionBlockAmount(@NotNull Faction faction, XMaterial xMaterial) {
+        return getFactionBlock(faction, xMaterial).getAmount();
+    }
+
+    public CompletableFuture<Void> recalculateFactionValue(@NotNull Faction faction) {
+        return CompletableFuture.runAsync(() -> {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().getEntries(faction).forEach(factionSpawners -> factionSpawners.setAmount(0));
+            IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().getEntries(faction).forEach(factionBlocks -> factionBlocks.setAmount(0));
+            for (Chunk chunk : getFactionChunks(faction).join()) {
+                ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
+                World world = chunk.getWorld();
+                int maxHeight = world.getMaxHeight() - 1;
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        final int maxy = Math.min(maxHeight, chunkSnapshot.getHighestBlockYAt(x, z));
+                        for (int y = LocationUtils.getMinHeight(world); y <= maxy; y++) {
+                            XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
+                            if (material.equals(XMaterial.AIR)) continue;
+                            FactionBlocks factionBlocks = getFactionBlock(faction, material);
+                            factionBlocks.setAmount(factionBlocks.getAmount() + 1);
+                        }
+                    }
+                }
+
+                for (BlockState blockState : chunk.getTileEntities()) {
+                    if (!(blockState instanceof CreatureSpawner)) continue;
+                    CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
+                    FactionSpawners factionSpawners = getFactionSpawners(faction, creatureSpawner.getSpawnedType());
+                    factionSpawners.setAmount(factionSpawners.getAmount() + 1);
+                }
+            }
+        });
+    }
+
+    public CompletableFuture<List<Chunk>> getFactionChunks(@NotNull Faction faction) {
+        return CompletableFuture.supplyAsync(() ->
+                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).stream()
+                        .map(FactionClaim::getChunk)
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a list of all Factions sorted by SortType
+     *
+     * @param sortType How we are sorting the Factions
+     * @return The sorted list of all Factions
+     */
+    public List<Faction> getFactions(SortType sortType) {
+        if (sortType == SortType.VALUE) {
+            return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries().stream()
+                    .sorted(Comparator.comparing(Faction::getValue).reversed())
+                    .collect(Collectors.toList());
+        }
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
+    }
+
+    /**
+     * Gets a list of all Factions
+     *
+     * @return The list of all Factions
+     */
+    public List<Faction> getFactions() {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
+    }
+
+    /**
+     * Represents a way of ordering Islands.
+     */
+    public enum SortType {
+        VALUE
     }
 
     public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {

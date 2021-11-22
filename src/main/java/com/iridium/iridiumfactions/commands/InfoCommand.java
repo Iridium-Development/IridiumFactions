@@ -95,6 +95,8 @@ public class InfoCommand extends Command {
                     .replace("%faction_members_online_count%", String.valueOf(onlineUsers.size()))
                     .replace("%faction_members_offline_count%", String.valueOf(offlineUsers.size()))
                     .replace("%faction_members_count%", String.valueOf(users.size()))
+                    .replace("%faction_value%", String.valueOf(faction.getValue()))
+                    .replace("%faction_rank%", String.valueOf(faction.getRank()))
             ));
         }
     }

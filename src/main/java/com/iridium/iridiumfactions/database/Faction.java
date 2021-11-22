@@ -1,6 +1,11 @@
 package com.iridium.iridiumfactions.database;
 
+import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
+import com.iridium.iridiumfactions.Cache;
+import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.configs.BlockValues;
+import com.iridium.iridiumfactions.managers.FactionManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
@@ -9,12 +14,15 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents a Faction of IridiumFactions.
@@ -40,6 +48,8 @@ public final class Faction {
     @DatabaseField(columnName = "home")
     private String home;
 
+    private Cache<Double> valueCache = new Cache<>(500);
+
     /**
      * The default constructor.
      *
@@ -49,6 +59,12 @@ public final class Faction {
         this.name = name;
         this.description = "Default Faction Description";
         this.time = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public User getOwner() {
+        return IridiumFactions.getInstance().getFactionManager().getFactionMembers(this).stream().filter(user ->
+                user.getFactionRank().equals(FactionRank.OWNER)
+        ).findFirst().orElse(new User(UUID.randomUUID(), ""));
     }
 
     /**
@@ -111,6 +127,26 @@ public final class Faction {
             String world = location.getWorld() != null ? location.getWorld().getName() : "";
             this.home = world + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getPitch() + "," + location.getYaw();
         }
+    }
+
+    public double getValue() {
+        return valueCache.getCache(() -> {
+            double totalValue = 0.00;
+
+            for (Map.Entry<XMaterial, BlockValues.ValuableBlock> valuableBlocks : IridiumFactions.getInstance().getBlockValues().blockValues.entrySet()) {
+                totalValue += IridiumFactions.getInstance().getFactionManager().getFactionBlockAmount(this, valuableBlocks.getKey()) * valuableBlocks.getValue().value;
+            }
+
+            for (Map.Entry<EntityType, BlockValues.ValuableBlock> valuableSpawners : IridiumFactions.getInstance().getBlockValues().spawnerValues.entrySet()) {
+                totalValue += IridiumFactions.getInstance().getFactionManager().getFactionSpawnerAmount(this, valuableSpawners.getKey()) * valuableSpawners.getValue().value;
+            }
+
+            return totalValue;
+        });
+    }
+
+    public int getRank() {
+        return IridiumFactions.getInstance().getFactionManager().getFactions(FactionManager.SortType.VALUE).indexOf(this) + 1;
     }
 
     /**

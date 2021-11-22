@@ -5,7 +5,7 @@ public class Messages {
     public String noPermission = "%prefix% &7You don't have permission for that.";
     public String mustBeAPlayer = "%prefix% &7You must be a player to execute this command.";
     public String notAPlayer = "%prefix% &7That player doesn't exist.";
-    public String unknownCommand = "%prefix% &7Unknown Command, Try /is help.";
+    public String unknownCommand = "%prefix% &7Unknown Command, Try /f help.";
     public String helpCommandHeader = "&8===== &c&lIridiumFactions Help &r&8=====";
     public String helpCommandMessage = "&c/f %command%&r: &7%description%";
     public String helpCommandFooter = " &7Page %page% of %max_page% ";
@@ -86,4 +86,8 @@ public class Messages {
     public String truceRequestSent = "%prefix% &7%player% has sent an truce request to %faction%";
     public String truceRequestReceived = "%prefix% &7You have received an truce request from %player%";
     public String cannotRelationshipYourFaction = "%prefix% &7You cannot change the relationship with your own Faction";
+    public String islandValue = "%prefix% &c&l * &7%rank%: &c%value%";
+    public String calculatingFactions = "%prefix% &7Calculating %amount% Players Faction, Estimated time: %minutes% Minutes and %seconds% Seconds";
+    public String calculatingFinished = "%prefix% &7Calculating Players Faction Finished";
+    public String calculationAlreadyInProcess = "%prefix% &7Calculating Players Faction already in Process";
 }
