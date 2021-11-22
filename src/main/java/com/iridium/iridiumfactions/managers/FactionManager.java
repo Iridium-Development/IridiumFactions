@@ -3,7 +3,6 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
-import com.iridium.iridiumfactions.configs.BlockValues;
 import com.iridium.iridiumfactions.database.*;
 import com.iridium.iridiumfactions.utils.LocationUtils;
 import org.bukkit.Chunk;
@@ -12,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -344,11 +344,18 @@ public class FactionManager {
         return FactionRelationShipRequestResponse.REQUEST_SENT;
     }
 
-    public CompletableFuture<Double> getFactionValue(@NotNull Faction faction) {
-        return CompletableFuture.supplyAsync(() -> {
-            double total = 0.00;
-            faction.getBlockCountCache().clear();
-            faction.getSpawnerCountCache().clear();
+    public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {
+        // TODO
+        return 0;
+    }
+
+    public int getFactionBlockAmount(@NotNull Faction faction, XMaterial xMaterial) {
+        // TODO
+        return 0;
+    }
+
+    public CompletableFuture<Void> recalculateFactionValue(@NotNull Faction faction) {
+        return CompletableFuture.runAsync(() -> {
             for (Chunk chunk : getFactionChunks(faction).join()) {
                 ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
                 World world = chunk.getWorld();
@@ -359,8 +366,7 @@ public class FactionManager {
                         for (int y = LocationUtils.getMinHeight(world); y <= maxy; y++) {
                             XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
                             if (material.equals(XMaterial.AIR)) continue;
-                            total += IridiumFactions.getInstance().getBlockValues().blockValues.getOrDefault(material, new BlockValues.ValuableBlock(0, "", 0, 0)).value;
-                            faction.getBlockCountCache().put(material, faction.getBlockCountCache().getOrDefault(material, 0) + 1);
+                            //TODO add block support
                         }
                     }
                 }
@@ -368,11 +374,9 @@ public class FactionManager {
                 for (BlockState blockState : chunk.getTileEntities()) {
                     if (!(blockState instanceof CreatureSpawner)) continue;
                     CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
-                    total += IridiumFactions.getInstance().getBlockValues().spawnerValues.getOrDefault(creatureSpawner.getSpawnedType(), new BlockValues.ValuableBlock(0, "", 0, 0)).value;
-                    faction.getSpawnerCountCache().put(creatureSpawner.getSpawnedType(), faction.getSpawnerCountCache().getOrDefault(creatureSpawner.getSpawnedType(), 0) + 1);
+                    //TODO add spawner support
                 }
             }
-            return total;
         });
     }
 
@@ -390,15 +394,13 @@ public class FactionManager {
      * @param sortType How we are sorting the Factions
      * @return The sorted list of all Factions
      */
-    public CompletableFuture<List<Faction>> getFactions(SortType sortType) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (sortType == SortType.VALUE) {
-                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries().stream()
-                        .sorted(Comparator.<Faction, Double>comparing(faction -> faction.getValue().join()).reversed())
-                        .collect(Collectors.toList());
-            }
-            return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
-        });
+    public List<Faction> getFactions(SortType sortType) {
+        if (sortType == SortType.VALUE) {
+            return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries().stream()
+                    .sorted(Comparator.comparing(Faction::getValue).reversed())
+                    .collect(Collectors.toList());
+        }
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
     }
 
     /**

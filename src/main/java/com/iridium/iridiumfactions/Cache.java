@@ -1,11 +1,8 @@
 package com.iridium.iridiumfactions;
 
-import java.util.concurrent.CompletableFuture;
-
 public class Cache<T> {
 
     private T cache;
-    private CompletableFuture<T> cacheAsync;
     private long lastCache;
     private final long refreshTimeInMilliseconds;
 
@@ -20,15 +17,6 @@ public class Cache<T> {
             this.lastCache = currentTime;
         }
         return cache;
-    }
-
-    public CompletableFuture<T> getCacheAsync(CacheContentProvider<CompletableFuture<T>> cacheContentProvider) {
-        long currentTime = System.currentTimeMillis();
-        if (lastCache + refreshTimeInMilliseconds < currentTime || cache == null) {
-            this.cacheAsync = cacheContentProvider.getObject();
-            this.lastCache = currentTime;
-        }
-        return cacheAsync;
     }
 
     public void clearCache() {

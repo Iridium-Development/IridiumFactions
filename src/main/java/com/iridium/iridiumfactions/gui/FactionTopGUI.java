@@ -3,7 +3,6 @@ package com.iridium.iridiumfactions.gui;
 import com.iridium.iridiumcore.gui.GUI;
 import com.iridium.iridiumcore.utils.InventoryUtils;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
-import com.iridium.iridiumcore.utils.Placeholder;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PlaceholderBuilder;
@@ -14,9 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FactionTopGUI implements GUI {
 
@@ -30,22 +27,16 @@ public class FactionTopGUI implements GUI {
 
     @Override
     public void addContent(Inventory inventory) {
-        IridiumFactions.getInstance().getFactionManager().getFactions(FactionManager.SortType.VALUE).thenAcceptAsync(factions -> {
-            Map<Faction, List<Placeholder>> factionPlaceholders = new HashMap<>();
-            factions.forEach(faction -> factionPlaceholders.put(faction, PlaceholderBuilder.getFactionPlaceholders(faction).join()));
-
-            Bukkit.getScheduler().runTask(IridiumFactions.getInstance(), () -> {
-                InventoryUtils.fillInventory(inventory, IridiumFactions.getInstance().getInventories().factionTopGUI.background);
-                for (int rank : IridiumFactions.getInstance().getConfiguration().factionTopSlots.keySet()) {
-                    int slot = IridiumFactions.getInstance().getConfiguration().factionTopSlots.get(rank);
-                    if (factions.size() >= rank) {
-                        inventory.setItem(slot, ItemStackUtils.makeItem(IridiumFactions.getInstance().getInventories().factionTopGUI.item, factionPlaceholders.get(factions.get(rank - 1))));
-                    } else {
-                        inventory.setItem(slot, ItemStackUtils.makeItem(IridiumFactions.getInstance().getInventories().factionTopGUI.filler));
-                    }
-                }
-            });
-        });
+        List<Faction> factions = IridiumFactions.getInstance().getFactionManager().getFactions(FactionManager.SortType.VALUE);
+        InventoryUtils.fillInventory(inventory, IridiumFactions.getInstance().getInventories().factionTopGUI.background);
+        for (int rank : IridiumFactions.getInstance().getConfiguration().factionTopSlots.keySet()) {
+            int slot = IridiumFactions.getInstance().getConfiguration().factionTopSlots.get(rank);
+            if (factions.size() >= rank) {
+                inventory.setItem(slot, ItemStackUtils.makeItem(IridiumFactions.getInstance().getInventories().factionTopGUI.item, PlaceholderBuilder.getFactionPlaceholders(factions.get(rank - 1))));
+            } else {
+                inventory.setItem(slot, ItemStackUtils.makeItem(IridiumFactions.getInstance().getInventories().factionTopGUI.filler));
+            }
+        }
     }
 
     /**

@@ -15,6 +15,8 @@ public class Configuration {
 
     public int mapWidth = 52;
     public int mapHeight = 10;
+    public int factionRecalculateInterval = 5;
+
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";

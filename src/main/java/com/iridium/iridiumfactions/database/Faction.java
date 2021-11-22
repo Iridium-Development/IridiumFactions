@@ -4,6 +4,7 @@ import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumfactions.Cache;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.configs.BlockValues;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -20,10 +21,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a Faction of IridiumFactions.
@@ -50,9 +49,6 @@ public final class Faction {
     private String home;
 
     private Cache<Double> valueCache = new Cache<>(500);
-
-    private Map<XMaterial, Integer> blockCountCache = new HashMap<>();
-    private Map<EntityType, Integer> spawnerCountCache = new HashMap<>();
 
     /**
      * The default constructor.
@@ -120,12 +116,22 @@ public final class Faction {
         }
     }
 
-    public CompletableFuture<Double> getValue() {
-        return valueCache.getCacheAsync(() -> IridiumFactions.getInstance().getFactionManager().getFactionValue(this));
+    public double getValue() {
+        double totalValue = 0.00;
+
+        for (Map.Entry<XMaterial, BlockValues.ValuableBlock> valuableBlocks : IridiumFactions.getInstance().getBlockValues().blockValues.entrySet()) {
+            totalValue += IridiumFactions.getInstance().getFactionManager().getFactionBlockAmount(this, valuableBlocks.getKey()) * valuableBlocks.getValue().value;
+        }
+
+        for (Map.Entry<EntityType, BlockValues.ValuableBlock> valuableSpawners : IridiumFactions.getInstance().getBlockValues().spawnerValues.entrySet()) {
+            totalValue += IridiumFactions.getInstance().getFactionManager().getFactionSpawnerAmount(this, valuableSpawners.getKey()) * valuableSpawners.getValue().value;
+        }
+        
+        return totalValue;
     }
 
-    public CompletableFuture<Integer> getRank() {
-        return CompletableFuture.supplyAsync(() -> IridiumFactions.getInstance().getFactionManager().getFactions(FactionManager.SortType.VALUE).join().indexOf(this) + 1);
+    public int getRank() {
+        return IridiumFactions.getInstance().getFactionManager().getFactions(FactionManager.SortType.VALUE).indexOf(this) + 1;
     }
 
     /**

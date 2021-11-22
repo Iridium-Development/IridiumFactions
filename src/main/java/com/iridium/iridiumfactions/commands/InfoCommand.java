@@ -84,23 +84,21 @@ public class InfoCommand extends Command {
                 .filter(u -> u.getPlayer() == null)
                 .map(User::getName)
                 .collect(Collectors.toList());
-        faction.getValue().thenAccept(value -> faction.getRank().thenAccept(rank -> {
-            for (String line : IridiumFactions.getInstance().getConfiguration().factionInfo) {
-                player.sendMessage(StringUtils.color(line
-                        .replace("%faction_description%", faction.getDescription())
-                        .replace("%faction_total_power%", String.valueOf(faction.getTotalPower()))
-                        .replace("%faction_remaining_power%", String.valueOf(faction.getRemainingPower()))
-                        .replace("%faction_land%", String.valueOf(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size()))
-                        .replace("%faction_members_online%", String.join(", ", onlineUsers))
-                        .replace("%faction_members_offline%", String.join(", ", offlineUsers))
-                        .replace("%faction_members_online_count%", String.valueOf(onlineUsers.size()))
-                        .replace("%faction_members_offline_count%", String.valueOf(offlineUsers.size()))
-                        .replace("%faction_members_count%", String.valueOf(users.size()))
-                        .replace("%faction_value%", String.valueOf(value))
-                        .replace("%faction_rank%", String.valueOf(rank))
-                ));
-            }
-        }));
+        for (String line : IridiumFactions.getInstance().getConfiguration().factionInfo) {
+            player.sendMessage(StringUtils.color(line
+                    .replace("%faction_description%", faction.getDescription())
+                    .replace("%faction_total_power%", String.valueOf(faction.getTotalPower()))
+                    .replace("%faction_remaining_power%", String.valueOf(faction.getRemainingPower()))
+                    .replace("%faction_land%", String.valueOf(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).size()))
+                    .replace("%faction_members_online%", String.join(", ", onlineUsers))
+                    .replace("%faction_members_offline%", String.join(", ", offlineUsers))
+                    .replace("%faction_members_online_count%", String.valueOf(onlineUsers.size()))
+                    .replace("%faction_members_offline_count%", String.valueOf(offlineUsers.size()))
+                    .replace("%faction_members_count%", String.valueOf(users.size()))
+                    .replace("%faction_value%", String.valueOf(faction.getValue()))
+                    .replace("%faction_rank%", String.valueOf(faction.getRank()))
+            ));
+        }
     }
 
     /**

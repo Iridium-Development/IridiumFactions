@@ -87,4 +87,7 @@ public class Messages {
     public String truceRequestReceived = "%prefix% &7You have received an truce request from %player%";
     public String cannotRelationshipYourFaction = "%prefix% &7You cannot change the relationship with your own Faction";
     public String islandValue = "%prefix% &c&l * &7%rank%: &c%value%";
+    public String calculatingFactions = "%prefix% &7Calculating %amount% Players Faction, Estimated time: %minutes% Minutes and %seconds% Seconds";
+    public String calculatingFinished = "%prefix% &7Calculating Players Faction Finished";
+    public String calculationAlreadyInProcess = "%prefix% &7Calculating Players Faction already in Process";
 }
