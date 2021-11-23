@@ -1,6 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
-import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.FactionsMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -31,8 +31,8 @@ public class MapCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
-        IridiumFactions.getInstance().getUserManager().sendFactionMap(player);
-        return false;
+        new FactionsMap(player).sendMap();
+        return true;
     }
 
     /**
