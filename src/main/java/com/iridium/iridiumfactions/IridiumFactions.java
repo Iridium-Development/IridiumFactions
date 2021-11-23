@@ -45,9 +45,12 @@ public class IridiumFactions extends IridiumCore {
         instance = this;
     }
 
+    public IridiumFactions() {
+        instance = this;
+    }
+
     @Override
     public void onEnable() {
-        instance = this;
         super.onEnable();
 
         this.commandManager = new CommandManager("IridiumFactions");
@@ -72,9 +75,10 @@ public class IridiumFactions extends IridiumCore {
                 if (!factions.hasNext()) {
                     factions = getDatabaseManager().getFactionTableManager().getEntries().stream().map(Faction::getId).collect(Collectors.toList()).listIterator();
                 } else {
-                    getFactionManager().getFactionViaId(factions.next()).ifPresent(faction ->
-                            getFactionManager().recalculateFactionValue(faction)
-                    );
+                    Faction faction = getFactionManager().getFactionViaId(factions.next());
+                    if (faction.getFactionType() == FactionType.PLAYER_FACTION) {
+                        getFactionManager().recalculateFactionValue(faction);
+                    }
                 }
             }
 

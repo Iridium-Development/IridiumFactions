@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class FactionsMap {
     private final Chunk centerChunk;
@@ -40,12 +39,11 @@ public class FactionsMap {
     }
 
     public String getHeader() {
-        Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk);
-        String factionName = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, faction.orElse(null)).getColor() + faction.map(Faction::getName).orElse("&2Wilderness");
+        Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk);
         return StringUtils.color(StringUtils.getCenteredMessage(IridiumFactions.getInstance().getConfiguration().mapTitle
                         .replace("%chunk_x%", String.valueOf(centerChunk.getX()))
                         .replace("%chunk_z%", String.valueOf(centerChunk.getZ()))
-                        .replace("%faction%", factionName)
+                        .replace("%faction%", IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, faction).getColor() + faction.getName())
                 , IridiumFactions.getInstance().getConfiguration().mapTitleFiller));
     }
 
@@ -74,12 +72,12 @@ public class FactionsMap {
             }
 
             for (int x = centerChunk.getX() - (mapWidth / 2) + (buffer ? 3 : 0); x < centerChunk.getX() + (mapWidth / 2); x++) {
-                Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk.getWorld(), x, z);
+                Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(centerChunk.getWorld(), x, z);
                 if (centerChunk.getX() == x && centerChunk.getZ() == z) {
                     stringBuilder.append("&b+");
                 } else {
-                    if (faction.isPresent()) {
-                        stringBuilder.append(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, faction.orElse(null)).getColor()).append(getFactionCharacter(faction.get()));
+                    if (faction.getFactionType() != FactionType.WILDERNESS) {
+                        stringBuilder.append(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, faction).getColor()).append(getFactionCharacter(faction));
                     } else {
                         stringBuilder.append("&7-");
                     }

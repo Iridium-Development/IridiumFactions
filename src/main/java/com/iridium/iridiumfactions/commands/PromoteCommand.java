@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.FactionRank;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -14,7 +15,6 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class PromoteCommand extends Command {
 
@@ -40,8 +40,8 @@ public class PromoteCommand extends Command {
         }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
@@ -49,20 +49,20 @@ public class PromoteCommand extends Command {
         OfflinePlayer targetPlayer = Bukkit.getServer().getOfflinePlayer(args[1]);
         User targetUser = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer);
 
-        if (faction.get().getId() != targetUser.getFactionID()) {
+        if (faction.getId() != targetUser.getFactionID()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userNotInFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
         FactionRank nextRank = FactionRank.getByLevel(targetUser.getFactionRank().getLevel() + 1);
-        if (nextRank == null || nextRank.getLevel() >= user.getFactionRank().getLevel() || !IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction.get(), user, PermissionType.PROMOTE)) {
+        if (nextRank == null || nextRank.getLevel() >= user.getFactionRank().getLevel() || !IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.PROMOTE)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotPromoteUser.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
         targetUser.setFactionRank(nextRank);
 
-        for (User member : IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get())) {
+        for (User member : IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction)) {
             Player islandMember = Bukkit.getPlayer(member.getUuid());
             if (islandMember != null) {
                 if (islandMember.equals(player)) {

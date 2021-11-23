@@ -17,7 +17,6 @@ class FactionsMapTest {
 
     private ServerMock serverMock;
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setup() {
         this.serverMock = MockBukkit.mock();
@@ -45,7 +44,7 @@ class FactionsMapTest {
     @Test
     public void getHeader() {
         PlayerMock player = serverMock.addPlayer("Player");
-        assertEquals(new FactionsMap(player).getHeader(), "§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8[ §c(0, 0) §7§2Wilderness §8]§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m ");
+        assertEquals(new FactionsMap(player).getHeader(), "§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8[ §c(0, 0) §2Wilderness §8]§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m ");
 
         Faction faction = new Faction("Faction Name", 1);
         FactionClaim factionClaim = new FactionClaim(faction, "world", player.getLocation().getChunk().getX(), player.getLocation().getChunk().getZ());

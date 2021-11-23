@@ -26,7 +26,6 @@ class FactionManagerTest {
 
     private ServerMock serverMock;
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setup() {
         this.serverMock = MockBukkit.mock();
@@ -47,8 +46,12 @@ class FactionManagerTest {
         IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction1);
         IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction2);
 
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(1).orElse(null), faction1);
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(2).orElse(null), faction2);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(1), faction1);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(2), faction2);
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(-1).getFactionType(), FactionType.WILDERNESS);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(-2).getFactionType(), FactionType.WARZONE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(-3).getFactionType(), FactionType.SAFEZONE);
     }
 
     @Test
@@ -64,6 +67,10 @@ class FactionManagerTest {
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("faction 1").orElse(null), faction1);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("FACTION 2").orElse(null), faction2);
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Wilderness").get().getFactionType(), FactionType.WILDERNESS);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Warzone").get().getFactionType(), FactionType.WARZONE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Safezone").get().getFactionType(), FactionType.SAFEZONE);
     }
 
     @Test
@@ -89,8 +96,8 @@ class FactionManagerTest {
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim1);
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim2);
 
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location).orElse(null), faction1);
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location).orElse(null), faction2);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location), faction1);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location), faction2);
     }
 
     @Test
@@ -98,16 +105,13 @@ class FactionManagerTest {
         Player player = serverMock.addPlayer("Player");
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         Faction faction = IridiumFactions.getInstance().getFactionManager().createFaction(player, "Faction").join();
-        assertEquals(user.getFaction().orElse(null), faction);
+        assertEquals(user.getFaction(), faction);
         assertEquals(user.getFactionRank(), FactionRank.OWNER);
     }
 
     @Test
     public void claimFactionLand() {
-        Faction faction = mock(Faction.class);
-        when(faction.getId()).thenReturn(1);
-        when(faction.getName()).thenReturn("Faction");
-        when(faction.getRemainingPower()).thenReturn(9999.00);
+        Faction faction = new Faction("Faction", 1);
         PlayerMock playerMock = serverMock.addPlayer("Player");
         User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
 
@@ -126,21 +130,23 @@ class FactionManagerTest {
         assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
         ));
-        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).getFactionType(), FactionType.WILDERNESS);
 
         user.setFactionRank(FactionRank.OWNER);
         user.setFaction(faction);
 
-        when(faction.getRemainingPower()).thenReturn(0.00);
+        for (int i = 0; i < 100; i++) {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "", 0, 0));
+        }
 
         // Cannot Claim land due to lack of power
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, playerMock).join();
         assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
         ));
-        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).getFactionType(), FactionType.WILDERNESS);
 
-        user.setBypassing(true);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().clear();
 
         // Can successfully claim land
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, playerMock).join();
@@ -151,7 +157,7 @@ class FactionManagerTest {
                 .replace("%x%", String.valueOf(0))
                 .replace("%z%", String.valueOf(0))
         ));
-        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).isPresent());
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaChunk(chunk).getFactionType(), FactionType.PLAYER_FACTION);
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
 
         // Cant claim the same land twice
@@ -161,6 +167,22 @@ class FactionManagerTest {
                 .replace("%faction%", faction.getName())
         ));
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+    }
+
+    @Test
+    public void claimWarzoneThenWilderness() {
+        PlayerMock playerMock = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+
+        user.setBypassing(true);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(new Faction(FactionType.WARZONE), playerMock.getLocation().getChunk(), playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+        assertEquals(playerMock.nextMessage(), "§c§lIridiumFactions §8» §7Player has claimed land at (0,0).");
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(new Faction(FactionType.WILDERNESS), playerMock.getLocation().getChunk(), playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 0);
+        assertEquals(playerMock.nextMessage(), "§c§lIridiumFactions §8» §7Player has claimed land at (0,0).");
     }
 
     @Test
@@ -375,7 +397,10 @@ class FactionManagerTest {
         Faction factionA = new Faction("FactionA", 1);
         Faction factionB = new Faction("FactionB", 2);
 
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(factionA, null), RelationshipType.TRUCE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(new Faction(FactionType.WILDERNESS), factionA), RelationshipType.TRUCE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(factionA, new Faction(FactionType.WILDERNESS)), RelationshipType.WILDERNESS);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(factionA, new Faction(FactionType.WARZONE)), RelationshipType.WARZONE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(factionA, new Faction(FactionType.SAFEZONE)), RelationshipType.SAFEZONE);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(factionA, factionA), RelationshipType.OWN);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionRelationship(factionA, factionB), RelationshipType.TRUCE);
 

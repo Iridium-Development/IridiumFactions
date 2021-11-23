@@ -5,7 +5,6 @@ import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -41,32 +40,16 @@ public class InfoCommand extends Command {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         if (args.length == 1) {
-            if (!user.getFaction().isPresent()) {
-                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-                return false;
-            }
-            sendFactionInfo(player, user.getFaction().get());
+            sendFactionInfo(player, user.getFaction());
             return true;
         }
-        Player targetPlayer = Bukkit.getPlayer(args[1]);
-        if (targetPlayer != null) {
-            User factionUser = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer);
-            Optional<Faction> factionByPlayer = factionUser.getFaction();
-            if (factionByPlayer.isPresent()) {
-                sendFactionInfo(player, factionByPlayer.get());
-                return true;
-            }
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().playerNoFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+        if (!faction.isPresent()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        String factionName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        Optional<Faction> factionByName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(factionName);
-        if (factionByName.isPresent()) {
-            sendFactionInfo(player, factionByName.get());
-            return true;
-        }
-        sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-        return false;
+        sendFactionInfo(player, faction.get());
+        return true;
     }
 
     public void sendFactionInfo(Player player, Faction faction) {

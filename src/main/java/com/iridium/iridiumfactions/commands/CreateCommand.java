@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.command.CommandSender;
@@ -39,7 +40,7 @@ public class CreateCommand extends Command {
         }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (user.getFaction().isPresent()) {
+        if (user.getFaction().getFactionType() == FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }

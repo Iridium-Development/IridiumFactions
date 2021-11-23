@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
@@ -36,18 +37,31 @@ public class ClaimCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
+        Faction faction = user.getFaction();
+        if (args.length == 3) {
+            Optional<Faction> factionByName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(args[2]);
+            if (!factionByName.isPresent()) {
+                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                return false;
+            }
+            if (!user.isBypassing()) {
+                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noPermission.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                return false;
+            }
+            faction = factionByName.get();
+        } else {
+            if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
+                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                return false;
+            }
         }
         if (args.length == 1) {
-            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction.get(), player.getLocation().getChunk(), player);
+            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, player.getLocation().getChunk(), player);
             return true;
         }
         try {
             int radius = Integer.parseInt(args[1]);
-            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction.get(), player.getLocation().getChunk(), radius, player);
+            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, player.getLocation().getChunk(), radius, player);
             return true;
         } catch (NumberFormatException exception) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notANumber.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));

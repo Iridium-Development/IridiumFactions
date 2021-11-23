@@ -3,11 +3,13 @@ package com.iridium.iridiumfactions.database;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumfactions.Cache;
 import com.iridium.iridiumfactions.FactionRank;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.BlockValues;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,7 +50,36 @@ public final class Faction {
     @DatabaseField(columnName = "home")
     private String home;
 
+    @Setter(AccessLevel.NONE)
+    private FactionType factionType = FactionType.PLAYER_FACTION;
+
     private Cache<Double> valueCache = new Cache<>(500);
+
+    /**
+     * Constructor used for Wilderness Warzone and Safezone
+     *
+     * @param factionType The type of faction this is
+     */
+    public Faction(@NotNull FactionType factionType) {
+        this.factionType = factionType;
+        switch (factionType) {
+            case WILDERNESS:
+                this.id = -1;
+                this.name = IridiumFactions.getInstance().getConfiguration().wildernessFaction.defaultName;
+                this.description = IridiumFactions.getInstance().getConfiguration().wildernessFaction.defaultDescription;
+                break;
+            case WARZONE:
+                this.id = -2;
+                this.name = IridiumFactions.getInstance().getConfiguration().warzoneFaction.defaultName;
+                this.description = IridiumFactions.getInstance().getConfiguration().warzoneFaction.defaultDescription;
+                break;
+            case SAFEZONE:
+                this.id = -3;
+                this.name = IridiumFactions.getInstance().getConfiguration().safezoneFaction.defaultName;
+                this.description = IridiumFactions.getInstance().getConfiguration().safezoneFaction.defaultDescription;
+                break;
+        }
+    }
 
     /**
      * The default constructor.
@@ -57,7 +88,7 @@ public final class Faction {
      */
     public Faction(final @NotNull String name) {
         this.name = name;
-        this.description = "Default Faction Description";
+        this.description = IridiumFactions.getInstance().getConfiguration().playerFaction.defaultDescription;
         this.time = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 

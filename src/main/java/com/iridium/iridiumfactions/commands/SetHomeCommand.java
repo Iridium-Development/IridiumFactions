@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
@@ -37,22 +37,22 @@ public class SetHomeCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(player.getLocation()).map(Faction::getId).orElse(0) != faction.get().getId()) {
+        if (IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(player.getLocation()).getId() != faction.getId()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notInFactionLand.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction.get(), user, PermissionType.SETHOME)) {
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.SETHOME)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotSetHome
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));
             return false;
         }
-        faction.get().setHome(player.getLocation());
+        faction.setHome(player.getLocation());
         return true;
     }
 

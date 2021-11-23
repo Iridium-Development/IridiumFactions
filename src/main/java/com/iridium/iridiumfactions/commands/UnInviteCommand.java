@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
@@ -41,7 +42,7 @@ public class UnInviteCommand extends Command {
         }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (!user.getFaction().isPresent()) {
+        if (user.getFaction().getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
@@ -51,7 +52,7 @@ public class UnInviteCommand extends Command {
             return false;
         }
         User offlinePlayerUser = IridiumFactions.getInstance().getUserManager().getUser(revokee);
-        Optional<FactionInvite> factionInvite = IridiumFactions.getInstance().getFactionManager().getFactionInvite(user.getFaction().get(), offlinePlayerUser);
+        Optional<FactionInvite> factionInvite = IridiumFactions.getInstance().getFactionManager().getFactionInvite(user.getFaction(), offlinePlayerUser);
         if (!factionInvite.isPresent()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noActiveInvite.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;

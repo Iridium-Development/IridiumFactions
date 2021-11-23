@@ -1,11 +1,11 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -36,13 +36,13 @@ public class AllyCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> userFaction = user.getFaction();
-        if (!userFaction.isPresent()) {
+        Faction userFaction = user.getFaction();
+        if (userFaction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        Optional<Faction> faction = getFaction(player, args);
-        if (!faction.isPresent()) {
+        Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+        if (!faction.isPresent() || faction.get().getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
@@ -60,7 +60,7 @@ public class AllyCommand extends Command {
                 ));
                 return false;
             case REQUEST_SENT:
-                IridiumFactions.getInstance().getFactionManager().getFactionMembers(userFaction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
+                IridiumFactions.getInstance().getFactionManager().getFactionMembers(userFaction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
                         p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().allianceRequestSent
                                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                                 .replace("%player%", player.getName())
@@ -71,27 +71,12 @@ public class AllyCommand extends Command {
                         p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().allianceRequestReceived
                                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                                 .replace("%player%", player.getName())
-                                .replace("%faction%", userFaction.get().getName())
+                                .replace("%faction%", userFaction.getName())
                         ))
                 );
                 return true;
         }
         return false;
-    }
-
-    public Optional<Faction> getFaction(Player player, String[] args) {
-        Player targetPlayer = Bukkit.getPlayer(args[1]);
-        if (targetPlayer != null) {
-            User factionUser = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer);
-            Optional<Faction> factionByPlayer = factionUser.getFaction();
-            if (factionByPlayer.isPresent()) {
-                return factionByPlayer;
-            }
-            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().playerNoFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return Optional.empty();
-        }
-        String factionName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        return IridiumFactions.getInstance().getFactionManager().getFactionViaName(factionName);
     }
 
     /**

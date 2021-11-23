@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.gui.FactionInvitesGUI;
@@ -35,11 +36,11 @@ public class InvitesCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (!user.getFaction().isPresent()) {
+        if (user.getFaction().getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        player.openInventory(new FactionInvitesGUI(user.getFaction().get()).getInventory());
+        player.openInventory(new FactionInvitesGUI(user.getFaction()).getInventory());
         return true;
     }
 

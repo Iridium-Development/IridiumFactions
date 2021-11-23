@@ -44,10 +44,9 @@ public class FactionRelationshipRequest extends FactionData {
     }
 
     public void accept(User user) {
-        Faction faction1 = getFaction().orElse(null);
-        Faction faction2 = IridiumFactions.getInstance().getFactionManager().getFactionViaId(faction2ID).orElse(null);
+        Faction faction1 = getFaction();
+        Faction faction2 = IridiumFactions.getInstance().getFactionManager().getFactionViaId(faction2ID);
         Optional<User> user1 = getUser();
-        if (faction1 == null || faction2 == null) return;
 
         IridiumFactions.getInstance().getFactionManager().setFactionRelationship(faction1, faction2, relationshipType);
         String message = relationshipType == RelationshipType.ALLY ? IridiumFactions.getInstance().getMessages().factionAllied : IridiumFactions.getInstance().getMessages().factionTruced;

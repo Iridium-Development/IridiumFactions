@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum RelationshipType {
-    OWN("&a", 2),
-    ALLY("&d", 1),
-    TRUCE("&7", 0),
-    ENEMY("&c", -1);
+    OWN("&a", 4),
+    ALLY("&d", 3),
+    TRUCE("&7", 2),
+    ENEMY("&c", 1),
+    WILDERNESS("&2", -1),
+    WARZONE("&c", -2),
+    SAFEZONE("&e", -3);
 
     private String color;
     private int rank;

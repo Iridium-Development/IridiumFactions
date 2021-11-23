@@ -2,7 +2,9 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.FactionRank;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -36,22 +38,23 @@ public class LeaveCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (!user.getFaction().isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
         sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().leftFaction
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                .replace("%name%", user.getFaction().get().getName())
+                .replace("%name%", faction.getName())
         ));
 
-        IridiumFactions.getInstance().getFactionManager().getFactionMembers(user.getFaction().get()).forEach(factionUser -> {
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).forEach(factionUser -> {
             Player factionPlayer = Bukkit.getPlayer(factionUser.getUuid());
             if (factionPlayer != null && factionPlayer != player) {
                 factionPlayer.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userLeftFaction
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%name%", user.getFaction().get().getName())
+                        .replace("%name%", faction.getName())
                         .replace("%player%", player.getName())
                 ));
             }
