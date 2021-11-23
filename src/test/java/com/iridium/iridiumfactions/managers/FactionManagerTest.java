@@ -170,6 +170,22 @@ class FactionManagerTest {
     }
 
     @Test
+    public void claimWarzoneThenWilderness() {
+        PlayerMock playerMock = serverMock.addPlayer("Player");
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+
+        user.setBypassing(true);
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(new Faction(FactionType.WARZONE), playerMock.getLocation().getChunk(), playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+        assertEquals(playerMock.nextMessage(), "§c§lIridiumFactions §8» §7Player has claimed land at (0,0).");
+
+        IridiumFactions.getInstance().getFactionManager().claimFactionLand(new Faction(FactionType.WILDERNESS), playerMock.getLocation().getChunk(), playerMock).join();
+        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 0);
+        assertEquals(playerMock.nextMessage(), "§c§lIridiumFactions §8» §7Player has claimed land at (0,0).");
+    }
+
+    @Test
     public void claimFactionLandRadius() {
         Faction faction = new Faction("Faction", 1);
 
