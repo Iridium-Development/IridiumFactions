@@ -21,24 +21,37 @@ import java.util.stream.Collectors;
 
 public class FactionManager {
 
-    public Optional<Faction> getFactionViaId(int id) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(id);
+    @NotNull
+    public Faction getFactionViaId(int id) {
+        switch (id) {
+            case -1:
+                return new Faction(FactionType.WILDERNESS);
+            case -2:
+                return new Faction(FactionType.WARZONE);
+            case -3:
+                return new Faction(FactionType.SAFEZONE);
+            default:
+                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(id).orElse(getFactionViaId(-1));
+        }
     }
 
     public Optional<Faction> getFactionViaName(String name) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(name);
     }
 
-    public Optional<Faction> getFactionViaLocation(Location location) {
+    @NotNull
+    public Faction getFactionViaLocation(Location location) {
         return getFactionViaChunk(location.getChunk());
     }
 
-    public Optional<Faction> getFactionViaChunk(Chunk chunk) {
+    @NotNull
+    public Faction getFactionViaChunk(Chunk chunk) {
         return getFactionViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
     }
 
-    public Optional<Faction> getFactionViaChunk(World world, int x, int z) {
-        return getFactionViaId(getFactionClaimViaChunk(world, x, z).map(FactionData::getFactionID).orElse(0));
+    @NotNull
+    public Faction getFactionViaChunk(World world, int x, int z) {
+        return getFactionViaId(getFactionClaimViaChunk(world, x, z).map(FactionData::getFactionID).orElse(-1));
     }
 
     private Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
@@ -83,11 +96,11 @@ public class FactionManager {
                 ));
                 return;
             }
-            Optional<Faction> factionClaimedAtLand = getFactionViaChunk(world, x, z);
-            if (factionClaimedAtLand.isPresent()) {
+            Faction factionClaimedAtLand = getFactionViaChunk(world, x, z);
+            if (factionClaimedAtLand.getFactionType() != FactionType.PLAYER_FACTION) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%faction%", factionClaimedAtLand.get().getName())
+                        .replace("%faction%", factionClaimedAtLand.getName())
                 ));
                 return;
             }
@@ -145,8 +158,8 @@ public class FactionManager {
                 return;
             }
             Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
-            Optional<Faction> factionClaimedAtLand = getFactionViaId(factionClaim.map(FactionData::getFactionID).orElse(0));
-            if (!factionClaim.isPresent() || !factionClaimedAtLand.isPresent() || factionClaimedAtLand.get().getId() != faction.getId()) {
+            Faction factionClaimedAtLand = getFactionViaId(factionClaim.map(FactionData::getFactionID).orElse(-1));
+            if (!factionClaim.isPresent() || factionClaimedAtLand.getId() != faction.getId()) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaim
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%faction%", faction.getName())
@@ -281,7 +294,7 @@ public class FactionManager {
     }
 
     public RelationshipType getFactionRelationship(User user, Faction faction) {
-        return getFactionRelationship(user.getFaction().orElse(null), faction);
+        return getFactionRelationship(user.getFaction(), faction);
     }
 
     public void setFactionRelationship(Faction a, Faction b, RelationshipType relationshipType) {
@@ -321,10 +334,7 @@ public class FactionManager {
     }
 
     public FactionRelationShipRequestResponse sendFactionRelationshipRequest(User user, Faction faction, RelationshipType newRelationship) {
-        Faction userFaction = user.getFaction().orElse(null);
-        if (userFaction == null) {
-            throw new UnsupportedOperationException("The user's faction cannot be null");
-        }
+        Faction userFaction = user.getFaction();
         RelationshipType relationshipType = getFactionRelationship(user, faction);
         if (relationshipType == newRelationship) return FactionRelationShipRequestResponse.SAME_RELATIONSHIP;
         if (newRelationship.getRank() < relationshipType.getRank()) {

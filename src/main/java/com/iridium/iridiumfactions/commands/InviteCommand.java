@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
@@ -43,12 +43,12 @@ public class InviteCommand extends Command {
         }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction.get(), user, PermissionType.INVITE)) {
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.INVITE)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotInvite
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));
@@ -60,12 +60,12 @@ public class InviteCommand extends Command {
             return false;
         }
         User offlinePlayerUser = IridiumFactions.getInstance().getUserManager().getUser(invitee);
-        if (IridiumFactions.getInstance().getFactionManager().getFactionInvite(user.getFaction().get(), offlinePlayerUser).isPresent()) {
+        if (IridiumFactions.getInstance().getFactionManager().getFactionInvite(user.getFaction(), offlinePlayerUser).isPresent()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().inviteAlreadyPresent.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
-        IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().addEntry(new FactionInvite(user.getFaction().get(), offlinePlayerUser, user));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().addEntry(new FactionInvite(user.getFaction(), offlinePlayerUser, user));
         player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionInviteSent
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                 .replace("%player%", offlinePlayerUser.getName())

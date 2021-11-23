@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.listeners;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,13 +27,12 @@ public class PlayerBucketListener implements Listener {
     public void onPlayerBucket(PlayerBucketEvent event) {
         Player player = event.getPlayer();
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation()).ifPresent(faction -> {
-            if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.BUCKET)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUseBuckets
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                event.setCancelled(true);
-            }
-        });
+        Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation());
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.BUCKET)) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUseBuckets
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+            ));
+            event.setCancelled(true);
+        }
     }
 }

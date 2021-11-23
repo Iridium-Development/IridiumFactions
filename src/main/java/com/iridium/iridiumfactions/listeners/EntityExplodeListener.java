@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions.listeners;
 
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionBlocks;
 import com.iridium.iridiumfactions.database.FactionSpawners;
 import org.bukkit.block.Block;
@@ -16,15 +17,14 @@ public class EntityExplodeListener implements Listener {
 
     public void onMonitorEntityExplode(EntityExplodeEvent event) {
         for (Block block : event.blockList()) {
-            IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(block.getLocation()).ifPresent(faction -> {
-                if (block.getState() instanceof CreatureSpawner) {
-                    CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
-                    FactionSpawners factionSpawners = IridiumFactions.getInstance().getFactionManager().getFactionSpawners(faction, creatureSpawner.getSpawnedType());
-                    factionSpawners.setAmount(factionSpawners.getAmount() - 1);
-                }
-                FactionBlocks factionBlocks = IridiumFactions.getInstance().getFactionManager().getFactionBlock(faction, XMaterial.matchXMaterial(block.getType()));
-                factionBlocks.setAmount(factionBlocks.getAmount() - 1);
-            });
+            Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(block.getLocation());
+            if (block.getState() instanceof CreatureSpawner) {
+                CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
+                FactionSpawners factionSpawners = IridiumFactions.getInstance().getFactionManager().getFactionSpawners(faction, creatureSpawner.getSpawnedType());
+                factionSpawners.setAmount(factionSpawners.getAmount() - 1);
+            }
+            FactionBlocks factionBlocks = IridiumFactions.getInstance().getFactionManager().getFactionBlock(faction, XMaterial.matchXMaterial(block.getType()));
+            factionBlocks.setAmount(factionBlocks.getAmount() - 1);
         }
     }
 }

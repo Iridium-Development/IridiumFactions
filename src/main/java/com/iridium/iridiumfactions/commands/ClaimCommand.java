@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
@@ -10,7 +11,6 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
@@ -36,18 +36,18 @@ public class ClaimCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         if (args.length == 1) {
-            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction.get(), player.getLocation().getChunk(), player);
+            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, player.getLocation().getChunk(), player);
             return true;
         }
         try {
             int radius = Integer.parseInt(args[1]);
-            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction.get(), player.getLocation().getChunk(), radius, player);
+            IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, player.getLocation().getChunk(), radius, player);
             return true;
         } catch (NumberFormatException exception) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notANumber.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));

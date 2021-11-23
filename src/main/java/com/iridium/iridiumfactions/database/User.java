@@ -16,7 +16,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -63,7 +62,7 @@ public final class User {
         this.power = 10;
     }
 
-    public Optional<Faction> getFaction() {
+    public Faction getFaction() {
         return IridiumFactions.getInstance().getFactionManager().getFactionViaId(factionID);
     }
 
@@ -80,7 +79,7 @@ public final class User {
         this.joinTime = ZonedDateTime.of(joinTime, ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
-    public Player getPlayer(){
+    public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
 }

@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
@@ -37,17 +37,17 @@ public class HomeCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        Location home = faction.get().getHome();
+        Location home = faction.getHome();
         if (home == null) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().homeNotSet.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(home).map(Faction::getId).orElse(0) != faction.get().getId()) {
+        if (IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(home).getId() != faction.getId()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().homeNotInFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }

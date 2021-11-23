@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.configs;
 
 import com.google.common.collect.ImmutableMap;
+import com.iridium.iridiumfactions.FactionConfiguration;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.RelationshipType;
 
@@ -20,6 +21,11 @@ public class Configuration {
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
+
+    public FactionConfiguration playerFaction = new FactionConfiguration("Default Faction Description");
+    public FactionConfiguration wildernessFaction = new FactionConfiguration("&2Wilderness", "");
+    public FactionConfiguration warzoneFaction = new FactionConfiguration("&cWarzone", "");
+    public FactionConfiguration safezoneFaction = new FactionConfiguration("&eSafezone", "");
 
     public Map<FactionRank, String> factionRankNames = new HashMap<>(ImmutableMap.<FactionRank, String>builder()
             .put(FactionRank.OWNER, "Owner")

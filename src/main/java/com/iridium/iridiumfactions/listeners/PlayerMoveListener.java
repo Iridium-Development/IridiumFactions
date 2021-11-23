@@ -19,15 +19,11 @@ public class PlayerMoveListener implements Listener {
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         if (event.getTo() == null) return;
         if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
-        Faction fromFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getFrom()).orElse(null);
-        Faction toFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getTo()).orElse(null);
+        Faction fromFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getFrom());
+        Faction toFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getTo());
         if (fromFaction != toFaction) {
-            if (toFaction != null) {
-                RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, toFaction);
-                IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color(relationshipType.getColor()) + toFaction.getName(), StringUtils.color(ChatColor.GRAY + toFaction.getDescription()), 20, 40, 20);
-            } else {
-                IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color("&2Wilderness"), StringUtils.color(""), 20, 40, 20);
-            }
+            RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, toFaction);
+            IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color(relationshipType.getColor()) + toFaction.getName(), StringUtils.color(ChatColor.GRAY + toFaction.getDescription()), 20, 40, 20);
         }
     }
 

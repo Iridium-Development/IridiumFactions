@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import org.bukkit.Bukkit;
@@ -59,9 +60,10 @@ public class RecalculateCommand extends Command {
             @Override
             public void run() {
                 if (factions.hasNext()) {
-                    IridiumFactions.getInstance().getFactionManager().getFactionViaId(factions.next()).ifPresent(island ->
-                            IridiumFactions.getInstance().getFactionManager().recalculateFactionValue(island)
-                    );
+                    Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaId(factions.next());
+                    if (faction.getFactionType() == FactionType.PLAYER_FACTION) {
+                        IridiumFactions.getInstance().getFactionManager().recalculateFactionValue(faction);
+                    }
                 } else {
                     bukkitTask.cancel();
                     bukkitTask = null;

@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -38,12 +39,12 @@ public class RenameCommand extends Command {
     public boolean execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Optional<Faction> faction = user.getFaction();
-        if (!faction.isPresent()) {
+        Faction faction = user.getFaction();
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction.get(), user, PermissionType.RENAME)) {
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.RENAME)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotChangeName
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));
@@ -51,12 +52,12 @@ public class RenameCommand extends Command {
         }
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         Optional<Faction> factionWithName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(name);
-        if (factionWithName.isPresent() && factionWithName.get().getId() != faction.get().getId()) {
+        if (factionWithName.isPresent() && factionWithName.get().getId() != faction.getId()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        faction.get().setName(name);
-        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
+        faction.setName(name);
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
                 member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameChanged
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%player%", player.getName())

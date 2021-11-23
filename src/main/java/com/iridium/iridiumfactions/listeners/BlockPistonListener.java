@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.listeners;
 
 import com.google.common.collect.ImmutableMap;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.database.Faction;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
@@ -25,28 +26,26 @@ public class BlockPistonListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-        IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation()).ifPresent(faction -> {
-            for (Block block : event.getBlocks()) {
-                int[] offset = offsets.get(event.getDirection());
-                if (!faction.equals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(block.getLocation().add(offset[0], offset[1], offset[2])).orElse(null))) {
-                    event.setCancelled(true);
-                    return;
-                }
+        Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation());
+        for (Block block : event.getBlocks()) {
+            int[] offset = offsets.get(event.getDirection());
+            if (!faction.equals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(block.getLocation().add(offset[0], offset[1], offset[2])))) {
+                event.setCancelled(true);
+                return;
             }
-        });
+        }
 
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
-        IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation()).ifPresent(faction -> {
-            for (Block block : event.getBlocks()) {
-                int[] offset = offsets.get(event.getDirection());
-                if (!faction.equals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(block.getLocation().add(offset[0], offset[1], offset[2])).orElse(null))) {
-                    event.setCancelled(true);
-                    return;
-                }
+        Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation());
+        for (Block block : event.getBlocks()) {
+            int[] offset = offsets.get(event.getDirection());
+            if (!faction.equals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(block.getLocation().add(offset[0], offset[1], offset[2])))) {
+                event.setCancelled(true);
+                return;
             }
-        });
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -41,19 +42,19 @@ public class InfoCommand extends Command {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         if (args.length == 1) {
-            if (!user.getFaction().isPresent()) {
+            if (user.getFaction().getFactionType() != FactionType.PLAYER_FACTION) {
                 sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
                 return false;
             }
-            sendFactionInfo(player, user.getFaction().get());
+            sendFactionInfo(player, user.getFaction());
             return true;
         }
         Player targetPlayer = Bukkit.getPlayer(args[1]);
         if (targetPlayer != null) {
             User factionUser = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer);
-            Optional<Faction> factionByPlayer = factionUser.getFaction();
-            if (factionByPlayer.isPresent()) {
-                sendFactionInfo(player, factionByPlayer.get());
+            Faction factionByPlayer = factionUser.getFaction();
+            if (factionByPlayer.getFactionType() != FactionType.PLAYER_FACTION) {
+                sendFactionInfo(player, factionByPlayer);
                 return true;
             }
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().playerNoFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
