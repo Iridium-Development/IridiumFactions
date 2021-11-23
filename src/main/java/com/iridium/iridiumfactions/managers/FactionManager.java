@@ -97,7 +97,7 @@ public class FactionManager {
                 return;
             }
             Faction factionClaimedAtLand = getFactionViaChunk(world, x, z);
-            if (factionClaimedAtLand.getFactionType() != FactionType.PLAYER_FACTION) {
+            if (factionClaimedAtLand.getFactionType() != FactionType.WILDERNESS) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%faction%", factionClaimedAtLand.getName())
@@ -275,8 +275,17 @@ public class FactionManager {
         }
     }
 
-    public RelationshipType getFactionRelationship(Faction a, Faction b) {
-        if (a == null || b == null) {
+    public RelationshipType getFactionRelationship(@NotNull Faction a, @NotNull Faction b) {
+        if (b.getFactionType() == FactionType.WILDERNESS) {
+            return RelationshipType.WILDERNESS;
+        }
+        if (b.getFactionType() == FactionType.WARZONE) {
+            return RelationshipType.WARZONE;
+        }
+        if (b.getFactionType() == FactionType.SAFEZONE) {
+            return RelationshipType.SAFEZONE;
+        }
+        if (a.getFactionType() != FactionType.PLAYER_FACTION) {
             return RelationshipType.TRUCE;
         }
         if (a == b) {
@@ -293,7 +302,7 @@ public class FactionManager {
         return RelationshipType.TRUCE;
     }
 
-    public RelationshipType getFactionRelationship(User user, Faction faction) {
+    public RelationshipType getFactionRelationship(User user, @NotNull Faction faction) {
         return getFactionRelationship(user.getFaction(), faction);
     }
 
