@@ -5,10 +5,7 @@ import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
 import com.iridium.iridiumfactions.utils.LocationUtils;
-import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
@@ -46,6 +43,15 @@ public class FactionManager {
             default:
                 return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(name);
         }
+    }
+
+    public Optional<Faction> getFactionViaNameOrPlayer(String name) {
+        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(name);
+        Faction playerFaction = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
+        if (playerFaction.getFactionType() == FactionType.WILDERNESS) {
+            return getFactionViaName(name);
+        }
+        return Optional.of(playerFaction);
     }
 
     @NotNull

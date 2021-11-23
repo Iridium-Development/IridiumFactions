@@ -6,15 +6,11 @@ import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Command which reloads all configuration files.
@@ -45,29 +41,29 @@ public class TruceCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        Faction faction = getFaction(args);
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
+        Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+        if (!faction.isPresent() || faction.get().getFactionType() != FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (faction.getId() == user.getFactionID()) {
+        if (faction.get().getId() == user.getFactionID()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotRelationshipYourFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        switch (IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, faction, RelationshipType.TRUCE)) {
+        switch (IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, faction.get(), RelationshipType.TRUCE)) {
             case SET:
                 IridiumFactions.getInstance().getFactionManager().getFactionMembers(userFaction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
                         p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnAllied
                                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                                 .replace("%player%", player.getName())
-                                .replace("%faction%", faction.getName())
+                                .replace("%faction%", faction.get().getName())
                         ))
                 );
-                IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
+                IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
                         p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().yourFactionAlianceRevoked
                                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                                 .replace("%player%", player.getName())
-                                .replace("%faction%", faction.getName())
+                                .replace("%faction%", faction.get().getName())
                         ))
                 );
                 return true;
@@ -75,7 +71,7 @@ public class TruceCommand extends Command {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyTruced
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%player%", player.getName())
-                        .replace("%faction%", faction.getName())
+                        .replace("%faction%", faction.get().getName())
                 ));
                 return false;
             case REQUEST_SENT:
@@ -83,10 +79,10 @@ public class TruceCommand extends Command {
                         p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().truceRequestSent
                                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                                 .replace("%player%", player.getName())
-                                .replace("%faction%", faction.getName())
+                                .replace("%faction%", faction.get().getName())
                         ))
                 );
-                IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
+                IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(p ->
                         p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().truceRequestReceived
                                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                                 .replace("%player%", player.getName())
@@ -95,15 +91,6 @@ public class TruceCommand extends Command {
                 );
         }
         return false;
-    }
-
-    public Faction getFaction(String[] args) {
-        Player targetPlayer = Bukkit.getPlayer(args[1]);
-        if (targetPlayer != null) {
-            return IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
-        }
-        String factionName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        return IridiumFactions.getInstance().getFactionManager().getFactionViaName(factionName).orElse(IridiumFactions.getInstance().getFactionManager().getFactionViaId(-1));
     }
 
     /**
