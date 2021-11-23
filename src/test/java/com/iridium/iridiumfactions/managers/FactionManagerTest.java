@@ -67,6 +67,10 @@ class FactionManagerTest {
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("faction 1").orElse(null), faction1);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("FACTION 2").orElse(null), faction2);
+
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Wilderness").get().getFactionType(), FactionType.WILDERNESS);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Warzone").get().getFactionType(), FactionType.WARZONE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Safezone").get().getFactionType(), FactionType.SAFEZONE);
     }
 
     @Test

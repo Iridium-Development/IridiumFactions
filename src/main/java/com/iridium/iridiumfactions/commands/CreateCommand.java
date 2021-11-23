@@ -40,7 +40,7 @@ public class CreateCommand extends Command {
         }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (user.getFaction().getFactionType() != FactionType.PLAYER_FACTION) {
+        if (user.getFaction().getFactionType() == FactionType.PLAYER_FACTION) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }

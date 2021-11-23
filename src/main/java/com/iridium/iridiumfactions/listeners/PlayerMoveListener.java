@@ -21,7 +21,7 @@ public class PlayerMoveListener implements Listener {
         if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
         Faction fromFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getFrom());
         Faction toFaction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getTo());
-        if (fromFaction != toFaction) {
+        if (fromFaction.getId() != toFaction.getId()) {
             RelationshipType relationshipType = IridiumFactions.getInstance().getFactionManager().getFactionRelationship(user, toFaction);
             IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color(relationshipType.getColor()) + toFaction.getName(), StringUtils.color(ChatColor.GRAY + toFaction.getDescription()), 20, 40, 20);
         }

@@ -36,7 +36,16 @@ public class FactionManager {
     }
 
     public Optional<Faction> getFactionViaName(String name) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(name);
+        switch (name.toUpperCase()) {
+            case "WILDERNESS":
+                return Optional.of(new Faction(FactionType.WILDERNESS));
+            case "WARZONE":
+                return Optional.of(new Faction(FactionType.WARZONE));
+            case "SAFEZONE":
+                return Optional.of(new Faction(FactionType.SAFEZONE));
+            default:
+                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(name);
+        }
     }
 
     @NotNull
@@ -96,11 +105,11 @@ public class FactionManager {
                 ));
                 return;
             }
-            Faction factionClaimedAtLand = getFactionViaChunk(world, x, z);
-            if (factionClaimedAtLand.getFactionType() != FactionType.WILDERNESS) {
+            Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
+            if (factionClaim.isPresent() && !user.isBypassing()) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%faction%", factionClaimedAtLand.getName())
+                        .replace("%faction%", factionClaim.get().getFaction().getName())
                 ));
                 return;
             }
@@ -116,7 +125,24 @@ public class FactionManager {
                     ));
                 }
             });
-            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, world.getName(), x, z));
+            if (user.getFactionID() != faction.getId()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", user.getName())
+                        .replace("%faction%", faction.getName())
+                        .replace("%x%", String.valueOf(x))
+                        .replace("%z%", String.valueOf(z))
+                ));
+            }
+            if (factionClaim.isPresent()) {
+                if (faction.getFactionType() == FactionType.WILDERNESS) {
+                    IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
+                } else {
+                    factionClaim.get().setFaction(faction);
+                }
+            } else {
+                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, world.getName(), x, z));
+            }
         });
     }
 

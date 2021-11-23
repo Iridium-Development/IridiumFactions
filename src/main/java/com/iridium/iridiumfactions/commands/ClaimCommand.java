@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Command which reloads all configuration files.
@@ -37,9 +38,22 @@ public class ClaimCommand extends Command {
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         Faction faction = user.getFaction();
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
+        if (args.length == 3) {
+            Optional<Faction> factionByName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(args[2]);
+            if (!factionByName.isPresent()) {
+                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                return false;
+            }
+            if (!user.isBypassing()) {
+                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noPermission.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                return false;
+            }
+            faction = factionByName.get();
+        } else {
+            if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
+                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                return false;
+            }
         }
         if (args.length == 1) {
             IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, player.getLocation().getChunk(), player);

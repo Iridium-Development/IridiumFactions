@@ -45,9 +45,12 @@ public class IridiumFactions extends IridiumCore {
         instance = this;
     }
 
+    public IridiumFactions() {
+        instance = this;
+    }
+
     @Override
     public void onEnable() {
-        instance = this;
         super.onEnable();
 
         this.commandManager = new CommandManager("IridiumFactions");
