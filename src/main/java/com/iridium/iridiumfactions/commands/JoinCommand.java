@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,36 +49,29 @@ public class JoinCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        Faction faction = null;
-        Player factionOwner = Bukkit.getServer().getPlayer(args[1]);
-        if (factionOwner != null) {
-            faction = IridiumFactions.getInstance().getUserManager().getUser(factionOwner).getFaction();
-        }
-        if (faction != null) {
-            faction = IridiumFactions.getInstance().getFactionManager().getFactionViaName(args[1]).orElse(null);
-        }
-        if (faction == null) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noFactionExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+        if (!faction.isPresent()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
-        Optional<FactionInvite> factionInvite = IridiumFactions.getInstance().getFactionManager().getFactionInvite(faction, user);
+        Optional<FactionInvite> factionInvite = IridiumFactions.getInstance().getFactionManager().getFactionInvite(faction.get(), user);
         if (!factionInvite.isPresent() && !user.isBypassing()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noInvite.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
-        user.setFaction(faction);
+        user.setFaction(faction.get());
         user.setFactionRank(FactionRank.MEMBER);
 
         factionInvite.ifPresent(invite -> IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().delete(invite));
 
         sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().joinedFaction
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                .replace("%name%", faction.getName())
+                .replace("%name%", faction.get().getName())
         ));
 
-        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).forEach(factionUser -> {
+        IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction.get()).forEach(factionUser -> {
             Player factionPlayer = Bukkit.getPlayer(factionUser.getUuid());
             if (factionPlayer != null && factionPlayer != player) {
                 factionPlayer.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userJoinedFaction
