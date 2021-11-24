@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class UserManagerTest {
 
@@ -33,6 +34,7 @@ class UserManagerTest {
 
     @Test
     public void getUser() {
+        fail();
         Player player1 = serverMock.addPlayer("Player 1");
         Player player2 = serverMock.addPlayer("Player 2");
         // serverMock.addPlayer also calls PlayerJoinListener which adds the user to the DB
