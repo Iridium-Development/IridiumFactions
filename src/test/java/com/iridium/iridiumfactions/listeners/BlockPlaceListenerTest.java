@@ -11,18 +11,17 @@ import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BlockPlaceListenerTest {
 
     private ServerMock serverMock;
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setup() {
         this.serverMock = MockBukkit.mock();
@@ -38,10 +37,9 @@ class BlockPlaceListenerTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void onBlockPlace() {
-        World world = serverMock.addSimpleWorld("world");
-        Location location = new Location(world, 0, 0, 0);
         PlayerMock playerMock = serverMock.addPlayer("Player");
         User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        Location location = playerMock.getLocation();
         Faction faction = new Faction("Faction", 1);
         FactionClaim factionClaim = new FactionClaim(faction, location.getChunk());
 
@@ -49,7 +47,7 @@ class BlockPlaceListenerTest {
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim);
 
         assertTrue(playerMock.simulateBlockPlace(Material.DIRT, location).isCancelled());
-        assertEquals(playerMock.nextMessage(), StringUtils.color(IridiumFactions.getInstance().getMessages().cannotPlaceBlocks
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotPlaceBlocks
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
         ));
 

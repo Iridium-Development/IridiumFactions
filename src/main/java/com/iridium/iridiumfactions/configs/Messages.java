@@ -83,6 +83,7 @@ public class Messages {
     public String alreadyEnemies = "%prefix% &7You are already enemies with this Faction";
     public String allianceRequestSent = "%prefix% &7%player% has sent an alliance request to %faction%";
     public String allianceRequestReceived = "%prefix% &7You have received an alliance request from %player%";
+    public String allianceRequestAlreadySent = "%prefix% &7You have already requested an alliance with this Faction";
     public String truceRequestSent = "%prefix% &7%player% has sent an truce request to %faction%";
     public String truceRequestReceived = "%prefix% &7You have received an truce request from %player%";
     public String cannotRelationshipYourFaction = "%prefix% &7You cannot change the relationship with your own Faction";

@@ -24,7 +24,7 @@ public class DescriptionCommand extends Command {
      * The default constructor.
      */
     public DescriptionCommand() {
-        super(Collections.singletonList("description"), "change your faction description", "", true, Duration.ZERO);
+        super(Collections.singletonList("description"), "change your faction description", "%prefix% &7/f description <name>", "", true, Duration.ZERO);
     }
 
     /**
@@ -37,6 +37,10 @@ public class DescriptionCommand extends Command {
      */
     @Override
     public boolean execute(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            sender.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         Faction faction = user.getFaction();

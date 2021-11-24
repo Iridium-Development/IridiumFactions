@@ -31,7 +31,7 @@ public class AboutCommand extends Command {
      */
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        sender.sendMessage(StringUtils.color("&7Plugin Name: &cIridiumSkyblock"));
+        sender.sendMessage(StringUtils.color("&7Plugin Name: &cIridiumFactions"));
         sender.sendMessage(StringUtils.color("&7Plugin Version: &c" + IridiumFactions.getInstance().getDescription().getVersion()));
         sender.sendMessage(StringUtils.color("&7Plugin Author: &cPeaches_MLG"));
         sender.sendMessage(StringUtils.color("&7Plugin Donations: &cwww.patreon.com/Peaches_MLG"));

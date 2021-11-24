@@ -52,11 +52,14 @@ public class AllyCommand extends Command {
         }
 
         switch (IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, faction.get(), RelationshipType.ALLY)) {
+            case ALREADY_SENT_REQUEST:
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().allianceRequestAlreadySent
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return false;
             case SAME_RELATIONSHIP:
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyAllied
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%player%", player.getName())
-                        .replace("%faction%", faction.get().getName())
                 ));
                 return false;
             case REQUEST_SENT:
