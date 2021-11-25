@@ -18,6 +18,7 @@ public class Messages {
     public String factionNameAlreadyExists = "%prefix% &7A faction by that name already exists";
     public String factionCreated = "%prefix% &7You have created a faction!";
     public String dontHaveFaction = "%prefix% &7You dont have a faction.";
+    public String teleportingFactionHome = "%prefix% &7Teleporting to your Faction home.";
     public String homeNotSet = "%prefix% &7Your Faction home is not set.";
     public String homeNotInFaction = "%prefix% &7Your Faction home is not inside your Faction.";
     public String notInFactionLand = "%prefix% &7You must be inside your faction land to do this.";
@@ -32,6 +33,7 @@ public class Messages {
     public String joinedFaction = "%prefix% &7You have joined the faction %name%.";
     public String userJoinedFaction = "%prefix% &7%player% has joined your faction.";
     public String userNotInFaction = "%prefix% &7That user is not a member of your faction";
+    public String userAlreadyInFaction = "%prefix% &7That user is already a member of your faction";
     public String cannotKickOwner = "%prefix% &7You cannot kick the Faction owner";
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";

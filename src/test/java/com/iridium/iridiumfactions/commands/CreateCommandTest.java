@@ -43,6 +43,15 @@ class CreateCommandTest {
     }
 
     @Test
+    public void executeCreateCommandFactionNameWilderness() {
+        PlayerMock playerMock = serverMock.addPlayer("player");
+
+        serverMock.dispatchCommand(playerMock, "f create Wilderness");
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
     public void executeCreateCommandFactionNameAlreadyExists() {
         PlayerMock playerMock = serverMock.addPlayer("player");
         Faction faction = new Faction("Faction", 1);

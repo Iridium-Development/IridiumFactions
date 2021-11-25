@@ -60,6 +60,10 @@ public class InviteCommand extends Command {
             return false;
         }
         User offlinePlayerUser = IridiumFactions.getInstance().getUserManager().getUser(invitee);
+        if (offlinePlayerUser.getFactionID() == faction.getId()) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userAlreadyInFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
         if (IridiumFactions.getInstance().getFactionManager().getFactionInvite(user.getFaction(), offlinePlayerUser).isPresent()) {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().inviteAlreadyPresent.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;

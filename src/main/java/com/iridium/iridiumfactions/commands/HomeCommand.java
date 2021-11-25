@@ -52,7 +52,7 @@ public class HomeCommand extends Command {
             return false;
         }
         player.teleport(home);
-        sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionHomeSet.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().teleportingFactionHome.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
         return true;
     }
 
