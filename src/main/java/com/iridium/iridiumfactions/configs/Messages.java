@@ -34,7 +34,7 @@ public class Messages {
     public String userJoinedFaction = "%prefix% &7%player% has joined your faction.";
     public String userNotInFaction = "%prefix% &7That user is not a member of your faction";
     public String userAlreadyInFaction = "%prefix% &7That user is already a member of your faction";
-    public String cannotKickOwner = "%prefix% &7You cannot kick the Faction owner";
+    public String cannotKickHigherRank = "%prefix% &7You cannot kick somone with a higher rank than you.";
     public String leftFaction = "%prefix% &7You have left the faction %name%.";
     public String userLeftFaction = "%prefix% &7%player% has left your faction.";
     public String notANumber = "%prefix% &7That is not a valid number.";

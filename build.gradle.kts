@@ -24,7 +24,7 @@ repositories {
 dependencies {
     // Dependencies that we want to shade in
     implementation("org.jetbrains:annotations:22.0.0")
-    implementation("com.iridium:IridiumCore:1.3.9")
+    implementation("com.iridium:IridiumCore:1.4.6")
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("com.j256.ormlite:ormlite-core:5.7")
     implementation("com.j256.ormlite:ormlite-jdbc:5.7")
@@ -43,8 +43,8 @@ dependencies {
 
     // Test dependencies
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    testImplementation("org.mockito:mockito-inline:4.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.mockito:mockito-inline:4.1.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.16:1.5.2")
 }
 

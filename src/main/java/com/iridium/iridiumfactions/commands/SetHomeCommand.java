@@ -53,6 +53,9 @@ public class SetHomeCommand extends Command {
             return false;
         }
         faction.setHome(player.getLocation());
+        player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionHomeSet
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
         return true;
     }
 
