@@ -16,6 +16,8 @@ public class Messages {
     public String activeCooldown = "%prefix% &7You cannot do that due to a running cooldown, please wait %hours% hour(s), %minutes% minute(s), %seconds% second(s)!";
     public String alreadyHaveFaction = "%prefix% &7You already have a faction";
     public String factionNameAlreadyExists = "%prefix% &7A faction by that name already exists";
+    public String factionNameTooShort = "%prefix% &7This faction name is too short. It must be at least %min_length% characters long.";
+    public String factionNameTooLong = "%prefix% &7This faction name is too long. It must be at most %max_length% characters long.";
     public String factionCreated = "%prefix% &7You have created a faction!";
     public String dontHaveFaction = "%prefix% &7You dont have a faction.";
     public String teleportingFactionHome = "%prefix% &7Teleporting to your Faction home.";

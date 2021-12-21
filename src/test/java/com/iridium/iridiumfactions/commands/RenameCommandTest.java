@@ -62,6 +62,36 @@ class RenameCommandTest {
     }
 
     @Test
+    public void executeRenameCommandTooShort() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
+
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.RENAME.getPermissionKey(), true);
+
+        serverMock.dispatchCommand(playerMock, "f rename i");
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooShort
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%min_length%", String.valueOf(IridiumFactions.getInstance().getConfiguration().minFactionNameLength))
+        ));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeRenameCommandTooLong() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
+
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.RENAME.getPermissionKey(), true);
+
+        serverMock.dispatchCommand(playerMock, "f rename ReallyLongFactionNameThatIsTooLong");
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooLong
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%max_length%", String.valueOf(IridiumFactions.getInstance().getConfiguration().maxFactionNameLength))
+        ));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
     public void executeRenameCommandSuccessful() {
         Faction faction = new FactionBuilder("THEBESTFACTION").build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();

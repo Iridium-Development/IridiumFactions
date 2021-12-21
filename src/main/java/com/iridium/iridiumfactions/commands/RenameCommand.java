@@ -56,6 +56,20 @@ public class RenameCommand extends Command {
             sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
+        if (name.length() < IridiumFactions.getInstance().getConfiguration().minFactionNameLength) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooShort
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                    .replace("%min_length%", String.valueOf(IridiumFactions.getInstance().getConfiguration().minFactionNameLength))
+            ));
+            return false;
+        }
+        if (name.length() > IridiumFactions.getInstance().getConfiguration().maxFactionNameLength) {
+            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooLong
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                    .replace("%max_length%", String.valueOf(IridiumFactions.getInstance().getConfiguration().maxFactionNameLength))
+            ));
+            return false;
+        }
         faction.setName(name);
         IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
                 member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameChanged
