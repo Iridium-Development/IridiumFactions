@@ -1,8 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
-import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionType;
-import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.gui.FactionMembersGUI;
 import org.bukkit.command.CommandSender;
@@ -21,25 +19,12 @@ public class MembersCommand extends Command {
      * The default constructor.
      */
     public MembersCommand() {
-        super(Collections.singletonList("members"), "View your faction members", "%prefix% &7/f members", "", true, Duration.ZERO);
+        super(Collections.singletonList("members"), "View your faction members", "%prefix% &7/f members", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        if (user.getFaction().getFactionType() != FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
+    public boolean execute(User user, Faction faction, String[] args) {
+        Player player = user.getPlayer();
         player.openInventory(new FactionMembersGUI(user.getFaction()).getInventory());
         return true;
     }

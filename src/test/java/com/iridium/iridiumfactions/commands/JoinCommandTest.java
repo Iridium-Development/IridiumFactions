@@ -4,8 +4,10 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionBuilder;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.UserBuilder;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
@@ -34,7 +36,7 @@ class JoinCommandTest {
 
     @Test
     public void executeJoinCommandBadSyntax() {
-        PlayerMock playerMock = serverMock.addPlayer("Player");
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(new FactionBuilder().build()).build();
 
         serverMock.dispatchCommand(playerMock, "f join");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().joinCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
@@ -43,12 +45,8 @@ class JoinCommandTest {
 
     @Test
     public void executeJoinCommandInFaction() {
-        PlayerMock playerMock = serverMock.addPlayer("Player");
-        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
-        Faction faction = new Faction("Faction", 1);
-
-        user.setFaction(faction);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
 
         serverMock.dispatchCommand(playerMock, "f join Faction");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
@@ -57,7 +55,7 @@ class JoinCommandTest {
 
     @Test
     public void executeJoinCommandFactionDoesntExist() {
-        PlayerMock playerMock = serverMock.addPlayer("Player");
+        PlayerMock playerMock = new UserBuilder(serverMock).build();
 
         serverMock.dispatchCommand(playerMock, "f join Faction");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
@@ -66,11 +64,10 @@ class JoinCommandTest {
 
     @Test
     public void executeJoinCommandNoInvite() {
-        PlayerMock playerMock = serverMock.addPlayer("Player");
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).build();
 
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(new Faction("Faction", 1));
-
-        serverMock.dispatchCommand(playerMock, "f join Faction");
+        serverMock.dispatchCommand(playerMock, "f join " + faction.getName());
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().noInvite.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
         playerMock.assertNoMoreSaid();
     }

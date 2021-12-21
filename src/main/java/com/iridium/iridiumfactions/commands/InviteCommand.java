@@ -1,7 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -24,28 +23,14 @@ public class InviteCommand extends Command {
      * The default constructor.
      */
     public InviteCommand() {
-        super(Collections.singletonList("invite"), "Invite a user to your faction", "%prefix% &7/f invite <player>", "", true, Duration.ZERO);
+        super(Collections.singletonList("invite"), "Invite a user to your faction", "%prefix% &7/f invite <player>", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    public boolean execute(User user, Faction faction, String[] args) {
+        Player player = user.getPlayer();
         if (args.length != 2) {
-            sender.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Faction faction = user.getFaction();
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.INVITE)) {
@@ -56,16 +41,16 @@ public class InviteCommand extends Command {
         }
         Player invitee = Bukkit.getServer().getPlayer(args[1]);
         if (invitee == null) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notAPlayer.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notAPlayer.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         User offlinePlayerUser = IridiumFactions.getInstance().getUserManager().getUser(invitee);
         if (offlinePlayerUser.getFactionID() == faction.getId()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userAlreadyInFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().userAlreadyInFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         if (IridiumFactions.getInstance().getFactionManager().getFactionInvite(user.getFaction(), offlinePlayerUser).isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().inviteAlreadyPresent.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().inviteAlreadyPresent.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 

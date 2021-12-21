@@ -128,14 +128,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 continue;
             }
 
-            // Check if this command is only for players
-            if (command.onlyForPlayers && !(commandSender instanceof Player)) {
-                // Must be a player
-                commandSender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().mustBeAPlayer
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-                return false;
-            }
-
             // Check permissions
             if (!((commandSender.hasPermission(command.permission) || command.permission
                     .equalsIgnoreCase("") || command.permission

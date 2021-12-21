@@ -1,7 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -22,28 +21,14 @@ public class SetHomeCommand extends Command {
      * The default constructor.
      */
     public SetHomeCommand() {
-        super(Collections.singletonList("sethome"), "Set your Faction home", "", true, Duration.ZERO);
+        super(Collections.singletonList("sethome"), "Set your Faction home", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Faction faction = user.getFaction();
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
+    public boolean execute(User user, Faction faction, String[] args) {
+        Player player = user.getPlayer();
         if (IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(player.getLocation()).getId() != faction.getId()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notInFactionLand.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notInFactionLand.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.SETHOME)) {

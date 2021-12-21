@@ -31,7 +31,7 @@ class PromoteCommandTest {
 
     @Test
     public void executePromoteCommandBadSyntax() {
-        PlayerMock playerMock = new UserBuilder(serverMock).build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(new FactionBuilder().build()).build();
 
         serverMock.dispatchCommand(playerMock, "f promote");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().promoteCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));

@@ -1,7 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
@@ -24,26 +23,12 @@ public class RenameCommand extends Command {
      * The default constructor.
      */
     public RenameCommand() {
-        super(Arrays.asList("rename", "name", "tag"), "change your faction name", "", true, Duration.ZERO);
+        super(Arrays.asList("rename", "name", "tag"), "change your faction name", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Faction faction = user.getFaction();
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
+    public boolean execute(User user, Faction faction, String[] args) {
+        Player player = user.getPlayer();
         if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.RENAME)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotChangeName
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
@@ -53,18 +38,18 @@ public class RenameCommand extends Command {
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         Optional<Faction> factionWithName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(name);
         if (factionWithName.isPresent() && factionWithName.get().getId() != faction.getId()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         if (name.length() < IridiumFactions.getInstance().getConfiguration().minFactionNameLength) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooShort
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooShort
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                     .replace("%min_length%", String.valueOf(IridiumFactions.getInstance().getConfiguration().minFactionNameLength))
             ));
             return false;
         }
         if (name.length() > IridiumFactions.getInstance().getConfiguration().maxFactionNameLength) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooLong
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameTooLong
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                     .replace("%max_length%", String.valueOf(IridiumFactions.getInstance().getConfiguration().maxFactionNameLength))
             ));

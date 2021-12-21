@@ -4,9 +4,7 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionRank;
-import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
@@ -35,7 +33,7 @@ class InviteCommandTest {
 
     @Test
     public void executeInviteCommandBadSyntax() {
-        PlayerMock playerMock = serverMock.addPlayer("Player");
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(new FactionBuilder().build()).build();
 
         serverMock.dispatchCommand(playerMock, "f invite");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().inviteCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));

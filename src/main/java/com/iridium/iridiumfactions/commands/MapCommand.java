@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumfactions.FactionsMap;
+import com.iridium.iridiumfactions.database.User;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -17,20 +18,12 @@ public class MapCommand extends Command {
      * The default constructor.
      */
     public MapCommand() {
-        super(Collections.singletonList("map"), "view your faction map", "", true, Duration.ZERO);
+        super(Collections.singletonList("map"), "view your faction map", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
+    public boolean execute(User user, String[] args) {
+        Player player = user.getPlayer();
         new FactionsMap(player).sendMap();
         return true;
     }

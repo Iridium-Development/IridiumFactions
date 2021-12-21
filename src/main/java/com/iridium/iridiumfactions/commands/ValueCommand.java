@@ -1,7 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
@@ -21,26 +20,12 @@ public class ValueCommand extends Command {
      * The default constructor.
      */
     public ValueCommand() {
-        super(Collections.singletonList("value"), "View your Faction value", "", true, Duration.ZERO);
+        super(Collections.singletonList("value"), "View your Faction value", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Shows the Island's value.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Faction faction = user.getFaction();
-        if (user.getFaction().getFactionType() != FactionType.PLAYER_FACTION) {
-            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
+    public boolean execute(User user, Faction faction, String[] args) {
+        Player player = user.getPlayer();
         player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().islandValue
                 .replace("%rank%", String.valueOf(faction.getRank()))
                 .replace("%value%", String.valueOf(faction.getValue()))

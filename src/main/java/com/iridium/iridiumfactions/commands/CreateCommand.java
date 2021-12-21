@@ -21,37 +21,28 @@ public class CreateCommand extends Command {
      * The default constructor.
      */
     public CreateCommand() {
-        super(Collections.singletonList("create"), "Create a new faction", "%prefix% &7/f create <name>", "", true, Duration.ZERO);
+        super(Collections.singletonList("create"), "Create a new faction", "%prefix% &7/f create <name>", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    public boolean execute(User user, String[] args) {
+        Player player = user.getPlayer();
         if (args.length < 2) {
-            sender.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         if (user.getFaction().getFactionType() == FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
         String factionName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         if (IridiumFactions.getInstance().getFactionManager().getFactionViaName(factionName).isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionNameAlreadyExists.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         IridiumFactions.getInstance().getFactionManager().createFaction(player, factionName).thenAccept(faction ->
-                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionCreated.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)))
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionCreated.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)))
         );
         return true;
     }

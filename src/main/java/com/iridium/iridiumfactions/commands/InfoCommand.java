@@ -24,28 +24,19 @@ public class InfoCommand extends Command {
      * The default constructor.
      */
     public InfoCommand() {
-        super(Arrays.asList("info", "who"), "View information about a faction", "", true, Duration.ZERO);
+        super(Arrays.asList("info", "who"), "View information about a faction", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+    public boolean execute(User user, String[] args) {
+        Player player = user.getPlayer();
         if (args.length == 1) {
             sendFactionInfo(player, user.getFaction());
             return true;
         }
         Optional<Faction> faction = IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
         if (!faction.isPresent()) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
         sendFactionInfo(player, faction.get());

@@ -18,17 +18,9 @@ public class AboutCommand extends Command {
      * The default constructor.
      */
     public AboutCommand() {
-        super(Arrays.asList("about", "version"), "Display plugin info", "", false, Duration.ZERO);
+        super(Arrays.asList("about", "version"), "Display plugin info", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Display plugin information to the user.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         sender.sendMessage(StringUtils.color("&7Plugin Name: &cIridiumFactions"));

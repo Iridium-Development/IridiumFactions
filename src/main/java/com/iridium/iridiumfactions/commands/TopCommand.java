@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
+import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.gui.FactionTopGUI;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,12 +15,12 @@ public class TopCommand extends Command {
      * The default constructor.
      */
     public TopCommand() {
-        super(Collections.singletonList("top"), "Display the top Factions", "", true, Duration.ZERO);
+        super(Collections.singletonList("top"), "Display the top Factions", "", Duration.ZERO);
     }
 
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
+    public boolean execute(User user, String[] args) {
+        Player player = user.getPlayer();
         player.openInventory(new FactionTopGUI().getInventory());
         return true;
     }

@@ -4,9 +4,7 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionRank;
-import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
@@ -33,20 +31,21 @@ class DescriptionCommandTest {
     }
 
     @Test
-    public void executeDemoteCommandBadSyntax() {
-        PlayerMock playerMock = serverMock.addPlayer("player");
-
-        serverMock.dispatchCommand(playerMock, "f description");
-        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().descriptionCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-        playerMock.assertNoMoreSaid();
-    }
-
-    @Test
     public void executeDescriptionCommandNoFaction() {
         PlayerMock playerMock = serverMock.addPlayer("player");
 
         serverMock.dispatchCommand(playerMock, "f description newDescription");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeDemoteCommandBadSyntax() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+
+        serverMock.dispatchCommand(playerMock, "f description");
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().descriptionCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
         playerMock.assertNoMoreSaid();
     }
 

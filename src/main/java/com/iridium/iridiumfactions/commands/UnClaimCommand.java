@@ -1,7 +1,6 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
@@ -21,26 +20,12 @@ public class UnClaimCommand extends Command {
      * The default constructor.
      */
     public UnClaimCommand() {
-        super(Collections.singletonList("unclaim"), "Un-Claim land for your faction", "", true, Duration.ZERO);
+        super(Collections.singletonList("unclaim"), "Un-Claim land for your faction", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        Faction faction = user.getFaction();
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
-            return false;
-        }
+    public boolean execute(User user, Faction faction, String[] args) {
+        Player player = user.getPlayer();
         if (args.length == 1) {
             IridiumFactions.getInstance().getFactionManager().unClaimFactionLand(faction, player.getLocation().getChunk(), player);
             return true;
@@ -50,7 +35,7 @@ public class UnClaimCommand extends Command {
             IridiumFactions.getInstance().getFactionManager().unClaimFactionLand(faction, player.getLocation().getChunk(), radius, player);
             return true;
         } catch (NumberFormatException exception) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notANumber.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notANumber.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
         }
         return false;
     }

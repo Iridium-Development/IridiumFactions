@@ -22,36 +22,27 @@ public class ClaimCommand extends Command {
      * The default constructor.
      */
     public ClaimCommand() {
-        super(Collections.singletonList("claim"), "Claim land for your faction", "", true, Duration.ZERO);
+        super(Collections.singletonList("claim"), "Claim land for your faction", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Reloads all configuration files.
-     *
-     * @param sender The CommandSender which executes this command
-     * @param args   The arguments used with this command. They contain the sub-command
-     */
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+    public boolean execute(User user, String[] args) {
+        Player player = user.getPlayer();
         Faction faction = user.getFaction();
         if (args.length == 3) {
             Optional<Faction> factionByName = IridiumFactions.getInstance().getFactionManager().getFactionViaName(args[2]);
             if (!factionByName.isPresent()) {
-                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDoesntExistByName.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
                 return false;
             }
             if (!user.isBypassing()) {
-                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noPermission.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noPermission.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
                 return false;
             }
             faction = factionByName.get();
         } else {
             if (faction.getFactionType() != FactionType.PLAYER_FACTION) {
-                sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().dontHaveFaction.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
                 return false;
             }
         }
@@ -64,7 +55,7 @@ public class ClaimCommand extends Command {
             IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, player.getLocation().getChunk(), radius, player);
             return true;
         } catch (NumberFormatException exception) {
-            sender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notANumber.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notANumber.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
         }
         return false;
     }

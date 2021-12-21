@@ -26,7 +26,7 @@ public class RecalculateCommand extends Command {
      * The default constructor.
      */
     public RecalculateCommand() {
-        super(Arrays.asList("recalculate", "recalc"), "Recalculate all Faction Values", "iridiumfactions.recalculate", false, Duration.ZERO);
+        super(Arrays.asList("recalculate", "recalc"), "Recalculate all Faction Values", "iridiumfactions.recalculate", Duration.ZERO);
     }
 
     /**

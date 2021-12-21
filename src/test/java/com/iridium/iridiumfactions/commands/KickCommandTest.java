@@ -4,9 +4,7 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.FactionRank;
-import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
@@ -34,7 +32,7 @@ class KickCommandTest {
 
     @Test
     public void executeKickCommandBadSyntax() {
-        PlayerMock playerMock = serverMock.addPlayer("player");
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(new FactionBuilder().build()).build();
 
         serverMock.dispatchCommand(playerMock, "f kick");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().kickCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));

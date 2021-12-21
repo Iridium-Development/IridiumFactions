@@ -40,7 +40,7 @@ class TransferCommandTest {
 
     @Test
     public void executeSetHomeCommandBadSyntax() {
-        PlayerMock playerMock = new UserBuilder(serverMock).build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(new FactionBuilder().build()).build();
 
         serverMock.dispatchCommand(playerMock, "f transfer");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getCommands().transferCommand.syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
