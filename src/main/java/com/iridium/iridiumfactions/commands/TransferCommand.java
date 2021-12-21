@@ -24,7 +24,7 @@ public class TransferCommand extends Command {
      * The default constructor.
      */
     public TransferCommand() {
-        super(Collections.singletonList("transfer"), "Transfer Faction ownership", "", true, Duration.ZERO);
+        super(Collections.singletonList("transfer"), "Transfer Faction ownership", "%prefix% &7Transfer faction ownership to someone else","", true, Duration.ZERO);
     }
 
     /**
@@ -37,6 +37,10 @@ public class TransferCommand extends Command {
      */
     @Override
     public boolean execute(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            sender.sendMessage(StringUtils.color(syntax.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+            return false;
+        }
         Player player = (Player) sender;
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         Faction faction = user.getFaction();
