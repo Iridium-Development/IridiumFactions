@@ -3,17 +3,19 @@ package com.iridium.iridiumfactions.listeners;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionClaim;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BlockBreakListenerTest {
 
@@ -101,5 +103,21 @@ class BlockBreakListenerTest {
         IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.BLOCK_BREAK.getPermissionKey(), true);
 
         assertFalse(playerMock.simulateBlockBreak(playerMock.getLocation().getBlock()).isCancelled());
+    }
+
+
+    @Test
+    public void onBlockBreakDecreasesBlockCount() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
+        Location location = playerMock.getLocation();
+
+        location.getBlock().setType(Material.DIAMOND_BLOCK);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.BLOCK_BREAK.getPermissionKey(), true);
+
+        assertEquals(0, IridiumFactions.getInstance().getFactionManager().getFactionBlockAmount(faction, XMaterial.DIAMOND_BLOCK));
+        assertFalse(playerMock.simulateBlockBreak(location.getBlock()).isCancelled());
+        assertEquals(-1, IridiumFactions.getInstance().getFactionManager().getFactionBlockAmount(faction, XMaterial.DIAMOND_BLOCK));
     }
 }

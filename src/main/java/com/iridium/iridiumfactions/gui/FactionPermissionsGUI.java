@@ -12,6 +12,7 @@ import com.iridium.iridiumfactions.PermissionType;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,6 +26,7 @@ import java.util.Map;
  * GUI which allows users to alter the Factions's permissions.
  */
 @AllArgsConstructor
+@Getter
 public class FactionPermissionsGUI implements GUI {
 
     private int page;
@@ -82,7 +84,7 @@ public class FactionPermissionsGUI implements GUI {
             return;
         }
 
-        if (event.getSlot() == IridiumFactions.getInstance().getInventories().factionPermissionsGUI.size - 3) {
+        if (event.getSlot() == IridiumFactions.getInstance().getInventories().factionPermissionsGUI.size - 3 && IridiumFactions.getInstance().getPermissionList().values().stream().anyMatch(permission -> permission.getPage() == page + 1)) {
             page++;
             event.getWhoClicked().openInventory(getInventory());
         }
