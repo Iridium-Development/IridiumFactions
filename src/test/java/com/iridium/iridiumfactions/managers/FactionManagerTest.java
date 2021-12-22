@@ -177,11 +177,11 @@ class FactionManagerTest {
         user.setBypassing(true);
 
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(new Faction(FactionType.WARZONE), playerMock.getLocation().getChunk(), playerMock).join();
-        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 1);
+        assertEquals(1, IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size());
         assertEquals(playerMock.nextMessage(), "§c§lIridiumFactions §8» §7Player has claimed land at (0,0).");
 
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(new Faction(FactionType.WILDERNESS), playerMock.getLocation().getChunk(), playerMock).join();
-        assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 0);
+        assertEquals(0, IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size());
         assertEquals(playerMock.nextMessage(), "§c§lIridiumFactions §8» §7Player has claimed land at (0,0).");
     }
 

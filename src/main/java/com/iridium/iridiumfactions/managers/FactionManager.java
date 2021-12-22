@@ -286,6 +286,8 @@ public class FactionManager {
     }
 
     public boolean getFactionPermission(@NotNull Faction faction, @NotNull FactionRank factionRank, @NotNull Permission permission, @NotNull String key) {
+        if (faction.getFactionType() == FactionType.WILDERNESS) return true;
+        if (faction.getFactionType() != FactionType.PLAYER_FACTION) return false;
         Optional<FactionPermission> factionPermission = IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().getEntry(new FactionPermission(faction, key, factionRank, true));
         return factionPermission.map(FactionPermission::isAllowed).orElseGet(() -> factionRank.getLevel() >= permission.getDefaultRank().getLevel());
     }
