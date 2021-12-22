@@ -35,4 +35,5 @@ public class Commands {
     public ValueCommand valueCommand = new ValueCommand();
     public TopCommand topCommand = new TopCommand();
     public RecalculateCommand recalculateCommand = new RecalculateCommand();
+    public ChatCommand chatCommand = new ChatCommand();
 }

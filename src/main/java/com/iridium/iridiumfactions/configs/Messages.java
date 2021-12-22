@@ -95,4 +95,7 @@ public class Messages {
     public String calculatingFactions = "%prefix% &7Calculating %amount% Players Faction, Estimated time: %minutes% Minutes and %seconds% Seconds";
     public String calculatingFinished = "%prefix% &7Calculating Players Faction Finished";
     public String calculationAlreadyInProcess = "%prefix% &7Calculating Players Faction already in Process";
+    public String unknownFactionChatType = "%prefix% &7Unknown Faction Chat Type %type%";
+    public String setFactionChatType = "%prefix% &7You have set your Faction Chat Type to %type%";
+    public String factionChatFormat = "%relationship_format%%player% &7: &7%message%";
 }

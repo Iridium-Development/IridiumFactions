@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions.database;
 
+import com.iridium.iridiumfactions.FactionChatType;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.j256.ormlite.field.DatabaseField;
@@ -48,6 +49,8 @@ public final class User {
 
     private boolean bypassing = false;
 
+    private FactionChatType factionChatType = FactionChatType.NONE;
+
     /**
      * The default constructor.
      *
@@ -69,6 +72,7 @@ public final class User {
     public void setFaction(Faction faction) {
         this.factionID = faction == null ? 0 : faction.getId();
         setJoinTime(LocalDateTime.now());
+        setFactionChatType(FactionChatType.NONE);
     }
 
     public LocalDateTime getJoinTime() {
