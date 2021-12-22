@@ -32,7 +32,7 @@ dependencies {
 
     // Other dependencies that are not required or already available at runtime
     compileOnly("org.projectlombok:lombok:1.18.22")
-    compileOnly("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.9.2")
     compileOnly("be.maximvdw:MVdWPlaceholderAPI:2.1.1-SNAPSHOT") {
         exclude("org.spigotmc")
@@ -45,7 +45,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.mockito:mockito-inline:4.1.0")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.16:1.5.2")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.18:1.14.0")
 }
 
 tasks {
@@ -93,7 +93,7 @@ tasks {
 // Set the Java version and vendor
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(16))
         vendor.set(JvmVendorSpec.ADOPTOPENJDK)
     }
 }
