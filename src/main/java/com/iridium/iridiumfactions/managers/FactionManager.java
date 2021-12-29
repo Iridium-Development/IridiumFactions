@@ -32,6 +32,14 @@ public class FactionManager {
         }
     }
 
+    public List<FactionWarp> getFactionWarps(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().getEntries(faction);
+    }
+
+    public Optional<FactionWarp> getFactionWarp(Faction faction, String name) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().getEntry(new FactionWarp(faction, null, name));
+    }
+
     public Optional<Faction> getFactionViaName(String name) {
         switch (name.toUpperCase()) {
             case "WILDERNESS":

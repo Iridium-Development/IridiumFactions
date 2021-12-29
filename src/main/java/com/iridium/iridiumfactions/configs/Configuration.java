@@ -29,6 +29,8 @@ public class Configuration {
     public FactionConfiguration warzoneFaction = new FactionConfiguration("Warzone", "");
     public FactionConfiguration safezoneFaction = new FactionConfiguration("Safezone", "");
 
+    public List<Integer> factionWarpSlots = Arrays.asList(9, 11, 13, 15, 17);
+
     public Map<FactionRank, String> factionRankNames = new HashMap<>(ImmutableMap.<FactionRank, String>builder()
             .put(FactionRank.OWNER, "Owner")
             .put(FactionRank.CO_OWNER, "CoOwner")

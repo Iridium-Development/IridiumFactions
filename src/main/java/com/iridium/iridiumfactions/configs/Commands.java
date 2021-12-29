@@ -36,4 +36,5 @@ public class Commands {
     public TopCommand topCommand = new TopCommand();
     public RecalculateCommand recalculateCommand = new RecalculateCommand();
     public ChatCommand chatCommand = new ChatCommand();
+    public WarpsCommand warpsCommand = new WarpsCommand();
 }

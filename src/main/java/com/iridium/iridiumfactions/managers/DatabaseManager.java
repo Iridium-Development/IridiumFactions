@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.*;
+import com.iridium.iridiumfactions.database.types.LocationType;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
@@ -40,6 +41,7 @@ public class DatabaseManager {
     private ForeignFactionTableManager<FactionRelationshipRequest, Integer> factionRelationshipRequestTableManager;
     private ForeignFactionTableManager<FactionBlocks, Integer> factionBlocksTableManager;
     private ForeignFactionTableManager<FactionSpawners, Integer> factionSpawnersTableManager;
+    private ForeignFactionTableManager<FactionWarp, Integer> factionWarpTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -48,6 +50,7 @@ public class DatabaseManager {
         String databaseURL = getDatabaseURL(sqlConfig);
 
         DataPersisterManager.registerDataPersisters(XMaterialType.getSingleton());
+        DataPersisterManager.registerDataPersisters(LocationType.getSingleton());
 
         if (!IridiumFactions.getInstance().isTesting()) {
 
@@ -68,6 +71,7 @@ public class DatabaseManager {
         this.factionRelationshipRequestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationshipRequest.class, Comparator.comparing(FactionRelationshipRequest::getFactionID).thenComparing(FactionRelationshipRequest::getFaction2ID).thenComparing(FactionRelationshipRequest::getRelationshipType));
         this.factionBlocksTableManager = new ForeignFactionTableManager<>(connectionSource, FactionBlocks.class, Comparator.comparing(FactionBlocks::getFactionID).thenComparing(FactionBlocks::getMaterial));
         this.factionSpawnersTableManager = new ForeignFactionTableManager<>(connectionSource, FactionSpawners.class, Comparator.comparing(FactionSpawners::getFactionID).thenComparing(FactionSpawners::getSpawnerType));
+        this.factionWarpTableManager = new ForeignFactionTableManager<>(connectionSource, FactionWarp.class, Comparator.comparing(FactionWarp::getFactionID).thenComparing(FactionWarp::getName));
     }
 
     /**
