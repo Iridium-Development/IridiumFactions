@@ -39,6 +39,15 @@ public class IridiumFactions extends IridiumCore {
     private BlockValues blockValues;
 
     private Map<String, Permission> permissionList;
+    /*
+    TODO LIST
+     View Active Relationships
+     View and Cancel Relationship requests
+     Implement Power properly
+     Faction Warps
+     Faction Upgrades (Spawners, ExtraPower, Warps, FactionChest, Experience)
+     Faction Bank (Money TNT Experience)
+     */
 
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
