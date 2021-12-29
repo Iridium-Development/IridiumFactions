@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public enum FactionChatType {
-    FACTION(Arrays.asList("f", "faction"), List.of(RelationshipType.OWN)),
+    FACTION(Arrays.asList("f", "faction"), Collections.singletonList(RelationshipType.OWN)),
     ALLY(Arrays.asList("a", "ally"), Arrays.asList(RelationshipType.ALLY, RelationshipType.OWN)),
     ENEMY(Arrays.asList("e", "enemy"), Arrays.asList(RelationshipType.ENEMY, RelationshipType.OWN)),
     NONE(Arrays.asList("n", "none"), Collections.emptyList());
