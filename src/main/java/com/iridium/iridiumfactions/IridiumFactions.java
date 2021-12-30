@@ -44,7 +44,6 @@ public class IridiumFactions extends IridiumCore {
      View Active Relationships
      View and Cancel Relationship requests
      Implement Power properly
-     Faction Warps
      Faction Upgrades (Spawners, ExtraPower, Warps, FactionChest, Experience)
      Faction Bank (Money TNT Experience)
      */
