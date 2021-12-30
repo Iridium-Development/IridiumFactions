@@ -34,6 +34,15 @@ public class Inventories {
             "&c&l[!] &7Left click to demote/kick"
     )));
 
+    public SingleItemGUI warpsGUI = new SingleItemGUI(27, "&7%faction_name%'s Faction Warps", background2, new Item(
+            XMaterial.GREEN_STAINED_GLASS_PANE, 1, "&b&l%warp_name%",
+            Arrays.asList(
+                    "&7%description%",
+                    "",
+                    "&b&l[!] &bLeft Click to Teleport",
+                    "&b&l[!] &bRight Click to Delete"
+            )));
+
     public FactionRanksInventoryConfig factionRanksGUI = new FactionRanksInventoryConfig(27, "&7Faction Permissions", background1,
             new Item(XMaterial.DIAMOND_AXE, 14, 1, "&c&lOwner", Collections.emptyList()),
             new Item(XMaterial.GOLDEN_AXE, 13, 1, "&c&lCo-Owner", Collections.emptyList()),

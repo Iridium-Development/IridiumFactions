@@ -16,7 +16,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -531,6 +534,37 @@ class FactionManagerTest {
 
         user3.setFaction(null);
         assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionMembers(faction).contains(user3));
+    }
+
+    @Test
+    public void getFactionWarps() {
+        Faction faction1 = new FactionBuilder().build();
+        Faction faction2 = new FactionBuilder().build();
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction1, new Location(null, 0, 0, 0), "Warp1"));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction2, new Location(null, 0, 0, 0), "Warp2"));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction2, new Location(null, 0, 0, 0), "Warp3"));
+
+        assertEquals(Collections.singletonList("Warp1"), IridiumFactions.getInstance().getFactionManager().getFactionWarps(faction1).stream().map(FactionWarp::getName).collect(Collectors.toList()));
+        assertEquals(Arrays.asList("Warp2", "Warp3"), IridiumFactions.getInstance().getFactionManager().getFactionWarps(faction2).stream().map(FactionWarp::getName).collect(Collectors.toList()));
+    }
+
+    @Test
+    public void getFactionWarp() {
+        Faction faction1 = new FactionBuilder().build();
+        Faction faction2 = new FactionBuilder().build();
+
+        FactionWarp factionWarp1 = new FactionWarp(faction1, new Location(null, 0, 0, 0), "Warp1");
+        FactionWarp factionWarp2 = new FactionWarp(faction2, new Location(null, 0, 0, 0), "Warp2");
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(factionWarp1);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(factionWarp2);
+
+        assertEquals(factionWarp1, IridiumFactions.getInstance().getFactionManager().getFactionWarp(faction1, "Warp1").orElse(null));
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionWarp(faction1, "Warp2").isPresent());
+
+        assertEquals(factionWarp2, IridiumFactions.getInstance().getFactionManager().getFactionWarp(faction2, "Warp2").orElse(null));
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionWarp(faction2, "Warp1").isPresent());
     }
 
 }

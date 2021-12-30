@@ -35,4 +35,5 @@ public class Permissions {
     public Permission setHome = new Permission(new Item(XMaterial.WHITE_BED, 29, 1, "&cFaction Home", Arrays.asList("&7Grant the ability to change your Faction home.", "", "&c&lPermission", "%permission%")), 1, FactionRank.MODERATOR);
     public Permission spawners = new Permission(new Item(XMaterial.SPAWNER, 30, 1, "&cBreak Spawners", Arrays.asList("&7Grant the ability to mine spawners in your Faction.", "", "&c&lPermission", "%permission%")), 1, FactionRank.MEMBER);
     public Permission unclaim = new Permission(new Item(XMaterial.GRASS_BLOCK, 31, 1, "&cUn-Claim Land", Arrays.asList("&7Grant the ability to unclaim your Faction land.", "", "&c&lPermission", "%permission%")), 1, FactionRank.MODERATOR);
+    public Permission manageWarps = new Permission(new Item(XMaterial.END_PORTAL_FRAME, 32, 1, "&cManage Warps", Arrays.asList("&7Grant the ability to create edit and delete Faction Warps.", "", "&c&lPermission", "%permission%")), 1, FactionRank.MODERATOR);
 }

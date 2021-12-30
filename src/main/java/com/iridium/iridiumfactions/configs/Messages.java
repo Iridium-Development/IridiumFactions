@@ -25,6 +25,7 @@ public class Messages {
     public String homeNotInFaction = "%prefix% &7Your Faction home is not inside your Faction.";
     public String notInFactionLand = "%prefix% &7You must be inside your faction land to do this.";
     public String factionHomeSet = "%prefix% &7Your Faction home has been set.";
+    public String factionWarpSet = "%prefix% &7You have created a Faction warp at your location.";
     public String inviteAlreadyPresent = "%prefix% &7There is already an active invite for that user.";
     public String factionInviteSent = "%prefix% &7You have sent a faction invite to %player%.";
     public String factionInviteReceived = "%prefix% &7You have received a faction invite from %player%.";
@@ -76,6 +77,9 @@ public class Messages {
     public String cannotPromoteUser = "%prefix% &7You cannot promote this User";
     public String cannotDemoteUser = "%prefix% &7You cannot demote this User";
     public String cannotSetHome = "%prefix% &7You cannot change the Faction home.";
+    public String cannotSetWarp = "%prefix% &7You cannot create a Faction warp.";
+    public String cannotDeleteWarp = "%prefix% &7You cannot delete this Faction warp.";
+    public String cannotEditWarp = "%prefix% &7You cannot edit this Faction warp.";
     public String factionAllied = "%prefix% &7%player% has declared an alliance with %faction%";
     public String factionTruced = "%prefix% &7%player% has declared a Truce with %faction%";
     public String factionEnemied = "%prefix% &7%player% has declared %faction% as an enemy";
@@ -98,4 +102,13 @@ public class Messages {
     public String unknownFactionChatType = "%prefix% &7Unknown Faction Chat Type %type%";
     public String setFactionChatType = "%prefix% &7You have set your Faction Chat Type to %type%";
     public String factionChatFormat = "%relationship_format%%player% &7: &7%message%";
+    public String warpAlreadyExists = "%prefix% &7A warp with this name already exists.";
+    public String incorrectPassword = "%prefix% &7Incorrect Password.";
+    public String unknownWarp = "%prefix% &7No warp with this name exists.";
+    public String teleportingWarp = "%prefix% &7Teleporting to warp %name%.";
+    public String deletingWarp = "%prefix% &7Deleting warp %name%.";
+    public String warpIconSet = "%prefix% &7You have set the warp icon to %icon%";
+    public String noSuchMaterial = "%prefix% &7No such material %material%";
+    public String warpDescriptionSet = "%prefix% &7You have set the warp description to %description%";
+    public String warpDescriptionRemoved = "%prefix% &7You have removed the warp's description";
 }

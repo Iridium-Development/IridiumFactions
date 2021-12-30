@@ -160,6 +160,7 @@ public class IridiumFactions extends IridiumCore {
         this.permissionList.put(PermissionType.SETHOME.getPermissionKey(), permissions.setHome);
         this.permissionList.put(PermissionType.SPAWNERS.getPermissionKey(), permissions.spawners);
         this.permissionList.put(PermissionType.UNCLAIM.getPermissionKey(), permissions.unclaim);
+        this.permissionList.put(PermissionType.MANAGE_WARPS.getPermissionKey(), permissions.manageWarps);
     }
 
     @Override
@@ -180,6 +181,9 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionRelationshipTableManager().save();
         getDatabaseManager().getFactionClaimTableManager().save();
         getDatabaseManager().getFactionPermissionTableManager().save();
+        getDatabaseManager().getFactionBlocksTableManager().save();
+        getDatabaseManager().getFactionSpawnersTableManager().save();
+        getDatabaseManager().getFactionWarpTableManager().save();
     }
 
     public static IridiumFactions getInstance() {
