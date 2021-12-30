@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Command which reloads all configuration files.
@@ -24,7 +24,7 @@ public class DeleteWarpCommand extends Command {
      * The default constructor.
      */
     public DeleteWarpCommand() {
-        super(Arrays.asList("SetWarpCommand", "deletewarp"), "Delete a Faction warp", "%prefix% &7/f deletewarp <name>", "", Duration.ZERO);
+        super(Arrays.asList("delwarp", "deletewarp"), "Delete a Faction warp", "%prefix% &7/f deletewarp <name>", "", Duration.ZERO);
     }
 
     @Override
@@ -71,9 +71,13 @@ public class DeleteWarpCommand extends Command {
      */
     @Override
     public List<String> onTabComplete(CommandSender commandSender, org.bukkit.command.Command command, String label, String[] args) {
-        // We currently don't want to tab-completion here
-        // Return a new List so it isn't a list of online players
-        return Collections.emptyList();
+        Player player = (Player) commandSender;
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+        Faction faction = user.getFaction();
+        return IridiumFactions.getInstance().getFactionManager().getFactionWarps(faction).stream()
+                .map(FactionWarp::getName)
+                .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                .collect(Collectors.toList());
     }
 
 }

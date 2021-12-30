@@ -12,6 +12,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DeleteWarpCommandTest {
@@ -90,5 +93,15 @@ class DeleteWarpCommandTest {
         ));
         playerMock.assertNoMoreSaid();
         assertEquals(0, IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().getEntries().size());
+    }
+
+    @Test
+    public void deleteWarpCommandTabComplete() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, null, "home"));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, null, "farm"));
+        assertEquals(Arrays.asList("farm", "home"), IridiumFactions.getInstance().getCommands().deleteWarpCommand.onTabComplete(playerMock, null, null, new String[]{"warp", ""}));
+        assertEquals(List.of("farm"), IridiumFactions.getInstance().getCommands().deleteWarpCommand.onTabComplete(playerMock, null, null, new String[]{"warp", "f"}));
     }
 }

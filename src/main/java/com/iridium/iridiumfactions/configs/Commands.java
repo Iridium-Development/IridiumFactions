@@ -40,4 +40,5 @@ public class Commands {
     public SetWarpCommand setWarpCommand = new SetWarpCommand();
     public WarpCommand warpCommand = new WarpCommand();
     public DeleteWarpCommand deleteWarpCommand = new DeleteWarpCommand();
+    public EditWarpCommand editWarpCommand = new EditWarpCommand();
 }
