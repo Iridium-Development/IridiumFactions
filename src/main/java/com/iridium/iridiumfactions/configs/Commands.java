@@ -38,4 +38,5 @@ public class Commands {
     public ChatCommand chatCommand = new ChatCommand();
     public WarpsCommand warpsCommand = new WarpsCommand();
     public SetWarpCommand setWarpCommand = new SetWarpCommand();
+    public WarpCommand warpCommand = new WarpCommand();
 }

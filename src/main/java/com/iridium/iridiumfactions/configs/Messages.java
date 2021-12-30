@@ -101,4 +101,7 @@ public class Messages {
     public String setFactionChatType = "%prefix% &7You have set your Faction Chat Type to %type%";
     public String factionChatFormat = "%relationship_format%%player% &7: &7%message%";
     public String warpAlreadyExists = "%prefix% &7A warp with this name already exists.";
+    public String incorrectPassword = "%prefix% &7Incorrect Password.";
+    public String unknownWarp = "%prefix% &7No warp with this name exists.";
+    public String teleportingWarp = "%prefix% &7Teleporting to warp %name%.";
 }

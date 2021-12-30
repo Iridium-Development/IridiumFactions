@@ -50,6 +50,12 @@ public class FactionWarpsGUI implements GUI {
 
     @Override
     public void onInventoryClick(InventoryClickEvent inventoryClickEvent) {
-
+        List<FactionWarp> factionWarpList = IridiumFactions.getInstance().getFactionManager().getFactionWarps(faction);
+        for (int i = 0; i < Math.min(factionWarpList.size(), IridiumFactions.getInstance().getConfiguration().factionWarpSlots.size()); i++) {
+            FactionWarp factionWarp = factionWarpList.get(i);
+            if (inventoryClickEvent.getSlot() == IridiumFactions.getInstance().getConfiguration().factionWarpSlots.get(i)) {
+                IridiumFactions.getInstance().getCommands().warpCommand.execute(inventoryClickEvent.getWhoClicked(), new String[]{"warp", factionWarp.getName()});
+            }
+        }
     }
 }

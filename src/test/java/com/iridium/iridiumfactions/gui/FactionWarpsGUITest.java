@@ -2,15 +2,23 @@ package com.iridium.iridiumfactions.gui;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
+import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
 import com.iridium.iridiumcore.utils.Placeholder;
 import com.iridium.iridiumfactions.FactionBuilder;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.UserBuilder;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.database.FactionWarp;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.AfterEach;
@@ -147,5 +155,21 @@ class FactionWarpsGUITest {
                 assertEquals(ItemStackUtils.makeItem(IridiumFactions.getInstance().getInventories().warpsGUI.background.filler), inventory.getItem(i));
             }
         }
+    }
+
+    @Test
+    public void factionWarpsGUITeleportWarp() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        Location warpLocation = playerMock.getLocation().clone().add(100, 100, 100);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, warpLocation, "test"));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, warpLocation.getChunk()));
+        FactionWarpsGUI factionWarpsGUI = new FactionWarpsGUI(faction);
+
+        playerMock.openInventory(factionWarpsGUI.getInventory());
+        factionWarpsGUI.onInventoryClick(new InventoryClickEvent(playerMock.getOpenInventory(), InventoryType.SlotType.CONTAINER, 9, ClickType.LEFT, InventoryAction.UNKNOWN));
+
+        assertEquals(warpLocation, playerMock.getLocation());
     }
 }
