@@ -37,4 +37,5 @@ public class Commands {
     public RecalculateCommand recalculateCommand = new RecalculateCommand();
     public ChatCommand chatCommand = new ChatCommand();
     public WarpsCommand warpsCommand = new WarpsCommand();
+    public SetWarpCommand setWarpCommand = new SetWarpCommand();
 }

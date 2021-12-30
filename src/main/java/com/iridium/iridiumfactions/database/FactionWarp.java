@@ -41,4 +41,12 @@ public final class FactionWarp extends FactionData {
         this.name = name;
         this.icon = IridiumFactions.getInstance().getInventories().warpsGUI.item.material;
     }
+
+    public FactionWarp(Faction faction, Location location, String name, String password) {
+        super(faction);
+        this.location = location;
+        this.name = name;
+        this.icon = IridiumFactions.getInstance().getInventories().warpsGUI.item.material;
+        this.password = password;
+    }
 }

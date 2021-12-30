@@ -22,6 +22,7 @@ public enum PermissionType {
     REDSTONE("redstone"),
     RENAME("rename"),
     SETHOME("sethome"),
+    SETWARP("setwarp"),
     SPAWNERS("spawners"),
     UNCLAIM("unclaim");
 

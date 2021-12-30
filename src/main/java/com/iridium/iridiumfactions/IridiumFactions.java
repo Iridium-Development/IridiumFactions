@@ -160,6 +160,7 @@ public class IridiumFactions extends IridiumCore {
         this.permissionList.put(PermissionType.SETHOME.getPermissionKey(), permissions.setHome);
         this.permissionList.put(PermissionType.SPAWNERS.getPermissionKey(), permissions.spawners);
         this.permissionList.put(PermissionType.UNCLAIM.getPermissionKey(), permissions.unclaim);
+        this.permissionList.put(PermissionType.SETWARP.getPermissionKey(), permissions.setWarp);
     }
 
     @Override
