@@ -78,6 +78,7 @@ public class Messages {
     public String cannotDemoteUser = "%prefix% &7You cannot demote this User";
     public String cannotSetHome = "%prefix% &7You cannot change the Faction home.";
     public String cannotSetWarp = "%prefix% &7You cannot create a Faction warp.";
+    public String cannotDeleteWarp = "%prefix% &7You cannot delete a Faction warp.";
     public String factionAllied = "%prefix% &7%player% has declared an alliance with %faction%";
     public String factionTruced = "%prefix% &7%player% has declared a Truce with %faction%";
     public String factionEnemied = "%prefix% &7%player% has declared %faction% as an enemy";
@@ -104,4 +105,5 @@ public class Messages {
     public String incorrectPassword = "%prefix% &7Incorrect Password.";
     public String unknownWarp = "%prefix% &7No warp with this name exists.";
     public String teleportingWarp = "%prefix% &7Teleporting to warp %name%.";
+    public String deletingWarp = "%prefix% &7Deleting warp %name%.";
 }
