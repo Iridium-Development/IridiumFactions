@@ -181,6 +181,9 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionRelationshipTableManager().save();
         getDatabaseManager().getFactionClaimTableManager().save();
         getDatabaseManager().getFactionPermissionTableManager().save();
+        getDatabaseManager().getFactionBlocksTableManager().save();
+        getDatabaseManager().getFactionSpawnersTableManager().save();
+        getDatabaseManager().getFactionWarpTableManager().save();
     }
 
     public static IridiumFactions getInstance() {
