@@ -11,6 +11,7 @@ import com.iridium.iridiumfactions.database.FactionWarp;
 import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -54,7 +55,11 @@ public class FactionWarpsGUI implements GUI {
         for (int i = 0; i < Math.min(factionWarpList.size(), IridiumFactions.getInstance().getConfiguration().factionWarpSlots.size()); i++) {
             FactionWarp factionWarp = factionWarpList.get(i);
             if (inventoryClickEvent.getSlot() == IridiumFactions.getInstance().getConfiguration().factionWarpSlots.get(i)) {
-                IridiumFactions.getInstance().getCommands().warpCommand.execute(inventoryClickEvent.getWhoClicked(), new String[]{"warp", factionWarp.getName()});
+                if(inventoryClickEvent.getClick()== ClickType.LEFT){
+                    IridiumFactions.getInstance().getCommands().warpCommand.execute(inventoryClickEvent.getWhoClicked(), new String[]{"warp", factionWarp.getName()});
+                }else{
+                    IridiumFactions.getInstance().getCommands().deleteWarpCommand.execute(inventoryClickEvent.getWhoClicked(), new String[]{"deletewarp", factionWarp.getName()});
+                }
             }
         }
     }

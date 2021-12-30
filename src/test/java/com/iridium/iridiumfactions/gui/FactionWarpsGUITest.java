@@ -7,6 +7,7 @@ import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
 import com.iridium.iridiumcore.utils.Placeholder;
 import com.iridium.iridiumfactions.FactionBuilder;
+import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.UserBuilder;
 import com.iridium.iridiumfactions.database.Faction;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class FactionWarpsGUITest {
 
@@ -171,5 +173,22 @@ class FactionWarpsGUITest {
         factionWarpsGUI.onInventoryClick(new InventoryClickEvent(playerMock.getOpenInventory(), InventoryType.SlotType.CONTAINER, 9, ClickType.LEFT, InventoryAction.UNKNOWN));
 
         assertEquals(warpLocation, playerMock.getLocation());
+    }
+
+    @Test
+    public void factionWarpsGUIDeleteWarp() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.OWNER).build();
+        Location warpLocation = playerMock.getLocation().clone().add(100, 100, 100);
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, warpLocation, "test"));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, warpLocation.getChunk()));
+        FactionWarpsGUI factionWarpsGUI = new FactionWarpsGUI(faction);
+
+        playerMock.openInventory(factionWarpsGUI.getInventory());
+        factionWarpsGUI.onInventoryClick(new InventoryClickEvent(playerMock.getOpenInventory(), InventoryType.SlotType.CONTAINER, 9, ClickType.RIGHT, InventoryAction.UNKNOWN));
+
+        assertNotEquals(warpLocation, playerMock.getLocation());
+        assertEquals(0, IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().getEntries().size());
     }
 }
