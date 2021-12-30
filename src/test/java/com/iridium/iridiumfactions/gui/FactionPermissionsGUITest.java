@@ -77,15 +77,14 @@ class FactionPermissionsGUITest {
 
     @Test
     public void factionPermissionsGUIChangePermissionsNoPermission() {
-        Map.Entry<String, Permission> permission = IridiumFactions.getInstance().getPermissionList().entrySet().stream().filter(perm -> perm.getValue().getPage() == 1).findFirst().get();
         Faction faction = new FactionBuilder().build();
-        PlayerMock playerMock = new UserBuilder(serverMock).withFactionRank(FactionRank.CO_OWNER).withFaction(faction).build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFactionRank(FactionRank.MEMBER).withFaction(faction).build();
+        Map.Entry<String, Permission> permission = IridiumFactions.getInstance().getPermissionList().entrySet().stream().filter(perm -> perm.getValue().getPage() == 1).findFirst().get();
         FactionPermissionsGUI factionPermissionsGUI = new FactionPermissionsGUI(permission.getValue().getPage(), faction, FactionRank.MEMBER);
         playerMock.openInventory(factionPermissionsGUI.getInventory());
 
-        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.CO_OWNER, PermissionType.CHANGE_PERMISSIONS.getPermissionKey(), false);
-
-        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, FactionRank.MEMBER, permission.getValue(), permission.getKey()));
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.CHANGE_PERMISSIONS.getPermissionKey(), false);
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, permission.getKey(), true);
 
         factionPermissionsGUI.onInventoryClick(new InventoryClickEvent(playerMock.getOpenInventory(), InventoryType.SlotType.CONTAINER, permission.getValue().getItem().slot, ClickType.LEFT, InventoryAction.UNKNOWN));
 
@@ -97,15 +96,14 @@ class FactionPermissionsGUITest {
 
     @Test
     public void factionPermissionsGUIChangePermissionsHigherRank() {
-        Map.Entry<String, Permission> permission = IridiumFactions.getInstance().getPermissionList().entrySet().stream().filter(perm -> perm.getValue().getPage() == 1).findFirst().get();
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFactionRank(FactionRank.MEMBER).withFaction(faction).build();
+        Map.Entry<String, Permission> permission = IridiumFactions.getInstance().getPermissionList().entrySet().stream().filter(perm -> perm.getValue().getPage() == 1).findFirst().get();
         FactionPermissionsGUI factionPermissionsGUI = new FactionPermissionsGUI(permission.getValue().getPage(), faction, FactionRank.CO_OWNER);
         playerMock.openInventory(factionPermissionsGUI.getInventory());
 
         IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.CHANGE_PERMISSIONS.getPermissionKey(), true);
-
-        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, FactionRank.MEMBER, permission.getValue(), permission.getKey()));
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, permission.getKey(), true);
 
         factionPermissionsGUI.onInventoryClick(new InventoryClickEvent(playerMock.getOpenInventory(), InventoryType.SlotType.CONTAINER, permission.getValue().getItem().slot, ClickType.LEFT, InventoryAction.UNKNOWN));
 
@@ -117,15 +115,14 @@ class FactionPermissionsGUITest {
 
     @Test
     public void factionPermissionsGUIChangePermissionsSuccess() {
-        Map.Entry<String, Permission> permission = IridiumFactions.getInstance().getPermissionList().entrySet().stream().filter(perm -> perm.getValue().getPage() == 1).findFirst().get();
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFactionRank(FactionRank.CO_OWNER).withFaction(faction).build();
+        Map.Entry<String, Permission> permission = IridiumFactions.getInstance().getPermissionList().entrySet().stream().filter(perm -> perm.getValue().getPage() == 1).findFirst().get();
         FactionPermissionsGUI factionPermissionsGUI = new FactionPermissionsGUI(permission.getValue().getPage(), faction, FactionRank.MEMBER);
         playerMock.openInventory(factionPermissionsGUI.getInventory());
 
         IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.CO_OWNER, PermissionType.CHANGE_PERMISSIONS.getPermissionKey(), true);
-
-        assertTrue(IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, FactionRank.MEMBER, permission.getValue(), permission.getKey()));
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, permission.getKey(), true);
 
         factionPermissionsGUI.onInventoryClick(new InventoryClickEvent(playerMock.getOpenInventory(), InventoryType.SlotType.CONTAINER, permission.getValue().getItem().slot, ClickType.LEFT, InventoryAction.UNKNOWN));
 

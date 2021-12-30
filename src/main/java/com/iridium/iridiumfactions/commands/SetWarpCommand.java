@@ -39,7 +39,7 @@ public class SetWarpCommand extends Command {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notInFactionLand.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
-        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.SETWARP)) {
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.MANAGE_WARPS)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotSetWarp
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));

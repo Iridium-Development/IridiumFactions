@@ -80,7 +80,7 @@ class SetWarpCommandTest {
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
 
-        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.SETWARP.getPermissionKey(), true);
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.MANAGE_WARPS.getPermissionKey(), true);
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
         IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, playerMock.getLocation(), "test"));
 
@@ -96,7 +96,7 @@ class SetWarpCommandTest {
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
 
-        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.SETWARP.getPermissionKey(), true);
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.MANAGE_WARPS.getPermissionKey(), true);
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
 
         serverMock.dispatchCommand(playerMock, "f setwarp test");
@@ -115,7 +115,7 @@ class SetWarpCommandTest {
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
 
-        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.SETWARP.getPermissionKey(), true);
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.MANAGE_WARPS.getPermissionKey(), true);
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
 
         serverMock.dispatchCommand(playerMock, "f setwarp test password");
