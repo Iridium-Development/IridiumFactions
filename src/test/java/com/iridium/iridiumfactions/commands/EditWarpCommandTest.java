@@ -148,6 +148,7 @@ class EditWarpCommandTest {
         assertEquals(XMaterial.BEDROCK, factionWarp.getIcon());
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().warpIconSet
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%icon%", "Bedrock")
         ));
         playerMock.assertNoMoreSaid();
     }

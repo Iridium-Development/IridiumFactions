@@ -57,14 +57,14 @@ public class EditWarpCommand extends Command {
         switch (args[2]) {
             case "icon":
                 if (args.length != 4) {
-                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getConfiguration().prefix+" &7/f editwarp " + name + " icon <icon>"));
+                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getConfiguration().prefix + " &7/f editwarp " + name + " icon <icon>"));
                     return false;
                 }
 
                 Optional<XMaterial> xMaterial = XMaterial.matchXMaterial(args[3]);
                 if (xMaterial.isPresent()) {
                     factionWarp.get().setIcon(xMaterial.get());
-                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().warpIconSet.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().warpIconSet.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix).replace("%icon%", xMaterial.get().toString())));
                     return true;
                 } else {
                     player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noSuchMaterial.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix).replace("%material%", args[3])));
