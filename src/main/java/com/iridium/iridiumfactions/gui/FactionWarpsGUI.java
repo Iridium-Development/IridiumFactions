@@ -26,7 +26,7 @@ public class FactionWarpsGUI implements GUI {
     @NotNull
     @Override
     public Inventory getInventory() {
-        Inventory inventory = Bukkit.createInventory(this, IridiumFactions.getInstance().getInventories().warpsGUI.size, StringUtils.color(IridiumFactions.getInstance().getInventories().warpsGUI.title));
+        Inventory inventory = Bukkit.createInventory(this, IridiumFactions.getInstance().getInventories().warpsGUI.size, StringUtils.color(IridiumFactions.getInstance().getInventories().warpsGUI.title.replace("%faction_name%", faction.getName())));
         addContent(inventory);
         return inventory;
     }
