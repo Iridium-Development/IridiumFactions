@@ -19,6 +19,11 @@ public class FactionBuilder {
         IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
     }
 
+    public FactionBuilder(int id) {
+        this.faction = new Faction("Faction_" + id, id);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
+    }
+
     public FactionBuilder withRelationship(Faction faction, RelationshipType relationshipType) {
         IridiumFactions.getInstance().getFactionManager().setFactionRelationship(faction, this.faction, relationshipType);
         return this;

@@ -2,10 +2,11 @@ package com.iridium.iridiumfactions.managers;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
+import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.UserBuilder;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ class UserManagerTest {
 
     private ServerMock serverMock;
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setup() {
         this.serverMock = MockBukkit.mock();
@@ -33,17 +33,18 @@ class UserManagerTest {
 
     @Test
     public void getUser() {
-        Player player1 = serverMock.addPlayer("Player 1");
-        Player player2 = serverMock.addPlayer("Player 2");
+        PlayerMock player1 = new UserBuilder(serverMock).build();
+        PlayerMock player2 = new UserBuilder(serverMock).build();
         // serverMock.addPlayer also calls PlayerJoinListener which adds the user to the DB
         IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().getEntries().clear();
 
-        User user = new User(player2.getUniqueId(), "User 2");
+        User user = new User(player2.getUniqueId(), player2.getName());
 
         IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().addEntry(user);
 
-        assertEquals(IridiumFactions.getInstance().getUserManager().getUser(player1).getName(), "Player 1");
-        assertEquals(IridiumFactions.getInstance().getUserManager().getUser(player2), user);
+        assertEquals(player1.getName(), IridiumFactions.getInstance().getUserManager().getUser(player1).getName());
+        assertEquals(player1.getUniqueId(), IridiumFactions.getInstance().getUserManager().getUser(player1).getUuid());
+        assertEquals(user, IridiumFactions.getInstance().getUserManager().getUser(player2));
     }
 
     @Test

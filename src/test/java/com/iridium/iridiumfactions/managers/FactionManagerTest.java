@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,11 +42,8 @@ class FactionManagerTest {
 
     @Test
     public void getFactionViaId() {
-        Faction faction1 = new Faction("Faction 1", 1);
-        Faction faction2 = new Faction("Faction 2", 2);
-
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction1);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction2);
+        Faction faction1 = new FactionBuilder(1).build();
+        Faction faction2 = new FactionBuilder(2).build();
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(1), faction1);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaId(2), faction2);
@@ -59,11 +55,8 @@ class FactionManagerTest {
 
     @Test
     public void getFactionViaName() {
-        Faction faction1 = new Faction("Faction 1", 1);
-        Faction faction2 = new Faction("Faction 2", 2);
-
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction1);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction2);
+        Faction faction1 = new FactionBuilder("Faction 1").build();
+        Faction faction2 = new FactionBuilder("Faction 2").build();
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Faction 1").orElse(null), faction1);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Faction 2").orElse(null), faction2);
@@ -78,36 +71,28 @@ class FactionManagerTest {
 
     @Test
     public void getFactionViaLocation() {
-        World world = mock(World.class);
-        when(world.getName()).thenReturn("world");
+        PlayerMock player = new UserBuilder(serverMock).build();
 
-        Location location = mock(Location.class);
-        Chunk chunk = mock(Chunk.class);
-        when(chunk.getWorld()).thenReturn(world);
-        when(chunk.getX()).thenReturn(0);
-        when(chunk.getZ()).thenReturn(0).thenReturn(1);
-        when(location.getChunk()).thenReturn(chunk);
+        Faction faction1 = new FactionBuilder().build();
+        Faction faction2 = new FactionBuilder().build();
 
-        Faction faction1 = new Faction("Faction 1", 1);
-        Faction faction2 = new Faction("Faction 2", 2);
+        Location claimLocation1 = new Location(player.getWorld(), 0, 0, 0);
+        Location claimLocation2 = new Location(player.getWorld(), 100, 0, 100);
 
-        FactionClaim factionClaim1 = new FactionClaim(faction1, "world", 0, 0);
-        FactionClaim factionClaim2 = new FactionClaim(faction2, "world", 0, 1);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction1, claimLocation1.getChunk()));
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction2, claimLocation2.getChunk()));
 
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction1);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction2);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim1);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim2);
-
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location), faction1);
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(location), faction2);
+        assertEquals(faction1, IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(claimLocation1));
+        assertEquals(faction2, IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(claimLocation2));
     }
 
     @Test
     public void createFaction() {
-        Player player = serverMock.addPlayer("Player");
+        PlayerMock player = new UserBuilder(serverMock).build();
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+
         Faction faction = IridiumFactions.getInstance().getFactionManager().createFaction(player, "Faction").join();
+
         assertEquals(user.getFaction(), faction);
         assertEquals(user.getFactionRank(), FactionRank.OWNER);
     }
