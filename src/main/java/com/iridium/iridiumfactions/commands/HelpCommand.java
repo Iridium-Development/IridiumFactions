@@ -27,14 +27,7 @@ public class HelpCommand extends Command {
         super(Collections.singletonList("help"), "Show a list of all commands", "", Duration.ZERO);
     }
 
-    /**
-     * Executes the command for the specified {@link CommandSender} with the provided arguments.
-     * Not called when the command execution was invalid (no permission, no player or command disabled).
-     * Shows a list of all IridiumSkyblock commands.
-     *
-     * @param sender    The CommandSender which executes this command
-     * @param arguments The arguments used with this command. They contain the sub-command
-     */
+
     @Override
     public boolean execute(CommandSender sender, String[] arguments) {
         List<Command> availableCommands = IridiumFactions.getInstance().getCommandManager().commands.stream()

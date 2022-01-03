@@ -46,6 +46,10 @@ public class IridiumFactions extends IridiumCore {
      Implement Power properly
      Faction Upgrades (Spawners, ExtraPower, Warps, FactionChest, Experience)
      Faction Bank (Money TNT Experience)
+     Faction Missions
+     Faction Main Menu
+     Faction Claim Permissions (Certain ranks only)
+     Faction Strikes
      */
 
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
