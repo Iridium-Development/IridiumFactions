@@ -11,7 +11,7 @@ public class SQL {
 
     public Driver driver = Driver.SQLITE;
     public String host = "localhost";
-    public String database = "IridiumSkyblock";
+    public String database = "IridiumFactions";
     public String username = "";
     public String password = "";
     public int port = 3306;
