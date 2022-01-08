@@ -438,6 +438,16 @@ public class FactionManager {
         return factionSpawners;
     }
 
+    public synchronized FactionUpgrade getFactionUpgrade(Faction faction, String upgrade){
+        FactionUpgrade factionUpgrade = new FactionUpgrade(faction, upgrade);
+        Optional<FactionUpgrade> factionUpgradeOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntry(factionUpgrade);
+        if (factionUpgradeOptional.isPresent()) {
+            return factionUpgradeOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().addEntry(factionUpgrade);
+        return factionUpgrade;
+    }
+
     public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {
         return getFactionSpawners(faction, entityType).getAmount();
     }

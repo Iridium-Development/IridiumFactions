@@ -552,4 +552,21 @@ class FactionManagerTest {
         assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionWarp(faction2, "Warp1").isPresent());
     }
 
+    @Test
+    public void getFactionUpgradeDoesntExist() {
+        Faction faction = new FactionBuilder().build();
+        FactionUpgrade factionUpgrade = IridiumFactions.getInstance().getFactionManager().getFactionUpgrade(faction, "upgrade");
+        assertEquals(1, factionUpgrade.getLevel());
+        assertEquals(Collections.singletonList(factionUpgrade), IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntries());
+    }
+
+    @Test
+    public void getFactionUpgradeAlreadyExists(){
+        Faction faction = new FactionBuilder().build();
+        FactionUpgrade factionUpgrade = new FactionUpgrade(faction, "upgrade", 10);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().addEntry(factionUpgrade);
+        assertEquals(10, IridiumFactions.getInstance().getFactionManager().getFactionUpgrade(faction, "upgrade").getLevel());
+        assertEquals(Collections.singletonList(factionUpgrade), IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntries());
+    }
+
 }
