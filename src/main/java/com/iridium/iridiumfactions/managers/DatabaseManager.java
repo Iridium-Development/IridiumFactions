@@ -77,7 +77,7 @@ public class DatabaseManager {
         this.factionSpawnersTableManager = new ForeignFactionTableManager<>(connectionSource, FactionSpawners.class, Comparator.comparing(FactionSpawners::getFactionID).thenComparing(FactionSpawners::getSpawnerType));
         this.factionWarpTableManager = new ForeignFactionTableManager<>(connectionSource, FactionWarp.class, Comparator.comparing(FactionWarp::getFactionID).thenComparing(FactionWarp::getName));
         this.factionUpgradeTableManager = new ForeignFactionTableManager<>(connectionSource, FactionUpgrade.class, Comparator.comparing(FactionUpgrade::getFactionID).thenComparing(FactionUpgrade::getUpgrade));
-        this.factionChestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionChest.class, Comparator.comparing(FactionChest::getFactionID));
+        this.factionChestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionChest.class, Comparator.comparing(FactionChest::getFactionID).thenComparing(FactionChest::getPage));
     }
 
     /**

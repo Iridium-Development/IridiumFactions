@@ -19,8 +19,16 @@ public class FactionChest extends FactionData {
     @Setter
     private Inventory factionChest;
 
+    @DatabaseField(columnName = "page", uniqueCombo = true)
+    private int page;
+
     public FactionChest(Faction faction, Inventory factionChest) {
+        this(faction, factionChest, 1);
+    }
+
+    public FactionChest(Faction faction, Inventory factionChest, int page) {
         super(faction);
         this.factionChest = factionChest;
+        this.page = page;
     }
 }

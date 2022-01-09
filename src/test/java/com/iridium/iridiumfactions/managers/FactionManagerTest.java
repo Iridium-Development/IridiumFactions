@@ -561,7 +561,7 @@ class FactionManagerTest {
     }
 
     @Test
-    public void getFactionUpgradeAlreadyExists(){
+    public void getFactionUpgradeAlreadyExists() {
         Faction faction = new FactionBuilder().build();
         FactionUpgrade factionUpgrade = new FactionUpgrade(faction, "upgrade", 10);
         IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().addEntry(factionUpgrade);

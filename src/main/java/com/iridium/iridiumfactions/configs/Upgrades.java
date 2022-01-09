@@ -97,10 +97,10 @@ public class Upgrades {
                     "&c&l[!] &cLeft Click to Purchase this Upgrade"
             )), ImmutableMap.<Integer, ChestUpgrade>builder()
             .put(1, new ChestUpgrade(1000, 1))
-            .put(2, new ChestUpgrade(1000, 2))
-            .put(3, new ChestUpgrade(1000, 3))
-            .put(4, new ChestUpgrade(1000, 4))
-            .put(5, new ChestUpgrade(1000, 5))
+            .put(2, new ChestUpgrade(1000, 6))
+            .put(3, new ChestUpgrade(1000, 12))
+            .put(4, new ChestUpgrade(1000, 18))
+            .put(5, new ChestUpgrade(1000, 24))
             .build());
 
     public Upgrade<ExperienceUpgrade> experienceUpgrade = new Upgrade<>(true, "Experience",
