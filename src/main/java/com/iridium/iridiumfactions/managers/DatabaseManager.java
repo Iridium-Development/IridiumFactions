@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.*;
+import com.iridium.iridiumfactions.database.types.InventoryType;
 import com.iridium.iridiumfactions.database.types.LocationType;
 import com.iridium.iridiumfactions.database.types.XMaterialType;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
@@ -43,6 +44,7 @@ public class DatabaseManager {
     private ForeignFactionTableManager<FactionSpawners, Integer> factionSpawnersTableManager;
     private ForeignFactionTableManager<FactionWarp, Integer> factionWarpTableManager;
     private ForeignFactionTableManager<FactionUpgrade, Integer> factionUpgradeTableManager;
+    private ForeignFactionTableManager<FactionChest, Integer> factionChestTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -52,6 +54,7 @@ public class DatabaseManager {
 
         DataPersisterManager.registerDataPersisters(XMaterialType.getSingleton());
         DataPersisterManager.registerDataPersisters(LocationType.getSingleton());
+        DataPersisterManager.registerDataPersisters(InventoryType.getSingleton());
 
         if (!IridiumFactions.getInstance().isTesting()) {
 
@@ -74,6 +77,7 @@ public class DatabaseManager {
         this.factionSpawnersTableManager = new ForeignFactionTableManager<>(connectionSource, FactionSpawners.class, Comparator.comparing(FactionSpawners::getFactionID).thenComparing(FactionSpawners::getSpawnerType));
         this.factionWarpTableManager = new ForeignFactionTableManager<>(connectionSource, FactionWarp.class, Comparator.comparing(FactionWarp::getFactionID).thenComparing(FactionWarp::getName));
         this.factionUpgradeTableManager = new ForeignFactionTableManager<>(connectionSource, FactionUpgrade.class, Comparator.comparing(FactionUpgrade::getFactionID).thenComparing(FactionUpgrade::getUpgrade));
+        this.factionChestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionChest.class, Comparator.comparing(FactionChest::getFactionID));
     }
 
     /**

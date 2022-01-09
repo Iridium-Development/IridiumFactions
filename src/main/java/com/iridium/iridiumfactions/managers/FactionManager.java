@@ -10,6 +10,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -306,6 +307,34 @@ public class FactionManager {
 
     public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull PermissionType permissionType) {
         return getFactionPermission(faction, user, IridiumFactions.getInstance().getPermissionList().get(permissionType.getPermissionKey()), permissionType.getPermissionKey());
+    }
+
+    public Inventory getFactionChestInventory(Faction faction) {
+        FactionChest factionChest = getFactionChest(faction);
+        FactionUpgrade factionUpgrade = getFactionUpgrade(faction, UpgradeType.CHEST_UPGRADE);
+        int rows = IridiumFactions.getInstance().getUpgrades().chestUpgrade.upgrades.get(factionUpgrade.getLevel()).rows;
+        if (factionChest.getFactionChest().getSize() == rows * 9) {
+            return factionChest.getFactionChest();
+        } else {
+            Inventory inventory = Bukkit.createInventory(null, rows * 9, StringUtils.color(IridiumFactions.getInstance().getConfiguration().factionChestTitle.replace("%faction_name%", faction.getName())));
+            inventory.setContents(factionChest.getFactionChest().getContents());
+            factionChest.getFactionChest().getViewers().forEach(humanEntity -> humanEntity.openInventory(inventory));
+            factionChest.setFactionChest(inventory);
+            return inventory;
+        }
+    }
+
+    public synchronized FactionChest getFactionChest(Faction faction) {
+        Optional<FactionChest> factionChest = IridiumFactions.getInstance().getDatabaseManager().getFactionChestTableManager().getEntry(new FactionChest(faction, null));
+        if (factionChest.isPresent()) {
+            return factionChest.get();
+        } else {
+            FactionUpgrade factionUpgrade = getFactionUpgrade(faction, UpgradeType.CHEST_UPGRADE);
+            int rows = IridiumFactions.getInstance().getUpgrades().chestUpgrade.upgrades.get(factionUpgrade.getLevel()).rows;
+            FactionChest chest = new FactionChest(faction, Bukkit.createInventory(null, rows * 9, StringUtils.color(IridiumFactions.getInstance().getConfiguration().factionChestTitle.replace("%faction_name%", faction.getName()))));
+            IridiumFactions.getInstance().getDatabaseManager().getFactionChestTableManager().addEntry(chest);
+            return chest;
+        }
     }
 
     public synchronized void setFactionPermission(@NotNull Faction faction, @NotNull FactionRank factionRank, @NotNull String key, boolean allowed) {

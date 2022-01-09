@@ -24,6 +24,7 @@ public class Configuration {
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
+    public String factionChestTitle = "&c%faction_name%'s Faction Chest";
 
     public FactionConfiguration playerFaction = new FactionConfiguration("Default Faction Description");
     public FactionConfiguration wildernessFaction = new FactionConfiguration("Wilderness", "");

@@ -220,6 +220,7 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionSpawnersTableManager().save();
         getDatabaseManager().getFactionWarpTableManager().save();
         getDatabaseManager().getFactionUpgradeTableManager().save();
+        getDatabaseManager().getFactionChestTableManager().save();
     }
 
     public NumberFormatter getNumberFormatter() {
