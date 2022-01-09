@@ -52,5 +52,11 @@ public class FactionUpgradeGUI implements GUI {
 
     @Override
     public void onInventoryClick(InventoryClickEvent event) {
+        for (Map.Entry<String, Upgrade<?>> upgrade : IridiumFactions.getInstance().getUpgradesList().entrySet()) {
+            if (event.getSlot() == upgrade.getValue().item.slot) {
+                IridiumFactions.getInstance().getCommands().upgradeCommand.execute(event.getWhoClicked(), new String[]{"", upgrade.getKey()});
+                addContent(event.getInventory());
+            }
+        }
     }
 }
