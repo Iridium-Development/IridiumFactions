@@ -145,7 +145,7 @@ class WarpCommandTest {
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
         IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, null, "home"));
         IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, null, "farm"));
-        assertEquals(Arrays.asList("farm", "home"), IridiumFactions.getInstance().getCommands().warpCommand.onTabComplete(playerMock, null, null, new String[]{"f", "warp", ""}));
-        assertEquals(List.of("farm"), IridiumFactions.getInstance().getCommands().warpCommand.onTabComplete(playerMock, null, null, new String[]{"f", "warp", "f"}));
+        assertEquals(Arrays.asList("farm", "home"), IridiumFactions.getInstance().getCommands().warpCommand.onTabComplete(playerMock, null, null, new String[]{"warp", ""}));
+        assertEquals(List.of("farm"), IridiumFactions.getInstance().getCommands().warpCommand.onTabComplete(playerMock, null, null, new String[]{"warp", "f"}));
     }
 }

@@ -115,4 +115,5 @@ public class Messages {
     public String cannotAfford = "%prefix% &7You cannot afford this.";
     public String maxLevelReached = "%prefix% &7Maximum level reached.";
     public String unknownUpgrade = "%prefix% &7Unknown Faction upgrade.";
+    public String warpLimitReached = "%prefix% &7The max warp limit has already been reached.";
 }

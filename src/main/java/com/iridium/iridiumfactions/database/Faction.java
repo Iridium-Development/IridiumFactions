@@ -1,10 +1,7 @@
 package com.iridium.iridiumfactions.database;
 
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
-import com.iridium.iridiumfactions.Cache;
-import com.iridium.iridiumfactions.FactionRank;
-import com.iridium.iridiumfactions.FactionType;
-import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.configs.BlockValues;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.j256.ormlite.field.DatabaseField;
@@ -127,7 +124,11 @@ public final class Faction {
      * @return The factions total power
      */
     public double getTotalPower() {
-        return IridiumFactions.getInstance().getFactionManager().getFactionMembers(this).stream().map(User::getPower).reduce(0.00, Double::sum);
+        return IridiumFactions.getInstance().getFactionManager().getFactionMembers(this).stream().map(User::getPower).reduce(0.00, Double::sum) + getExtraPower();
+    }
+
+    public int getExtraPower() {
+        return IridiumFactions.getInstance().getUpgrades().powerUpgrade.upgrades.get(IridiumFactions.getInstance().getFactionManager().getFactionUpgrade(this, UpgradeType.POWER_UPGRADE).getLevel()).extraPower;
     }
 
     /**

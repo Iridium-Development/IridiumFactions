@@ -3,7 +3,9 @@ package com.iridium.iridiumfactions.commands;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.PermissionType;
+import com.iridium.iridiumfactions.UpgradeType;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionUpgrade;
 import com.iridium.iridiumfactions.database.FactionWarp;
 import com.iridium.iridiumfactions.database.User;
 import org.bukkit.command.CommandSender;
@@ -43,6 +45,12 @@ public class SetWarpCommand extends Command {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotSetWarp
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));
+            return false;
+        }
+
+        FactionUpgrade factionUpgrade = IridiumFactions.getInstance().getFactionManager().getFactionUpgrade(faction, UpgradeType.WARPS_UPGRADE);
+        if (IridiumFactions.getInstance().getFactionManager().getFactionWarps(faction).size() >= IridiumFactions.getInstance().getUpgrades().warpsUpgrade.upgrades.get(factionUpgrade.getLevel()).warps) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().warpLimitReached.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
 
