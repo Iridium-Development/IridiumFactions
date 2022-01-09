@@ -37,8 +37,10 @@ public class IridiumFactions extends IridiumCore {
     private Inventories inventories;
     private Permissions permissions;
     private BlockValues blockValues;
+    private Upgrades upgrades;
 
     private Map<String, Permission> permissionList;
+    private Map<String, Upgrade<?>> upgradesList;
     /*
     TODO LIST
      View Active Relationships
@@ -132,6 +134,7 @@ public class IridiumFactions extends IridiumCore {
         this.inventories = getPersist().load(Inventories.class);
         this.permissions = getPersist().load(Permissions.class);
         this.blockValues = getPersist().load(BlockValues.class);
+        this.upgrades = getPersist().load(Upgrades.class);
 
         for (FactionRank factionRank : FactionRank.values()) {
             configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
@@ -141,6 +144,7 @@ public class IridiumFactions extends IridiumCore {
         }
 
         initializePermissionsList();
+        initializeUpgradesList();
     }
 
     public void initializePermissionsList() {
@@ -166,6 +170,15 @@ public class IridiumFactions extends IridiumCore {
         this.permissionList.put(PermissionType.MANAGE_WARPS.getPermissionKey(), permissions.manageWarps);
     }
 
+    public void initializeUpgradesList() {
+        this.upgradesList = new HashMap<>();
+        this.upgradesList.put(UpgradeType.CHEST_UPGRADE.getName(), upgrades.chestUpgrade);
+        this.upgradesList.put(UpgradeType.POWER_UPGRADE.getName(), upgrades.powerUpgrade);
+        this.upgradesList.put(UpgradeType.SPAWNER_UPGRADE.getName(), upgrades.spawnerUpgrade);
+        this.upgradesList.put(UpgradeType.WARPS_UPGRADE.getName(), upgrades.warpsUpgrade);
+        this.upgradesList.put(UpgradeType.EXPERIENCE_UPGRADE.getName(), upgrades.experienceUpgrade);
+    }
+
     @Override
     public void saveConfigs() {
         getPersist().save(configuration);
@@ -175,6 +188,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(inventories);
         getPersist().save(permissions);
         getPersist().save(blockValues);
+        getPersist().save(upgrades);
     }
 
     @Override

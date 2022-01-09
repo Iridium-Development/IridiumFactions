@@ -26,6 +26,8 @@ public class Inventories {
             .put(17, new Item(XMaterial.LIGHT_GRAY_STAINED_GLASS_PANE, 1, " ", Collections.emptyList()))
             .build());
 
+    public NoItemGUI upgradesGUI = new NoItemGUI(27, "&7Island Upgrades", background2);
+
     public SingleItemGUI membersGUI = new SingleItemGUI(27, "&7Faction Members", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%player_name%", "%player_name%", Arrays.asList(
             "&7Joined: %player_join%",
             "&7Rank: %player_rank%",

@@ -438,7 +438,11 @@ public class FactionManager {
         return factionSpawners;
     }
 
-    public synchronized FactionUpgrade getFactionUpgrade(Faction faction, String upgrade){
+    public FactionUpgrade getFactionUpgrade(Faction faction, UpgradeType upgradeType) {
+        return getFactionUpgrade(faction, upgradeType.getName());
+    }
+
+    public synchronized FactionUpgrade getFactionUpgrade(Faction faction, String upgrade) {
         FactionUpgrade factionUpgrade = new FactionUpgrade(faction, upgrade);
         Optional<FactionUpgrade> factionUpgradeOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntry(factionUpgrade);
         if (factionUpgradeOptional.isPresent()) {
