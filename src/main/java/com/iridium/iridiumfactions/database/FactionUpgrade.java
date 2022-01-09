@@ -15,6 +15,7 @@ public final class FactionUpgrade extends FactionData {
     private int id;
 
     @DatabaseField(columnName = "level", canBeNull = false)
+    @Setter
     private int level;
 
     @DatabaseField(columnName = "upgrade", canBeNull = false, uniqueCombo = true)

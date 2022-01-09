@@ -37,6 +37,7 @@ dependencies {
     compileOnly("be.maximvdw:MVdWPlaceholderAPI:2.1.1-SNAPSHOT") {
         exclude("org.spigotmc")
     }
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 
     // Enable lombok annotation processing
     annotationProcessor("org.projectlombok:lombok:1.18.22")
@@ -46,6 +47,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.mockito:mockito-inline:4.2.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.18:1.14.0")
+    testImplementation("com.github.MilkBowl:VaultAPI:1.7")
 }
 
 tasks {

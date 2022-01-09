@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions;
 
 import com.iridium.iridiumcore.IridiumCore;
+import com.iridium.iridiumcore.utils.NumberFormatter;
 import com.iridium.iridiumfactions.commands.CommandManager;
 import com.iridium.iridiumfactions.configs.*;
 import com.iridium.iridiumfactions.database.Faction;
@@ -9,8 +10,11 @@ import com.iridium.iridiumfactions.managers.DatabaseManager;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.iridium.iridiumfactions.managers.UserManager;
 import lombok.Getter;
+import lombok.Setter;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
@@ -41,6 +45,9 @@ public class IridiumFactions extends IridiumCore {
 
     private Map<String, Permission> permissionList;
     private Map<String, Upgrade<?>> upgradesList;
+
+    @Setter
+    private Economy economy;
     /*
     TODO LIST
      View Active Relationships
@@ -98,6 +105,8 @@ public class IridiumFactions extends IridiumCore {
 
         }, 0, getConfiguration().factionRecalculateInterval * 20L);
 
+        Bukkit.getScheduler().runTask(this, () -> this.economy = setupEconomy());
+
         getLogger().info("----------------------------------------");
         getLogger().info("");
         getLogger().info(getDescription().getName() + " Enabled!");
@@ -109,6 +118,15 @@ public class IridiumFactions extends IridiumCore {
     @Override
     public void onDisable() {
         super.onDisable();
+    }
+
+    private Economy setupEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
+        if (economyProvider == null) {
+            getLogger().warning("You do not have an economy plugin installed (like Essentials)");
+            return null;
+        }
+        return economyProvider.getProvider();
     }
 
     @Override
@@ -202,6 +220,10 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionSpawnersTableManager().save();
         getDatabaseManager().getFactionWarpTableManager().save();
         getDatabaseManager().getFactionUpgradeTableManager().save();
+    }
+
+    public NumberFormatter getNumberFormatter() {
+        return configuration.numberFormatter;
     }
 
     public static IridiumFactions getInstance() {
