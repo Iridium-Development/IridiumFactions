@@ -7,10 +7,9 @@ import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.*;
 import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -567,6 +566,15 @@ class FactionManagerTest {
         IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().addEntry(factionUpgrade);
         assertEquals(10, IridiumFactions.getInstance().getFactionManager().getFactionUpgrade(faction, "upgrade").getLevel());
         assertEquals(Collections.singletonList(factionUpgrade), IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntries());
+    }
+
+    @Test
+    public void getFactionChestInventoryItemsPersist() {
+        Faction faction = new FactionBuilder().build();
+        Inventory inventory = IridiumFactions.getInstance().getFactionManager().getFactionChestInventory(faction, 1);
+        inventory.addItem(new ItemStack(Material.STONE));
+        assertEquals(9, inventory.getSize());
+        assertEquals(new ItemStack(Material.STONE), inventory.getItem(0));
     }
 
 }
