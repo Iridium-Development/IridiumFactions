@@ -79,7 +79,7 @@ public class WarpCommand extends Command {
         Faction faction = user.getFaction();
         return IridiumFactions.getInstance().getFactionManager().getFactionWarps(faction).stream()
                 .map(FactionWarp::getName)
-                .filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase()))
+                .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
                 .collect(Collectors.toList());
     }
 

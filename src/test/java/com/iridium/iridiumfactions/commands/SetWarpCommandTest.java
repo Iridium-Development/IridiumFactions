@@ -80,12 +80,31 @@ class SetWarpCommandTest {
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
 
+        IridiumFactions.getInstance().getFactionManager().getFactionUpgrade(faction, UpgradeType.WARPS_UPGRADE).setLevel(3);
         IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.MANAGE_WARPS.getPermissionKey(), true);
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
         IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, playerMock.getLocation(), "test"));
 
         serverMock.dispatchCommand(playerMock, "f setwarp test");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().warpAlreadyExists
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeSetWarpCommandWarpLimitReached() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
+
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.MANAGE_WARPS.getPermissionKey(), true);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
+        for (int i = 0; i < 10; i++) {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().addEntry(new FactionWarp(faction, playerMock.getLocation(), "warp_" + i));
+        }
+
+        serverMock.dispatchCommand(playerMock, "f setwarp test");
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().warpLimitReached
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
         ));
         playerMock.assertNoMoreSaid();

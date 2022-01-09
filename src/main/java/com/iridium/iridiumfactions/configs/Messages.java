@@ -111,4 +111,10 @@ public class Messages {
     public String noSuchMaterial = "%prefix% &7No such material %material%";
     public String warpDescriptionSet = "%prefix% &7You have set the warp description to %description%";
     public String warpDescriptionRemoved = "%prefix% &7You have removed the warp's description";
+    public String successfullyBoughtUpgrade = "%prefix% &7You have successfully bought the %upgrade% Upgrade &r&7for $%cost%.";
+    public String cannotAfford = "%prefix% &7You cannot afford this.";
+    public String maxLevelReached = "%prefix% &7Maximum level reached.";
+    public String unknownUpgrade = "%prefix% &7Unknown Faction upgrade.";
+    public String warpLimitReached = "%prefix% &7The max warp limit has already been reached.";
+    public String factionChestNotUnlocked = "%prefix% &7You havent unlocked that faction chest yet.";
 }

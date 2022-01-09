@@ -9,7 +9,9 @@ import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -308,6 +310,39 @@ public class FactionManager {
         return getFactionPermission(faction, user, IridiumFactions.getInstance().getPermissionList().get(permissionType.getPermissionKey()), permissionType.getPermissionKey());
     }
 
+    public Inventory getFactionChestInventory(Faction faction, int page) {
+        FactionChest factionChest = getFactionChest(faction, page);
+        FactionUpgrade factionUpgrade = getFactionUpgrade(faction, UpgradeType.CHEST_UPGRADE);
+        int maxSlots = IridiumFactions.getInstance().getUpgrades().chestUpgrade.upgrades.get(factionUpgrade.getLevel()).rows * 9;
+        int inventorySize = Math.min(54, maxSlots - ((page - 1) * 54));
+        if (factionChest.getFactionChest() != null && factionChest.getFactionChest().getSize() == inventorySize) {
+            return factionChest.getFactionChest();
+        } else {
+            Inventory inventory = Bukkit.createInventory(null, inventorySize, StringUtils.color(IridiumFactions.getInstance().getConfiguration().factionChestTitle.replace("%faction_name%", faction.getName())));
+            Inventory oldInventory = factionChest.getFactionChest();
+            if (oldInventory != null) {
+                inventory.setContents(oldInventory.getContents());
+                oldInventory.clear();
+                for (HumanEntity humanEntity : new ArrayList<>(oldInventory.getViewers())) {
+                    humanEntity.openInventory(inventory);
+                }
+            }
+            factionChest.setFactionChest(inventory);
+            return inventory;
+        }
+    }
+
+    private synchronized FactionChest getFactionChest(Faction faction, int page) {
+        Optional<FactionChest> factionChest = IridiumFactions.getInstance().getDatabaseManager().getFactionChestTableManager().getEntry(new FactionChest(faction, null, page));
+        if (factionChest.isPresent()) {
+            return factionChest.get();
+        } else {
+            FactionChest chest = new FactionChest(faction, null, page);
+            IridiumFactions.getInstance().getDatabaseManager().getFactionChestTableManager().addEntry(chest);
+            return chest;
+        }
+    }
+
     public synchronized void setFactionPermission(@NotNull Faction faction, @NotNull FactionRank factionRank, @NotNull String key, boolean allowed) {
         Optional<FactionPermission> factionPermission = IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().getEntry(new FactionPermission(faction, key, factionRank, allowed));
         if (factionPermission.isPresent()) {
@@ -436,6 +471,20 @@ public class FactionManager {
         }
         IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().addEntry(factionSpawners);
         return factionSpawners;
+    }
+
+    public FactionUpgrade getFactionUpgrade(Faction faction, UpgradeType upgradeType) {
+        return getFactionUpgrade(faction, upgradeType.getName());
+    }
+
+    public synchronized FactionUpgrade getFactionUpgrade(Faction faction, String upgrade) {
+        FactionUpgrade factionUpgrade = new FactionUpgrade(faction, upgrade);
+        Optional<FactionUpgrade> factionUpgradeOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntry(factionUpgrade);
+        if (factionUpgradeOptional.isPresent()) {
+            return factionUpgradeOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().addEntry(factionUpgrade);
+        return factionUpgrade;
     }
 
     public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {

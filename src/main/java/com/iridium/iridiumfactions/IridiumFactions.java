@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions;
 
 import com.iridium.iridiumcore.IridiumCore;
+import com.iridium.iridiumcore.utils.NumberFormatter;
 import com.iridium.iridiumfactions.commands.CommandManager;
 import com.iridium.iridiumfactions.configs.*;
 import com.iridium.iridiumfactions.database.Faction;
@@ -9,8 +10,11 @@ import com.iridium.iridiumfactions.managers.DatabaseManager;
 import com.iridium.iridiumfactions.managers.FactionManager;
 import com.iridium.iridiumfactions.managers.UserManager;
 import lombok.Getter;
+import lombok.Setter;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
@@ -37,14 +41,18 @@ public class IridiumFactions extends IridiumCore {
     private Inventories inventories;
     private Permissions permissions;
     private BlockValues blockValues;
+    private Upgrades upgrades;
 
     private Map<String, Permission> permissionList;
+    private Map<String, Upgrade<?>> upgradesList;
+
+    @Setter
+    private Economy economy;
     /*
     TODO LIST
      View Active Relationships
      View and Cancel Relationship requests
      Implement Power properly
-     Faction Upgrades (Spawners, ExtraPower, Warps, FactionChest, Experience)
      Faction Bank (Money TNT Experience)
      Faction Missions
      Faction Main Menu
@@ -96,6 +104,8 @@ public class IridiumFactions extends IridiumCore {
 
         }, 0, getConfiguration().factionRecalculateInterval * 20L);
 
+        Bukkit.getScheduler().runTask(this, () -> this.economy = setupEconomy());
+
         getLogger().info("----------------------------------------");
         getLogger().info("");
         getLogger().info(getDescription().getName() + " Enabled!");
@@ -107,6 +117,15 @@ public class IridiumFactions extends IridiumCore {
     @Override
     public void onDisable() {
         super.onDisable();
+    }
+
+    private Economy setupEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
+        if (economyProvider == null) {
+            getLogger().warning("You do not have an economy plugin installed (like Essentials)");
+            return null;
+        }
+        return economyProvider.getProvider();
     }
 
     @Override
@@ -132,6 +151,7 @@ public class IridiumFactions extends IridiumCore {
         this.inventories = getPersist().load(Inventories.class);
         this.permissions = getPersist().load(Permissions.class);
         this.blockValues = getPersist().load(BlockValues.class);
+        this.upgrades = getPersist().load(Upgrades.class);
 
         for (FactionRank factionRank : FactionRank.values()) {
             configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
@@ -141,6 +161,7 @@ public class IridiumFactions extends IridiumCore {
         }
 
         initializePermissionsList();
+        initializeUpgradesList();
     }
 
     public void initializePermissionsList() {
@@ -166,6 +187,15 @@ public class IridiumFactions extends IridiumCore {
         this.permissionList.put(PermissionType.MANAGE_WARPS.getPermissionKey(), permissions.manageWarps);
     }
 
+    public void initializeUpgradesList() {
+        this.upgradesList = new HashMap<>();
+        this.upgradesList.put(UpgradeType.CHEST_UPGRADE.getName(), upgrades.chestUpgrade);
+        this.upgradesList.put(UpgradeType.POWER_UPGRADE.getName(), upgrades.powerUpgrade);
+        this.upgradesList.put(UpgradeType.SPAWNER_UPGRADE.getName(), upgrades.spawnerUpgrade);
+        this.upgradesList.put(UpgradeType.WARPS_UPGRADE.getName(), upgrades.warpsUpgrade);
+        this.upgradesList.put(UpgradeType.EXPERIENCE_UPGRADE.getName(), upgrades.experienceUpgrade);
+    }
+
     @Override
     public void saveConfigs() {
         getPersist().save(configuration);
@@ -175,6 +205,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(inventories);
         getPersist().save(permissions);
         getPersist().save(blockValues);
+        getPersist().save(upgrades);
     }
 
     @Override
@@ -187,6 +218,12 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionBlocksTableManager().save();
         getDatabaseManager().getFactionSpawnersTableManager().save();
         getDatabaseManager().getFactionWarpTableManager().save();
+        getDatabaseManager().getFactionUpgradeTableManager().save();
+        getDatabaseManager().getFactionChestTableManager().save();
+    }
+
+    public NumberFormatter getNumberFormatter() {
+        return configuration.numberFormatter;
     }
 
     public static IridiumFactions getInstance() {

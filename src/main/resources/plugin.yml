@@ -4,6 +4,7 @@ description: Factions Redefined
 main: com.iridium.iridiumfactions.IridiumFactions
 api-version: '1.13'
 author: Peaches_MLG
+depend: [ Vault ]
 commands:
   iridiumfactions:
     aliases: [ "factions", "f" ]

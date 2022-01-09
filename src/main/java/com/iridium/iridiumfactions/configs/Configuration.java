@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.configs;
 
 import com.google.common.collect.ImmutableMap;
+import com.iridium.iridiumcore.utils.NumberFormatter;
 import com.iridium.iridiumfactions.FactionConfiguration;
 import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.RelationshipType;
@@ -23,11 +24,14 @@ public class Configuration {
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
+    public String factionChestTitle = "&7%faction_name%'s Faction Chest";
 
     public FactionConfiguration playerFaction = new FactionConfiguration("Default Faction Description");
     public FactionConfiguration wildernessFaction = new FactionConfiguration("Wilderness", "");
     public FactionConfiguration warzoneFaction = new FactionConfiguration("Warzone", "");
     public FactionConfiguration safezoneFaction = new FactionConfiguration("Safezone", "");
+
+    public NumberFormatter numberFormatter = new NumberFormatter();
 
     public List<Integer> factionWarpSlots = Arrays.asList(9, 11, 13, 15, 17);
 
