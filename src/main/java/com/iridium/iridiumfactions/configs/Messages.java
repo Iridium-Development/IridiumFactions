@@ -117,4 +117,5 @@ public class Messages {
     public String unknownUpgrade = "%prefix% &7Unknown Faction upgrade.";
     public String warpLimitReached = "%prefix% &7The max warp limit has already been reached.";
     public String factionChestNotUnlocked = "%prefix% &7You havent unlocked that faction chest yet.";
+    public String unknownFactionRank = "%prefix% &7Unknown Faction rank.";
 }
