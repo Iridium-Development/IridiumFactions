@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @NoArgsConstructor
-@DatabaseTable(tableName = "faction_claims")
+@DatabaseTable(tableName = "faction_access")
 public class FactionAccess extends FactionData {
 
     @DatabaseField(columnName = "id", generatedId = true, canBeNull = false)
