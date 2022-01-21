@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.commands;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import org.bukkit.Bukkit;
 import org.junit.jupiter.api.AfterEach;
@@ -29,10 +30,10 @@ class AboutCommandTest {
     public void executeAboutCommand() {
         PlayerMock playerMock = serverMock.addPlayer("player");
         serverMock.dispatchCommand(playerMock, "f about");
-        playerMock.assertSaid("§7Plugin Name: §cIridiumFactions");
-        playerMock.assertSaid("§7Plugin Version: §c" + IridiumFactions.getInstance().getDescription().getVersion());
-        playerMock.assertSaid("§7Plugin Author: §cPeaches_MLG");
-        playerMock.assertSaid("§7Plugin Donations: §cwww.patreon.com/Peaches_MLG");
+        playerMock.assertSaid(StringUtils.color("&7Plugin Name: &cIridiumFactions"));
+        playerMock.assertSaid(StringUtils.color("&7Plugin Version: &c" + IridiumFactions.getInstance().getDescription().getVersion()));
+        playerMock.assertSaid(StringUtils.color("&7Plugin Author: &cPeaches_MLG"));
+        playerMock.assertSaid(StringUtils.color("&7Plugin Donations: &cwww.patreon.com/Peaches_MLG"));
         playerMock.assertNoMoreSaid();
     }
 

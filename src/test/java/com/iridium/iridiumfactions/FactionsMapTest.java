@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionClaim;
 import org.bukkit.Bukkit;
@@ -42,16 +43,18 @@ class FactionsMapTest {
     }
 
     @Test
-    public void getHeader() {
-        PlayerMock player = serverMock.addPlayer("Player");
-        assertEquals(new FactionsMap(player).getHeader(), "§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8[ §c(0, 0) §2Wilderness §8]§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m ");
+    public void getHeaderWilderness() {
+        PlayerMock playerMock = new UserBuilder(serverMock).build();
+        assertEquals(StringUtils.color("&8&m ".repeat(26) + "&8[ &c(0, 0) &2Wilderness &8]" + "&8&m ".repeat(26)), new FactionsMap(playerMock).getHeader());
+    }
 
-        Faction faction = new Faction("Faction Name", 1);
-        FactionClaim factionClaim = new FactionClaim(faction, "world", player.getLocation().getChunk().getX(), player.getLocation().getChunk().getZ());
+    @Test
+    public void getHeaderFaction() {
+        PlayerMock playerMock = new UserBuilder(serverMock).build();
+        Faction faction = new FactionBuilder("Faction").build();
 
-        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().addEntry(faction);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(factionClaim);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, "world", playerMock.getLocation().getChunk().getX(), playerMock.getLocation().getChunk().getZ()));
 
-        assertEquals(new FactionsMap(player).getHeader(), "§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8[ §c(0, 0) §7Faction Name §8]§8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m §8§m ");
+        assertEquals(StringUtils.color("&8&m ".repeat(28) + "&8[ &c(0, 0) &7" + faction.getName() + " &8]" + "&8&m ".repeat(28)), new FactionsMap(playerMock).getHeader());
     }
 }
