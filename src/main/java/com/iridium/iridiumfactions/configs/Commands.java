@@ -44,4 +44,7 @@ public class Commands {
     public UpgradeCommand upgradeCommand = new UpgradeCommand();
     public ChestCommand chestCommand = new ChestCommand();
     public AccessCommand accessCommand = new AccessCommand();
+    public BankCommand bankCommand = new BankCommand();
+    public WithdrawCommand withdrawCommand = new WithdrawCommand();
+    public DepositCommand depositCommand = new DepositCommand();
 }

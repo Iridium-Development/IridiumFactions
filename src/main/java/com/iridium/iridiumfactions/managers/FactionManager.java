@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.*;
+import com.iridium.iridiumfactions.bank.BankItem;
 import com.iridium.iridiumfactions.database.*;
 import com.iridium.iridiumfactions.utils.LocationUtils;
 import org.bukkit.*;
@@ -367,6 +368,17 @@ public class FactionManager {
             factionAccess.get().setAllowed(allowed);
         } else {
             IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().addEntry(new FactionAccess(faction, factionClaim, factionRank, allowed));
+        }
+    }
+
+    public synchronized FactionBank getFactionBank(Faction faction, BankItem bankItem) {
+        Optional<FactionBank> factionBank = IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().getEntry(new FactionBank(faction, bankItem.getName(), 0));
+        if (factionBank.isPresent()) {
+            return factionBank.get();
+        } else {
+            FactionBank bank = new FactionBank(faction, bankItem.getName(), 0);
+            IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().addEntry(bank);
+            return bank;
         }
     }
 

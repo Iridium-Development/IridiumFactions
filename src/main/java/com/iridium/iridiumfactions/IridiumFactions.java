@@ -2,6 +2,7 @@ package com.iridium.iridiumfactions;
 
 import com.iridium.iridiumcore.IridiumCore;
 import com.iridium.iridiumcore.utils.NumberFormatter;
+import com.iridium.iridiumfactions.bank.BankItem;
 import com.iridium.iridiumfactions.commands.CommandManager;
 import com.iridium.iridiumfactions.configs.*;
 import com.iridium.iridiumfactions.database.Faction;
@@ -19,9 +20,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -42,9 +41,11 @@ public class IridiumFactions extends IridiumCore {
     private Permissions permissions;
     private BlockValues blockValues;
     private Upgrades upgrades;
+    private BankItems bankItems;
 
     private Map<String, Permission> permissionList;
     private Map<String, Upgrade<?>> upgradesList;
+    private List<BankItem> bankItemList;
 
     @Setter
     private Economy economy;
@@ -53,7 +54,6 @@ public class IridiumFactions extends IridiumCore {
      View Active Relationships
      View and Cancel Relationship requests
      Implement Power properly
-     Faction Bank (Money TNT Experience)
      Faction Missions
      Faction Main Menu
      Faction Strikes
@@ -151,6 +151,7 @@ public class IridiumFactions extends IridiumCore {
         this.permissions = getPersist().load(Permissions.class);
         this.blockValues = getPersist().load(BlockValues.class);
         this.upgrades = getPersist().load(Upgrades.class);
+        this.bankItems = getPersist().load(BankItems.class);
 
         for (FactionRank factionRank : FactionRank.values()) {
             configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
@@ -161,6 +162,7 @@ public class IridiumFactions extends IridiumCore {
 
         initializePermissionsList();
         initializeUpgradesList();
+        initializeBankList();
     }
 
     public void initializePermissionsList() {
@@ -195,6 +197,19 @@ public class IridiumFactions extends IridiumCore {
         this.upgradesList.put(UpgradeType.EXPERIENCE_UPGRADE.getName(), upgrades.experienceUpgrade);
     }
 
+    public void initializeBankList() {
+        this.bankItemList = new ArrayList<>();
+        if (bankItems.tnTBankItem.isEnabled()) {
+            this.bankItemList.add(bankItems.tnTBankItem);
+        }
+        if (bankItems.experienceBankItem.isEnabled()) {
+            this.bankItemList.add(bankItems.experienceBankItem);
+        }
+        if (bankItems.moneyBankItem.isEnabled()) {
+            this.bankItemList.add(bankItems.moneyBankItem);
+        }
+    }
+
     @Override
     public void saveConfigs() {
         getPersist().save(configuration);
@@ -205,6 +220,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(permissions);
         getPersist().save(blockValues);
         getPersist().save(upgrades);
+        getPersist().save(bankItems);
     }
 
     @Override
@@ -219,6 +235,8 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionWarpTableManager().save();
         getDatabaseManager().getFactionUpgradeTableManager().save();
         getDatabaseManager().getFactionChestTableManager().save();
+        getDatabaseManager().getFactionAccessTableManager().save();
+        getDatabaseManager().getFactionBankTableManager().save();
     }
 
     public NumberFormatter getNumberFormatter() {
