@@ -577,4 +577,21 @@ class FactionManagerTest {
         assertEquals(new ItemStack(Material.STONE), inventory.getItem(0));
     }
 
+    @Test
+    public void getFactionBankDoesntExist() {
+        Faction faction = new FactionBuilder().build();
+        FactionBank factionBank = IridiumFactions.getInstance().getFactionManager().getFactionBank(faction, IridiumFactions.getInstance().getBankItems().experienceBankItem);
+        assertEquals(0, factionBank.getNumber());
+        assertEquals(Collections.singletonList(factionBank), IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().getEntries());
+    }
+
+    @Test
+    public void getFactionBankAlreadyExists() {
+        Faction faction = new FactionBuilder().build();
+        FactionBank factionBank = new FactionBank(faction, IridiumFactions.getInstance().getBankItems().experienceBankItem.getName(), 1000);
+        IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().addEntry(factionBank);
+        assertEquals(factionBank, IridiumFactions.getInstance().getFactionManager().getFactionBank(faction, IridiumFactions.getInstance().getBankItems().experienceBankItem));
+        assertEquals(Collections.singletonList(factionBank), IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().getEntries());
+    }
+
 }

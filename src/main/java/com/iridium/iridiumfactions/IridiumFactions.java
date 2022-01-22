@@ -54,7 +54,6 @@ public class IridiumFactions extends IridiumCore {
      View Active Relationships
      View and Cancel Relationship requests
      Implement Power properly
-     Faction Bank (Money TNT Experience)
      Faction Missions
      Faction Main Menu
      Faction Strikes
