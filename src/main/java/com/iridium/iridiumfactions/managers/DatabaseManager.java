@@ -46,6 +46,8 @@ public class DatabaseManager {
     private ForeignFactionTableManager<FactionUpgrade, Integer> factionUpgradeTableManager;
     private ForeignFactionTableManager<FactionChest, Integer> factionChestTableManager;
     private ForeignFactionTableManager<FactionAccess, Integer> factionAccessTableManager;
+    private ForeignFactionTableManager<FactionBank, Integer> factionBankTableManager;
+
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -80,6 +82,7 @@ public class DatabaseManager {
         this.factionUpgradeTableManager = new ForeignFactionTableManager<>(connectionSource, FactionUpgrade.class, Comparator.comparing(FactionUpgrade::getFactionID).thenComparing(FactionUpgrade::getUpgrade));
         this.factionChestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionChest.class, Comparator.comparing(FactionChest::getFactionID).thenComparing(FactionChest::getPage));
         this.factionAccessTableManager = new ForeignFactionTableManager<>(connectionSource, FactionAccess.class, Comparator.comparing(FactionAccess::getFactionID).thenComparing(FactionAccess::getClaimID).thenComparing(FactionAccess::getFactionRank));
+        this.factionBankTableManager = new ForeignFactionTableManager<>(connectionSource, FactionBank.class, Comparator.comparing(FactionBank::getFactionID).thenComparing(FactionBank::getBankItem));
     }
 
     /**

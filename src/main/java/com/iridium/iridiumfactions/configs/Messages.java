@@ -121,4 +121,9 @@ public class Messages {
     public String factionAccessSet = "%prefix% &7You have %access% %rank%'s access to this claim.";
     public String factionAccessListHeader = "%prefix% &7Faction Access List";
     public String factionRankAccess = "&c%rank%: &7%access%";
+    public String bankWithdrew = "%prefix% &7You successfully withdrew %amount% %type% from your Faction bank.";
+    public String bankDeposited = "%prefix% &7You successfully deposited %amount% %type% from your Factiopn bank.";
+    public String insufficientFundsToWithdrew = "%prefix% &7You do not have enough %type% to withdraw from your Faction bank.";
+    public String insufficientFundsToDeposit = "%prefix% &7You do not have enough %type% to deposit into your Faction bank.";
+    public String noSuchBankItem = "%prefix% &7That bank item doesn't exist.";
 }
