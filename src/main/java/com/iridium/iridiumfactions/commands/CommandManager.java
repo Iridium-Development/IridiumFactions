@@ -138,9 +138,9 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             }
 
             // Check permissions
-            if (!((commandSender.hasPermission(command.permission) || command.permission
+            if (!(commandSender.hasPermission(command.permission) || command.permission
                     .equalsIgnoreCase("") || command.permission
-                    .equalsIgnoreCase("iridiumfactions.")))) {
+                    .equalsIgnoreCase("iridiumfactions."))) {
                 // No permissions
                 commandSender.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noPermission
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
