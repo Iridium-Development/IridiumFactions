@@ -79,11 +79,11 @@ public class FactionManager {
         return getFactionViaId(getFactionClaimViaChunk(world, x, z).map(FactionData::getFactionID).orElse(-1));
     }
 
-    private Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
+    public Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
         return getFactionClaimViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
     }
 
-    private Optional<FactionClaim> getFactionClaimViaChunk(World world, int x, int z) {
+    public Optional<FactionClaim> getFactionClaimViaChunk(World world, int x, int z) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager()
                 .getEntry(new FactionClaim(new Faction(""), world.getName(), x, z));
     }
@@ -310,6 +310,15 @@ public class FactionManager {
         return getFactionPermission(faction, user, IridiumFactions.getInstance().getPermissionList().get(permissionType.getPermissionKey()), permissionType.getPermissionKey());
     }
 
+    public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull PermissionType permissionType, @NotNull Location location) {
+        Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(location.getChunk());
+        if (factionClaim.isPresent()) {
+            Optional<FactionAccess> factionAccess = IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().getEntry(new FactionAccess(faction, factionClaim.get(), user.getFactionRank(), true));
+            if (!factionAccess.map(FactionAccess::isAllowed).orElse(true)) return false;
+        }
+        return getFactionPermission(faction, user, permissionType);
+    }
+
     public Inventory getFactionChestInventory(Faction faction, int page) {
         FactionChest factionChest = getFactionChest(faction, page);
         FactionUpgrade factionUpgrade = getFactionUpgrade(faction, UpgradeType.CHEST_UPGRADE);
@@ -349,6 +358,15 @@ public class FactionManager {
             factionPermission.get().setAllowed(allowed);
         } else {
             IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().addEntry(new FactionPermission(faction, key, factionRank, allowed));
+        }
+    }
+
+    public synchronized void setFactionAccess(Faction faction, FactionRank factionRank, FactionClaim factionClaim, boolean allowed) {
+        Optional<FactionAccess> factionAccess = IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().getEntry(new FactionAccess(faction, factionClaim, factionRank, allowed));
+        if (factionAccess.isPresent()) {
+            factionAccess.get().setAllowed(allowed);
+        } else {
+            IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().addEntry(new FactionAccess(faction, factionClaim, factionRank, allowed));
         }
     }
 

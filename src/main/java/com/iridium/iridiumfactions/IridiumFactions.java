@@ -56,7 +56,6 @@ public class IridiumFactions extends IridiumCore {
      Faction Bank (Money TNT Experience)
      Faction Missions
      Faction Main Menu
-     Faction Claim Permissions (Certain ranks only)
      Faction Strikes
      */
 

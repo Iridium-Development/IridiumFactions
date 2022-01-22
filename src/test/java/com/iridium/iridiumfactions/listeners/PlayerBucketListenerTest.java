@@ -97,4 +97,22 @@ class PlayerBucketListenerTest {
         playerMock.assertNoMoreSaid();
     }
 
+    @Test
+    public void onBucketEmptyPlayerFactionNoAccess() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.BUCKET.getPermissionKey(), true);
+        IridiumFactions.getInstance().getFactionManager().setFactionAccess(faction, FactionRank.MEMBER, IridiumFactions.getInstance().getFactionManager().getFactionClaimViaChunk(playerMock.getLocation().getChunk()).get(), false);
+
+        PlayerBucketEmptyEvent playerBucketEmptyEvent = new PlayerBucketEmptyEvent(playerMock, playerMock.getLocation().getBlock(), playerMock.getLocation().getBlock(), BlockFace.UP, Material.BUCKET, playerMock.getItemInHand());
+        serverMock.getPluginManager().callEvent(playerBucketEmptyEvent);
+
+        assertTrue(playerBucketEmptyEvent.isCancelled());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUseBuckets
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+    }
+
 }

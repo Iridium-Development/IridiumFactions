@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 @Getter
 @AllArgsConstructor
 public enum FactionRank {
@@ -28,5 +30,14 @@ public enum FactionRank {
             }
         }
         return null;
+    }
+
+    public static Optional<FactionRank> getByName(String name){
+        for (FactionRank factionRank : values()) {
+            if (factionRank.name().equalsIgnoreCase(name) || factionRank.getDisplayName().equalsIgnoreCase(name)) {
+                return Optional.of(factionRank);
+            }
+        }
+        return Optional.empty();
     }
 }

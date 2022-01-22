@@ -43,4 +43,5 @@ public class Commands {
     public EditWarpCommand editWarpCommand = new EditWarpCommand();
     public UpgradeCommand upgradeCommand = new UpgradeCommand();
     public ChestCommand chestCommand = new ChestCommand();
+    public AccessCommand accessCommand = new AccessCommand();
 }

@@ -22,7 +22,7 @@ public class BlockPlaceListener implements Listener {
         Player player = event.getPlayer();
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation());
-        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.BLOCK_PLACE)) {
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.BLOCK_PLACE, event.getBlock().getLocation())) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotPlaceBlocks
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));

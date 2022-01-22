@@ -82,7 +82,7 @@ class BlockBreakListenerTest {
     @Test
     public void onBlockBreakPlayerFactionNoPermission() {
         Faction faction = new FactionBuilder().build();
-        PlayerMock playerMock = new UserBuilder(serverMock).withFactionRank(FactionRank.MEMBER).build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
 
         IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
         IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.BLOCK_BREAK.getPermissionKey(), false);
@@ -103,6 +103,23 @@ class BlockBreakListenerTest {
         IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.BLOCK_BREAK.getPermissionKey(), true);
 
         assertFalse(playerMock.simulateBlockBreak(playerMock.getLocation().getBlock()).isCancelled());
+    }
+
+
+    @Test
+    public void onBlockBreakPlayerFactionNoAccess() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.MEMBER).build();
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, playerMock.getLocation().getChunk()));
+        IridiumFactions.getInstance().getFactionManager().setFactionPermission(faction, FactionRank.MEMBER, PermissionType.BLOCK_BREAK.getPermissionKey(), true);
+        IridiumFactions.getInstance().getFactionManager().setFactionAccess(faction, FactionRank.MEMBER, IridiumFactions.getInstance().getFactionManager().getFactionClaimViaChunk(playerMock.getLocation().getChunk()).get(), false);
+
+        assertTrue(playerMock.simulateBlockBreak(playerMock.getLocation().getBlock()).isCancelled());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotBreakBlocks
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+        playerMock.assertNoMoreSaid();
     }
 
 

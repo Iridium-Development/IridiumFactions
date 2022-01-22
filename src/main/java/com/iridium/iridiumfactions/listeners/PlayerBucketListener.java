@@ -28,7 +28,7 @@ public class PlayerBucketListener implements Listener {
         Player player = event.getPlayer();
         User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(event.getBlock().getLocation());
-        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.BUCKET)) {
+        if (!IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.BUCKET, event.getBlock().getLocation())) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUseBuckets
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));
