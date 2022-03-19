@@ -1,0 +1,2 @@
+# IridiumFactions
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4128653395a041dbb7a84304f54a0535)](https://app.codacy.com/gh/Iridium-Development/IridiumFactions?utm_source=github.com&utm_medium=referral&utm_content=Iridium-Development/IridiumFactions&utm_campaign=Badge_Grade_Settings)
