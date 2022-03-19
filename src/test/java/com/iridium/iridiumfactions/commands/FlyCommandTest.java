@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FlyCommandTest {
@@ -55,7 +56,7 @@ class FlyCommandTest {
     }
 
     @Test
-    public void executeFlyCommandSuccessful() {
+    public void executeFlyCommandToggleEnabledSuccessful() {
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
         User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
@@ -67,6 +68,68 @@ class FlyCommandTest {
         assertTrue(playerMock.getAllowFlight());
         assertTrue(playerMock.isFlying());
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().flightEnabled.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeFlyCommandToggleDisabledSuccessful() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        user.setFlying(true);
+        IridiumFactions.getInstance().getFactionManager().getFactionBooster(faction, BoosterType.FLIGHT_BOOSTER).setTime(LocalDateTime.now().plusSeconds(600));
+
+        serverMock.dispatchCommand(playerMock, "f fly");
+
+        assertFalse(user.isFlying());
+        assertFalse(playerMock.getAllowFlight());
+        assertFalse(playerMock.isFlying());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().flightDisabled.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeFlyCommandEnabledSuccessful() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        IridiumFactions.getInstance().getFactionManager().getFactionBooster(faction, BoosterType.FLIGHT_BOOSTER).setTime(LocalDateTime.now().plusSeconds(600));
+
+        serverMock.dispatchCommand(playerMock, "f fly enable");
+
+        assertTrue(user.isFlying());
+        assertTrue(playerMock.getAllowFlight());
+        assertTrue(playerMock.isFlying());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().flightEnabled.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeFlyCommandDisabledSuccessful() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        IridiumFactions.getInstance().getFactionManager().getFactionBooster(faction, BoosterType.FLIGHT_BOOSTER).setTime(LocalDateTime.now().plusSeconds(600));
+
+        serverMock.dispatchCommand(playerMock, "f fly disable");
+
+        assertFalse(user.isFlying());
+        assertFalse(playerMock.getAllowFlight());
+        assertFalse(playerMock.isFlying());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().flightDisabled.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeFlyCommandInvalidSyntax() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        IridiumFactions.getInstance().getFactionManager().getFactionBooster(faction, BoosterType.FLIGHT_BOOSTER).setTime(LocalDateTime.now().plusSeconds(600));
+
+        serverMock.dispatchCommand(playerMock, "f fly invalid");
+
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getConfiguration().prefix + " &7/f fly <enable/disable>"));
         playerMock.assertNoMoreSaid();
     }
 

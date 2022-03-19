@@ -61,7 +61,6 @@ public class IridiumFactions extends IridiumCore {
      Faction Strikes
      Faction Boosters
      Potion Boosters
-     Flight Booster
      Shield Booster
      */
 

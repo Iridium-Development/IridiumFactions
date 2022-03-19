@@ -22,7 +22,7 @@ public class FlyCommand extends Command {
      * The default constructor.
      */
     public FlyCommand() {
-        super(Arrays.asList("fly", "flight"), "Toggle Faction Flight", "%prefix% &7/f fly", "", Duration.ZERO);
+        super(Arrays.asList("fly", "flight"), "Toggle Faction Flight", "%prefix% &7/f fly <enable/disable>", "", Duration.ZERO);
     }
 
     @Override
