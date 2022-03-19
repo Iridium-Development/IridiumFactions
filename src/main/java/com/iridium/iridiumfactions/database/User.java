@@ -48,6 +48,7 @@ public final class User {
     private @NotNull FactionRank factionRank;
 
     private boolean bypassing = false;
+    private boolean isFlying = false;
 
     private FactionChatType factionChatType = FactionChatType.NONE;
 

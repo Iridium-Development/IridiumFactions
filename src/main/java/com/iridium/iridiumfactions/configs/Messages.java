@@ -126,4 +126,10 @@ public class Messages {
     public String insufficientFundsToWithdrew = "%prefix% &7You do not have enough %type% to withdraw from your Faction bank.";
     public String insufficientFundsToDeposit = "%prefix% &7You do not have enough %type% to deposit into your Faction bank.";
     public String noSuchBankItem = "%prefix% &7That bank item doesn't exist.";
+    public String unknownBooster = "%prefix% &7Unknown Faction booster.";
+    public String boosterAlreadyActive = "%prefix% &7That booster has already been activated.";
+    public String successfullyBoughtBooster = "%prefix% &7You have successfully bought the %booster% Booster for $%cost%.";
+    public String flightEnabled = "%prefix% &7Faction flight enabled.";
+    public String flightDisabled = "%prefix% &7Faction flight disabled.";
+    public String flightBoosterNotActive = "%prefix% &7The flight booster is not currently active.";
 }

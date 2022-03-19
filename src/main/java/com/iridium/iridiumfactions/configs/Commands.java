@@ -47,4 +47,6 @@ public class Commands {
     public BankCommand bankCommand = new BankCommand();
     public WithdrawCommand withdrawCommand = new WithdrawCommand();
     public DepositCommand depositCommand = new DepositCommand();
+    public BoosterCommand boosterCommand = new BoosterCommand();
+    public FlyCommand flyCommand = new FlyCommand();
 }

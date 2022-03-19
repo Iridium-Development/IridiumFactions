@@ -42,9 +42,11 @@ public class IridiumFactions extends IridiumCore {
     private BlockValues blockValues;
     private Upgrades upgrades;
     private BankItems bankItems;
+    private Boosters boosters;
 
     private Map<String, Permission> permissionList;
     private Map<String, Upgrade<?>> upgradesList;
+    private Map<String, Booster> boosterList;
     private List<BankItem> bankItemList;
 
     @Setter
@@ -57,6 +59,10 @@ public class IridiumFactions extends IridiumCore {
      Faction Missions
      Faction Main Menu
      Faction Strikes
+     Faction Boosters
+     Potion Boosters
+     Flight Booster
+     Shield Booster
      */
 
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
@@ -152,6 +158,7 @@ public class IridiumFactions extends IridiumCore {
         this.blockValues = getPersist().load(BlockValues.class);
         this.upgrades = getPersist().load(Upgrades.class);
         this.bankItems = getPersist().load(BankItems.class);
+        this.boosters = getPersist().load(Boosters.class);
 
         for (FactionRank factionRank : FactionRank.values()) {
             configuration.factionRankNames.putIfAbsent(factionRank, factionRank.name());
@@ -162,6 +169,7 @@ public class IridiumFactions extends IridiumCore {
 
         initializePermissionsList();
         initializeUpgradesList();
+        initializeBoostersList();
         initializeBankList();
     }
 
@@ -197,6 +205,11 @@ public class IridiumFactions extends IridiumCore {
         this.upgradesList.put(UpgradeType.EXPERIENCE_UPGRADE.getName(), upgrades.experienceUpgrade);
     }
 
+    public void initializeBoostersList() {
+        this.boosterList = new HashMap<>();
+        this.boosterList.put(BoosterType.FLIGHT_BOOSTER.getName(), boosters.flightBooster);
+    }
+
     public void initializeBankList() {
         this.bankItemList = new ArrayList<>();
         if (bankItems.tnTBankItem.isEnabled()) {
@@ -221,6 +234,7 @@ public class IridiumFactions extends IridiumCore {
         getPersist().save(blockValues);
         getPersist().save(upgrades);
         getPersist().save(bankItems);
+        getPersist().save(boosters);
     }
 
     @Override
@@ -237,6 +251,7 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionChestTableManager().save();
         getDatabaseManager().getFactionAccessTableManager().save();
         getDatabaseManager().getFactionBankTableManager().save();
+        getDatabaseManager().getFactionBoosterTableManager().save();
     }
 
     public NumberFormatter getNumberFormatter() {
