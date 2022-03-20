@@ -58,7 +58,7 @@ public final class User {
 
     private BukkitTask bukkitTask;
 
-    public User(UUID uuid){
+    public User(UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -78,18 +78,20 @@ public final class User {
 
     public void initBukkitTask() {
         if (bukkitTask != null) return;
-        bukkitTask = Bukkit.getScheduler().runTaskTimer(IridiumFactions.getInstance(), () -> {
-            Player player = getPlayer();
-            if (player == null) return;
-            if (IridiumFactions.getInstance().getBoosters().boostersOnlyInTerritory) {
-                Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(player.getLocation());
-                if (!IridiumFactions.getInstance().getBoosters().boostersOnlyEffectFactionMembers || faction.getId() == factionID) {
-                    applyPotionEffects(faction);
-                }
-            } else {
-                applyPotionEffects(getFaction());
+        bukkitTask = Bukkit.getScheduler().runTaskTimer(IridiumFactions.getInstance(), () -> applyPotionEffects(), 0, 20);
+    }
+
+    public void applyPotionEffects() {
+        Player player = getPlayer();
+        if (player == null) return;
+        if (IridiumFactions.getInstance().getBoosters().boostersOnlyInTerritory) {
+            Faction faction = IridiumFactions.getInstance().getFactionManager().getFactionViaLocation(player.getLocation());
+            if (!IridiumFactions.getInstance().getBoosters().boostersOnlyEffectFactionMembers || faction.getId() == factionID) {
+                applyPotionEffects(faction);
             }
-        }, 0, 20);
+        } else {
+            applyPotionEffects(getFaction());
+        }
     }
 
     public void applyPotionEffects(Faction faction) {
