@@ -51,12 +51,12 @@ public class IridiumFactions extends IridiumCore {
 
     @Setter
     private Economy economy;
+
     /*
     TODO LIST
      View Active Relationships
      View and Cancel Relationship requests
      Faction Missions
-     Faction Main Menu
      Faction Strikes
      */
 

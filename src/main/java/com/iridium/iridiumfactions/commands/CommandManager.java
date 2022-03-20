@@ -2,8 +2,12 @@ package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.CooldownProvider;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.Commands;
+import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.User;
+import com.iridium.iridiumfactions.gui.InventoryConfigGUI;
 import com.iridium.iridiumfactions.utils.TimeUtils;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -131,7 +135,17 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, org.bukkit.command.@NotNull Command cmd, @NotNull String label, String[] args) {
         if (args.length == 0) {
-            //TODO
+            if (commandSender instanceof Player) {
+                Player player = (Player) commandSender;
+                User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+                Faction faction = user.getFaction();
+                if (faction.getFactionType() == FactionType.PLAYER_FACTION) {
+                    if (IridiumFactions.getInstance().getConfiguration().factionMenu) {
+                        player.openInventory(new InventoryConfigGUI(IridiumFactions.getInstance().getInventories().factionMenu).getInventory());
+                        return true;
+                    }
+                }
+            }
             IridiumFactions.getInstance().getCommands().helpCommand.execute(commandSender, args);
             return true;
         }

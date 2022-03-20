@@ -15,6 +15,7 @@ public class Configuration {
     public String prefix = "&c&lIridiumFactions &8»";
     public String dateTimeFormat = "EEEE, MMMM dd HH:mm:ss";
 
+    public boolean factionMenu = true;
     public int mapWidth = 52;
     public int mapHeight = 10;
     public int factionRecalculateInterval = 5;
