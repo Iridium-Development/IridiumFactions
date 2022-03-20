@@ -59,9 +59,6 @@ public class IridiumFactions extends IridiumCore {
      Faction Missions
      Faction Main Menu
      Faction Strikes
-     Faction Boosters
-     Potion Boosters
-     Shield Booster
      */
 
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
