@@ -35,7 +35,7 @@ public class UserTableManager extends TableManager<User, Integer> {
     }
 
     public Optional<User> getUser(UUID uuid) {
-        int index = Collections.binarySearch(getEntries(), new User(uuid, ""), Comparator.comparing(User::getUuid));
+        int index = Collections.binarySearch(getEntries(), new User(uuid), Comparator.comparing(User::getUuid));
         if (index < 0) return Optional.empty();
         return Optional.of(getEntries().get(index));
     }

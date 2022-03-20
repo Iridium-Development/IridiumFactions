@@ -517,6 +517,20 @@ public class FactionManager {
         return factionUpgrade;
     }
 
+    public FactionBooster getFactionBooster(Faction faction, BoosterType boosterType) {
+        return getFactionBooster(faction, boosterType.getName());
+    }
+
+    public synchronized FactionBooster getFactionBooster(Faction faction, String booster) {
+        FactionBooster factionBooster = new FactionBooster(faction, booster);
+        Optional<FactionBooster> factionBoosterOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionBoosterTableManager().getEntry(factionBooster);
+        if (factionBoosterOptional.isPresent()) {
+            return factionBoosterOptional.get();
+        }
+        IridiumFactions.getInstance().getDatabaseManager().getFactionBoosterTableManager().addEntry(factionBooster);
+        return factionBooster;
+    }
+
     public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {
         return getFactionSpawners(faction, entityType).getAmount();
     }

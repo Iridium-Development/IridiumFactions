@@ -18,6 +18,7 @@ public class UserManager {
     public @NotNull User getUser(@NotNull OfflinePlayer offlinePlayer) {
         Optional<User> userOptional = getUserByUUID(offlinePlayer.getUniqueId());
         if (userOptional.isPresent()) {
+            userOptional.get().initBukkitTask();
             return userOptional.get();
         } else {
             Optional<String> name = Optional.ofNullable(offlinePlayer.getName());
