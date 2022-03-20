@@ -87,7 +87,7 @@ public class IridiumFactions extends IridiumCore {
         this.factionManager = new FactionManager();
 
         // Auto Recalculate Factions
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+        Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
             ListIterator<Integer> factions = getDatabaseManager().getFactionTableManager().getEntries().stream().map(Faction::getId).collect(Collectors.toList()).listIterator();
 
             @Override
