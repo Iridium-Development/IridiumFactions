@@ -58,6 +58,8 @@ public final class User {
 
     private BukkitTask bukkitTask;
 
+    private int bukkitTaskTicks = 0;
+
     public User(UUID uuid) {
         this.uuid = uuid;
     }
@@ -73,12 +75,27 @@ public final class User {
         this.name = name;
         this.joinTime = 0L;
         this.factionRank = FactionRank.TRUCE;
-        this.power = 10;
+        this.power = IridiumFactions.getInstance().getConfiguration().startingPower;
     }
 
     public void initBukkitTask() {
         if (bukkitTask != null) return;
-        bukkitTask = Bukkit.getScheduler().runTaskTimer(IridiumFactions.getInstance(), () -> applyPotionEffects(), 0, 20);
+        bukkitTask = Bukkit.getScheduler().runTaskTimer(IridiumFactions.getInstance(), () -> bukkitTask(), 0, 20);
+    }
+
+    public void bukkitTask() {
+        bukkitTaskTicks++;
+        applyPotionEffects();
+        if (bukkitTaskTicks % IridiumFactions.getInstance().getConfiguration().powerRecoveryDelayInSeconds == 0) {
+            applyPowerRegeneration();
+        }
+    }
+
+    public void applyPowerRegeneration() {
+        if(IridiumFactions.getInstance().getConfiguration().maxPower > power){
+            power += IridiumFactions.getInstance().getConfiguration().powerRecoveryAmount;
+            power = Math.min(IridiumFactions.getInstance().getConfiguration().maxPower, power);
+        }
     }
 
     public void applyPotionEffects() {

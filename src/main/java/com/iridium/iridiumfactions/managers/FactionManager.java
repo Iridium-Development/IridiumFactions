@@ -123,7 +123,7 @@ public class FactionManager {
                 return;
             }
             Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
-            if (factionClaim.isPresent() && !user.isBypassing()) {
+            if (factionClaim.isPresent() && !user.isBypassing() && factionClaim.get().getFaction().getRemainingPower() >= 0) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                         .replace("%faction%", factionClaim.get().getFaction().getName())

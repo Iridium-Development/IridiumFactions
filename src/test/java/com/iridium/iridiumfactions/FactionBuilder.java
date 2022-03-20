@@ -1,5 +1,6 @@
 package com.iridium.iridiumfactions;
 
+import be.seeseemelk.mockbukkit.ServerMock;
 import com.iridium.iridiumfactions.database.Faction;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,6 +27,13 @@ public class FactionBuilder {
 
     public FactionBuilder withRelationship(Faction faction, RelationshipType relationshipType) {
         IridiumFactions.getInstance().getFactionManager().setFactionRelationship(faction, this.faction, relationshipType);
+        return this;
+    }
+
+    public FactionBuilder withMembers(int amount, double power, ServerMock serverMock) {
+        for (int i = 0; i < amount; i++) {
+            new UserBuilder(serverMock).withFaction(faction).withPower(power).build();
+        }
         return this;
     }
 

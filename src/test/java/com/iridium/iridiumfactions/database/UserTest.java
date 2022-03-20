@@ -92,4 +92,25 @@ class UserTest {
         assertEquals(1, potionEffect.getAmplifier());
     }
 
+    @Test
+    public void applyPowerRegenerationSuccess(){
+        PlayerMock playerMock = new UserBuilder(serverMock).build();
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+
+        user.applyPowerRegeneration();
+
+        assertEquals(1, user.getPower());
+    }
+
+    @Test
+    public void applyPowerRegenerationLimitReached(){
+        PlayerMock playerMock = new UserBuilder(serverMock).build();
+        User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);
+        user.setPower(10);
+
+        user.applyPowerRegeneration();
+
+        assertEquals(10, user.getPower());
+    }
+
 }

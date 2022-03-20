@@ -29,6 +29,11 @@ public class UserBuilder {
         return this;
     }
 
+    public UserBuilder withPower(double power) {
+        user.setPower(power);
+        return this;
+    }
+
     public UserBuilder setBypassing(){
         user.setBypassing(true);
         return this;

@@ -55,7 +55,6 @@ public class IridiumFactions extends IridiumCore {
     TODO LIST
      View Active Relationships
      View and Cancel Relationship requests
-     Implement Power properly
      Faction Missions
      Faction Main Menu
      Faction Strikes
@@ -141,6 +140,7 @@ public class IridiumFactions extends IridiumCore {
         Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockPistonListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerDeathListener(), this);
     }
 
     @Override

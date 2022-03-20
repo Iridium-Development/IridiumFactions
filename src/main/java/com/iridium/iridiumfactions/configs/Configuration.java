@@ -20,6 +20,12 @@ public class Configuration {
     public int factionRecalculateInterval = 5;
     public int minFactionNameLength = 3;
     public int maxFactionNameLength = 20;
+    public double maxPower = 10;
+    public double minPower = -10;
+    public double startingPower = 0;
+    public int powerLossPerDeath = 3;
+    public int powerRecoveryDelayInSeconds = 600;
+    public double powerRecoveryAmount = 1;
 
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
