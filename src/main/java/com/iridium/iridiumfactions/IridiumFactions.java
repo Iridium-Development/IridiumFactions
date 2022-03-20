@@ -207,6 +207,7 @@ public class IridiumFactions extends IridiumCore {
     public void initializeBoostersList() {
         this.boosterList = new HashMap<>();
         this.boosterList.put(BoosterType.FLIGHT_BOOSTER.getName(), boosters.flightBooster);
+        this.boosterList.putAll(boosters.potionBoosters);
     }
 
     public void initializeBankList() {

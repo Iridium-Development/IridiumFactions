@@ -43,7 +43,7 @@ public class BoosterCommand extends Command {
         }
 
         FactionBooster factionBooster = IridiumFactions.getInstance().getFactionManager().getFactionBooster(faction, boosterName);
-        if (factionBooster.isActive()) {
+        if (factionBooster.isActive() &&!booster.stackable) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().boosterAlreadyActive.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
@@ -52,7 +52,7 @@ public class BoosterCommand extends Command {
             return false;
         }
         IridiumFactions.getInstance().getEconomy().withdrawPlayer(player, booster.cost);
-        factionBooster.setTime(LocalDateTime.now().plusSeconds(booster.time));
+        factionBooster.setTime(LocalDateTime.now().plusSeconds(booster.time + (factionBooster.isActive() && booster.stackable ? factionBooster.getRemainingTime() : 0)));
         player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().successfullyBoughtBooster
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                 .replace("%booster%", booster.name)

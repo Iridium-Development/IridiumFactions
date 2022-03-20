@@ -64,9 +64,10 @@ class BoosterCommandTest {
     }
 
     @Test
-    public void executeBoostersCommandMaxLevel() {
+    public void executeBoostersCommandAlreadyActive() {
         Faction faction = new FactionBuilder().build();
         PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).build();
+        IridiumFactions.getInstance().getBoosters().flightBooster.stackable = false;
 
         IridiumFactions.getInstance().getFactionManager().getFactionBooster(faction, BoosterType.FLIGHT_BOOSTER).setTime(LocalDateTime.now().plusSeconds(600));
         serverMock.dispatchCommand(playerMock, "f booster " + BoosterType.FLIGHT_BOOSTER.getName());
@@ -106,7 +107,7 @@ class BoosterCommandTest {
 
     @Test
     public void boostersCommandTabComplete() {
-        assertEquals(List.of("flight"), IridiumFactions.getInstance().getCommands().boosterCommand.onTabComplete(null, null, null, null));
+        assertEquals(List.of("flight", "strength", "regeneration", "haste"), IridiumFactions.getInstance().getCommands().boosterCommand.onTabComplete(null, null, null, null));
     }
 
 }
