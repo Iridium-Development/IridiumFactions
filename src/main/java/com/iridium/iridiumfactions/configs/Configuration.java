@@ -84,4 +84,12 @@ public class Configuration {
             .put(9, 24)
             .put(10, 25)
             .build();
+
+    public Map<Integer, Integer> factionStrikesValueReductionPercent = ImmutableMap.<Integer, Integer>builder()
+            .put(1, 20)
+            .put(2, 40)
+            .put(3, 60)
+            .put(4, 80)
+            .put(5, 100)
+            .build();
 }

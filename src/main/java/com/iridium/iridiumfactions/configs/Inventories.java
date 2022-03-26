@@ -60,6 +60,7 @@ public class Inventories {
             "&c&l * &7Faction Name: &c%faction_name%",
             "&c&l * &7Faction Rank: &c%faction_rank%",
             "&c&l * &7Faction Value: &c%faction_value%",
+            "&c&l * &7Faction Reductions: &c-%faction_strike_reduction%%",
             "&c&l * &7Netherite Blocks: &c%NETHERITE_BLOCK_AMOUNT%",
             "&c&l * &7Emerald Blocks: &c%EMERALD_BLOCK_AMOUNT%",
             "&c&l * &7Diamond Blocks: &c%DIAMOND_BLOCK_AMOUNT%",

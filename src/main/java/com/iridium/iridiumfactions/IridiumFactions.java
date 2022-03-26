@@ -58,10 +58,6 @@ public class IridiumFactions extends IridiumCore {
      Maximum Relationship limit (ally 1 enemy -1)
      View and Cancel Relationship requests
      Faction Missions
-     Faction Strikes
-        Config
-        Value deductions
-
      */
 
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {

@@ -22,6 +22,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 /**
  * Represents a Faction of IridiumFactions.
@@ -173,8 +174,16 @@ public final class Faction {
                 totalValue += IridiumFactions.getInstance().getFactionManager().getFactionSpawnerAmount(this, valuableSpawners.getKey()) * valuableSpawners.getValue().value;
             }
 
-            return totalValue;
+            double strikeReductions = 1 - getStrikeReductions() / 100.00;
+
+            return totalValue * strikeReductions;
         });
+    }
+
+    public int getStrikeReductions() {
+        return IntStream.rangeClosed(0, IridiumFactions.getInstance().getFactionManager().getFactionStrikes(this).size())
+                .map(strikes -> IridiumFactions.getInstance().getConfiguration().factionStrikesValueReductionPercent.getOrDefault(strikes, 0))
+                .max().orElse(0);
     }
 
     public int getRank() {
