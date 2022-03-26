@@ -77,6 +77,11 @@ public class Inventories {
             "",
             "&c&l[!] &7Left click to uninvite"
     )));
+
+    public SingleItemGUI strikesGUI = new SingleItemGUI(0, "&7Faction Strikes", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%reason%", "%player_name%", Arrays.asList(
+            "&7Punished By: %player_name%",
+            "&7Reason: %reason%"
+    )));
     public NoItemGUI bankGUI = new NoItemGUI(27, "&7Faction Bank", background2);
 
     public ConfirmationInventoryConfig confirmationGUI = new ConfirmationInventoryConfig(27, "&7Are you sure?", background2, new Item(XMaterial.GREEN_STAINED_GLASS_PANE, 15, 1, "&a&lYes", Collections.emptyList()), new Item(XMaterial.RED_STAINED_GLASS_PANE, 11, 1, "&c&lNo", Collections.emptyList()));
