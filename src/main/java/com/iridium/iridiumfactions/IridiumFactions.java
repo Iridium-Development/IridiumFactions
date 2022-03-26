@@ -59,6 +59,10 @@ public class IridiumFactions extends IridiumCore {
      View and Cancel Relationship requests
      Faction Missions
      Faction Strikes
+        GUI
+        Config
+        Value deducations
+
      */
 
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {

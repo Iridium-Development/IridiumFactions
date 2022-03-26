@@ -132,4 +132,6 @@ public class Messages {
     public String flightEnabled = "%prefix% &7Faction flight enabled.";
     public String flightDisabled = "%prefix% &7Faction flight disabled.";
     public String flightBoosterNotActive = "%prefix% &7The flight booster is not currently active.";
+    public String issuedFactionStrike = "%prefix% &7You issued a faction strike to %faction% for %reason%.";
+    public String factionStrikeIssued = "%prefix% &7You have been issued a faction strike from %player% for %reason%.";
 }
