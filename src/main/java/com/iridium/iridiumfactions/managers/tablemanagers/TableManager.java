@@ -7,6 +7,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
+import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class TableManager<T, S> {
     private final SortedList<T> entries;
     private Dao<T, S> dao;
     private final Class<T> clazz;
+    @Getter
+    private boolean saved;
 
     private final ConnectionSource connectionSource;
 
@@ -56,6 +59,7 @@ public class TableManager<T, S> {
      * Saves everything to the Database
      */
     public void save() {
+        saved = true;
         if (IridiumFactions.getInstance().isTesting()) return;
         try {
             List<T> entryList = new ArrayList<>(entries);
