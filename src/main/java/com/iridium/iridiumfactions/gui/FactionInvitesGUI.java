@@ -1,57 +1,49 @@
 package com.iridium.iridiumfactions.gui;
 
-import com.iridium.iridiumcore.gui.GUI;
-import com.iridium.iridiumcore.utils.InventoryUtils;
+import com.iridium.iridiumcore.gui.PagedGUI;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
 import com.iridium.iridiumcore.utils.Placeholder;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.inventories.NoItemGUI;
-import com.iridium.iridiumfactions.configs.inventories.SingleItemGUI;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionInvite;
 import com.iridium.iridiumfactions.database.User;
-import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Collection;
+import java.util.UUID;
 
-@AllArgsConstructor
-public class FactionInvitesGUI implements GUI {
+public class FactionInvitesGUI extends PagedGUI<FactionInvite> {
 
     private final Faction faction;
+
+    public FactionInvitesGUI(Faction faction) {
+        super(1, IridiumFactions.getInstance().getInventories().invitesGUI.size, IridiumFactions.getInstance().getInventories().invitesGUI.background, IridiumFactions.getInstance().getInventories().previousPage, IridiumFactions.getInstance().getInventories().nextPage);
+        this.faction = faction;
+    }
 
     @NotNull
     @Override
     public Inventory getInventory() {
         NoItemGUI noItemGUI = IridiumFactions.getInstance().getInventories().invitesGUI;
-        Inventory inventory = Bukkit.createInventory(this, noItemGUI.size, StringUtils.color(noItemGUI.title));
+        Inventory inventory = Bukkit.createInventory(this, getSize(), StringUtils.color(noItemGUI.title));
         addContent(inventory);
         return inventory;
     }
 
     @Override
-    public void addContent(Inventory inventory) {
-        SingleItemGUI singleItemGUI = IridiumFactions.getInstance().getInventories().invitesGUI;
-        InventoryUtils.fillInventory(inventory, singleItemGUI.background);
-        AtomicInteger slot = new AtomicInteger(0);
-        for (FactionInvite factionInvite : IridiumFactions.getInstance().getFactionManager().getFactionInvites(faction)) {
-            int itemSlot = slot.getAndIncrement();
-            Optional<User> user = IridiumFactions.getInstance().getUserManager().getUserByUUID(factionInvite.getUser());
-            user.ifPresent(value -> inventory.setItem(itemSlot, ItemStackUtils.makeItem(singleItemGUI.item, Arrays.asList(
-                    new Placeholder("player_name", value.getName()),
-                    new Placeholder("player_rank", value.getFactionRank().name())
-            ))));
-        }
+    public Collection<FactionInvite> getPageObjects() {
+        return IridiumFactions.getInstance().getFactionManager().getFactionInvites(faction);
     }
 
     @Override
-    public void onInventoryClick(InventoryClickEvent inventoryClickEvent) {
-
+    public ItemStack getItemStack(FactionInvite factionInvite) {
+        User user = IridiumFactions.getInstance().getUserManager().getUserByUUID(factionInvite.getUser()).orElse(new User(UUID.randomUUID(), "N/A"));
+        return ItemStackUtils.makeItem(IridiumFactions.getInstance().getInventories().invitesGUI.item, Arrays.asList(new Placeholder("player_name", user.getName()), new Placeholder("player_rank", user.getFactionRank().name())));
     }
 }

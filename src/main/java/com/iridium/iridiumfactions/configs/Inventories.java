@@ -28,7 +28,7 @@ public class Inventories {
 
     public NoItemGUI upgradesGUI = new NoItemGUI(27, "&7Faction Upgrades", background2);
 
-    public SingleItemGUI membersGUI = new SingleItemGUI(27, "&7Faction Members", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%player_name%", "%player_name%", Arrays.asList(
+    public SingleItemGUI membersGUI = new SingleItemGUI(0, "&7Faction Members", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%player_name%", "%player_name%", Arrays.asList(
             "&7Joined: %player_join%",
             "&7Rank: %player_rank%",
             "",
@@ -73,7 +73,7 @@ public class Inventories {
 
     public NoItemGUI boostersGUI = new NoItemGUI(27, "&7Faction Boosters", background2);
 
-    public SingleItemGUI invitesGUI = new SingleItemGUI(27, "&7Faction Invites", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%player_name%", "%player_name%", Arrays.asList(
+    public SingleItemGUI invitesGUI = new SingleItemGUI(0, "&7Faction Invites", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%player_name%", "%player_name%", Arrays.asList(
             "",
             "&c&l[!] &7Left click to uninvite"
     )));
@@ -96,7 +96,7 @@ public class Inventories {
             .put("f invites", new Item(XMaterial.PAPER, 32, 1, "&c&lFaction Invites", Collections.singletonList("&7View your faction invites")))
             .build()
     );
-    
+
     public Item nextPage = new Item(XMaterial.LIME_STAINED_GLASS_PANE, 1, "&a&lNext Page", Collections.emptyList());
     public Item previousPage = new Item(XMaterial.RED_STAINED_GLASS_PANE, 1, "&c&lPrevious Page", Collections.emptyList());
 
