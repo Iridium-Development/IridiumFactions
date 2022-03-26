@@ -49,4 +49,5 @@ public class Commands {
     public DepositCommand depositCommand = new DepositCommand();
     public BoosterCommand boosterCommand = new BoosterCommand();
     public FlyCommand flyCommand = new FlyCommand();
+    public StrikeCommand strikeCommand = new StrikeCommand();
 }

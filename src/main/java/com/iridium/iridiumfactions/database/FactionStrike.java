@@ -23,10 +23,10 @@ public final class FactionStrike extends FactionData {
     @DatabaseField(columnName = "user", canBeNull = false)
     private UUID user;
 
-    public FactionStrike(Faction faction, String reason, UUID user) {
+    public FactionStrike(Faction faction, String reason, User user) {
         super(faction);
         this.reason = reason;
-        this.user = user;
+        this.user = user.getUuid();
     }
 
 }
