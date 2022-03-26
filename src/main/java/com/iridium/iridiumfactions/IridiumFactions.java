@@ -55,6 +55,7 @@ public class IridiumFactions extends IridiumCore {
     /*
     TODO LIST
      View Active Relationships
+     Maximum Relationship limit (ally 1 enemy -1)
      View and Cancel Relationship requests
      Faction Missions
      Faction Strikes
@@ -251,6 +252,7 @@ public class IridiumFactions extends IridiumCore {
         getDatabaseManager().getFactionAccessTableManager().save();
         getDatabaseManager().getFactionBankTableManager().save();
         getDatabaseManager().getFactionBoosterTableManager().save();
+        getDatabaseManager().getFactionStrikeTableManager().save();
     }
 
     public NumberFormatter getNumberFormatter() {
