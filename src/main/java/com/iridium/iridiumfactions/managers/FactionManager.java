@@ -296,6 +296,10 @@ public class FactionManager {
         });
     }
 
+    public List<FactionStrike> getFactionStrikes(@NotNull Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionStrikeTableManager().getEntries(faction);
+    }
+
     public boolean getFactionPermission(@NotNull Faction faction, @NotNull FactionRank factionRank, @NotNull Permission permission, @NotNull String key) {
         if (faction.getFactionType() == FactionType.WILDERNESS) return true;
         if (faction.getFactionType() != FactionType.PLAYER_FACTION) return false;
