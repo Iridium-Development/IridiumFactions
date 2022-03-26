@@ -60,6 +60,7 @@ public class Inventories {
             "&c&l * &7Faction Name: &c%faction_name%",
             "&c&l * &7Faction Rank: &c%faction_rank%",
             "&c&l * &7Faction Value: &c%faction_value%",
+            "&c&l * &7Faction Reductions: &c-%faction_strike_reduction%%",
             "&c&l * &7Netherite Blocks: &c%NETHERITE_BLOCK_AMOUNT%",
             "&c&l * &7Emerald Blocks: &c%EMERALD_BLOCK_AMOUNT%",
             "&c&l * &7Diamond Blocks: &c%DIAMOND_BLOCK_AMOUNT%",
@@ -76,6 +77,11 @@ public class Inventories {
     public SingleItemGUI invitesGUI = new SingleItemGUI(0, "&7Faction Invites", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%player_name%", "%player_name%", Arrays.asList(
             "",
             "&c&l[!] &7Left click to uninvite"
+    )));
+
+    public SingleItemGUI strikesGUI = new SingleItemGUI(0, "&7Faction Strikes", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%reason%", "%player_name%", Arrays.asList(
+            "&7Punished By: %player_name%",
+            "&7Reason: %reason%"
     )));
     public NoItemGUI bankGUI = new NoItemGUI(27, "&7Faction Bank", background2);
 

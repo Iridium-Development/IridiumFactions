@@ -37,7 +37,7 @@ public class IridiumFactionsTest {
             try {
                 Object object = field.get(IridiumFactions.getInstance().getDatabaseManager());
                 if (object instanceof TableManager tableManager) {
-                    assertTrue(tableManager.isSaved(), () -> "TableManager " + tableManager.getClass().getSimpleName() + " has not been saved");
+                    assertTrue(tableManager.isSaved(), () -> field.getName() + " has not been saved");
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class ForeignFactionTableManager<T extends FactionData, S> extends TableManager<T, S> {
 
@@ -37,6 +38,18 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
     }
 
     @Override
+    public CompletableFuture<Void> delete(T t) {
+        factionsSortedList.remove(t);
+        return super.delete(t);
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(Collection<T> t) {
+        factionsSortedList.removeAll(t);
+        return super.delete(t);
+    }
+
+    @Override
     public void addEntry(T t) {
         super.addEntry(t);
         factionsSortedList.add(t);
@@ -54,7 +67,7 @@ public class ForeignFactionTableManager<T extends FactionData, S> extends TableM
      * @param faction the specified faction
      */
     public List<T> getEntries(@NotNull Faction faction) {
-        int index = Collections.binarySearch(getEntries(), new FactionData(faction), Comparator.comparing(FactionData::getFactionID));
+        int index = Collections.binarySearch(factionsSortedList, new FactionData(faction), Comparator.comparing(FactionData::getFactionID));
         if (index < 0) return Collections.emptyList();
 
         int currentIndex = index - 1;
