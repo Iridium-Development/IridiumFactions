@@ -386,6 +386,15 @@ public class FactionManager {
         }
     }
 
+    public List<Faction> getFactionRelationships(Faction faction, RelationshipType relationshipType) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntries().stream()
+                .filter(factionRelationship -> factionRelationship.getFactionID() == faction.getId() || factionRelationship.getFaction2ID() == faction.getId())
+                .filter(factionRelationshipEntry -> factionRelationshipEntry.getRelationshipType() == relationshipType)
+                .map(relationship -> faction.getId() == relationship.getFactionID() ? relationship.getFaction2ID() : relationship.getFactionID())
+                .map(this::getFactionViaId)
+                .collect(Collectors.toList());
+    }
+
     public RelationshipType getFactionRelationship(@NotNull Faction a, @NotNull Faction b) {
         if (b.getFactionType() == FactionType.WILDERNESS) {
             return RelationshipType.WILDERNESS;
@@ -457,6 +466,15 @@ public class FactionManager {
         Faction userFaction = user.getFaction();
         RelationshipType relationshipType = getFactionRelationship(user, faction);
         if (relationshipType == newRelationship) return FactionRelationShipRequestResponse.SAME_RELATIONSHIP;
+        if (IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.containsKey(newRelationship)) {
+            int limit = IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.get(newRelationship);
+            if (getFactionRelationships(faction, newRelationship).size() >= limit && limit > 0) {
+                return FactionRelationShipRequestResponse.THEIR_LIMIT_REACHED;
+            }
+            if (getFactionRelationships(userFaction, newRelationship).size() >= limit && limit > 0) {
+                return FactionRelationShipRequestResponse.YOUR_LIMIT_REACHED;
+            }
+        }
         if (newRelationship.getRank() < relationshipType.getRank()) {
             setFactionRelationship(userFaction, faction, newRelationship);
             return FactionRelationShipRequestResponse.SET;

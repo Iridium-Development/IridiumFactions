@@ -134,4 +134,6 @@ public class Messages {
     public String flightBoosterNotActive = "%prefix% &7The flight booster is not currently active.";
     public String issuedFactionStrike = "%prefix% &7You issued a faction strike to %faction% for %reason%.";
     public String factionStrikeIssued = "%prefix% &7You have been issued a faction strike from %player% for %reason%.";
+    public String yourRelationshipLimitReached = "%prefix% &7You have reached the maximum number(%limit%) of %relationship%'s.";
+    public String theirRelationshipLimitReached = "%prefix% &7The other faction has reached their maximum number(%limit%) of %relationship%'s.";
 }

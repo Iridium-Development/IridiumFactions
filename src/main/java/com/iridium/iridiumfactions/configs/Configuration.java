@@ -60,6 +60,9 @@ public class Configuration {
             .put(RelationshipType.WARZONE, "&c")
             .put(RelationshipType.SAFEZONE, "&e")
             .build());
+    public Map<RelationshipType, Integer> factionRelationshipLimits = new HashMap<>(ImmutableMap.<RelationshipType, Integer>builder()
+            .put(RelationshipType.ALLY, 1)
+            .build());
 
     public String factionInfoTitle = "&8[ %faction% &8]";
     public String factionInfoTitleFiller = "&8&m ";

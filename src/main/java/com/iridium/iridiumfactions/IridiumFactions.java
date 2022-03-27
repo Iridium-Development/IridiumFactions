@@ -55,7 +55,6 @@ public class IridiumFactions extends IridiumCore {
     /*
     TODO LIST
      View Active Relationships
-     Maximum Relationship limit (ally 1 enemy -1)
      View and Cancel Relationship requests
      Faction Missions
      */

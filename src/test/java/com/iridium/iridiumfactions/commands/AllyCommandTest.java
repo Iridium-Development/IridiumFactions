@@ -4,8 +4,7 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.IridiumFactions;
-import com.iridium.iridiumfactions.RelationshipType;
+import com.iridium.iridiumfactions.*;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionRelationshipRequest;
 import com.iridium.iridiumfactions.database.User;
@@ -182,6 +181,36 @@ class AllyCommandTest {
         serverMock.dispatchCommand(playerMock, "f ally Test2");
         playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyAllied
                 .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+        ));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeAllyCommandOurLimitReached() {
+        Faction factionA = new FactionBuilder().withRelationship(new FactionBuilder().build(), RelationshipType.ALLY).build();
+        Faction factionB = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(factionA).build();
+
+        serverMock.dispatchCommand(playerMock, "f ally " + factionB.getName());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().yourRelationshipLimitReached
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%limit%", String.valueOf(IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.get(RelationshipType.ALLY)))
+                .replace("%relationship_type%", IridiumFactions.getInstance().getConfiguration().factionRankNames.get(FactionRank.ALLY))
+        ));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
+    public void executeAllyCommandTheirLimitReached() {
+        Faction factionA = new FactionBuilder().build();
+        Faction factionB = new FactionBuilder().withRelationship(new FactionBuilder().build(), RelationshipType.ALLY).build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(factionA).build();
+
+        serverMock.dispatchCommand(playerMock, "f ally " + factionB.getName());
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().theirRelationshipLimitReached
+                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                .replace("%limit%", String.valueOf(IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.get(RelationshipType.ALLY)))
+                .replace("%relationship_type%", IridiumFactions.getInstance().getConfiguration().factionRankNames.get(FactionRank.ALLY))
         ));
         playerMock.assertNoMoreSaid();
     }

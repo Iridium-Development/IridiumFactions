@@ -1,6 +1,7 @@
 package com.iridium.iridiumfactions.commands;
 
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionRank;
 import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.RelationshipType;
@@ -37,6 +38,18 @@ public class EnemyCommand extends Command {
             return false;
         }
         switch (IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, faction.get(), RelationshipType.ENEMY)) {
+            case YOUR_LIMIT_REACHED:
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().yourRelationshipLimitReached
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%limit%", String.valueOf(IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.get(RelationshipType.ENEMY)))
+                        .replace("%relationship_type%", IridiumFactions.getInstance().getConfiguration().factionRankNames.get(FactionRank.ENEMY))));
+                return false;
+            case THEIR_LIMIT_REACHED:
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().theirRelationshipLimitReached
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%limit%", String.valueOf(IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.get(RelationshipType.ENEMY)))
+                        .replace("%relationship_type%", IridiumFactions.getInstance().getConfiguration().factionRankNames.get(FactionRank.ENEMY))));
+                return false;
             case SAME_RELATIONSHIP:
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().alreadyEnemies
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)

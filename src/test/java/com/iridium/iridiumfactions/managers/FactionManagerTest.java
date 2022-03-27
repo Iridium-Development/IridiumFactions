@@ -242,6 +242,7 @@ class FactionManagerTest {
         IridiumFactions.getInstance().getFactionManager().claimFactionLand(faction, chunk, 2, playerMock).join();
         assertEquals(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries().size(), 9);
     }
+
     @Test
     public void claimFactionLandRadiusNoPermissions() {
         Faction faction = new FactionBuilder().build();
@@ -421,6 +422,17 @@ class FactionManagerTest {
     }
 
     @Test
+    public void getFactionRelationships(){
+        Faction factionA = new FactionBuilder().build();
+        Faction factionB = new FactionBuilder().build();
+
+        IridiumFactions.getInstance().getFactionManager().setFactionRelationship(factionA, factionB, RelationshipType.ALLY);
+
+        assertEquals(List.of(factionB), IridiumFactions.getInstance().getFactionManager().getFactionRelationships(factionA, RelationshipType.ALLY));
+        assertEquals(List.of(factionA), IridiumFactions.getInstance().getFactionManager().getFactionRelationships(factionB, RelationshipType.ALLY));
+    }
+
+    @Test
     public void getFactionRelationshipTruce() {
         Faction factionA = new FactionBuilder().build();
         Faction factionB = new FactionBuilder().build();
@@ -542,6 +554,38 @@ class FactionManagerTest {
         IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().addEntry(new FactionRelationshipRequest(factionA, factionB, RelationshipType.ALLY, user));
 
         assertEquals(FactionRelationShipRequestResponse.ALREADY_SENT_REQUEST, IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, factionB, RelationshipType.ALLY));
+    }
+
+    @Test
+    public void sendFactionRelationshipRequestAllyOurLimitReached() {
+        Faction factionA = new FactionBuilder().build();
+        Faction factionB = new FactionBuilder().build();
+        Faction factionC = new FactionBuilder().build();
+
+
+        IridiumFactions.getInstance().getFactionManager().setFactionRelationship(factionA, factionC, RelationshipType.ALLY);
+
+        User user = IridiumFactions.getInstance().getUserManager().getUser(
+                new UserBuilder(serverMock).withFaction(factionA).build()
+        );
+        assertEquals(FactionRelationShipRequestResponse.YOUR_LIMIT_REACHED, IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, factionB, RelationshipType.ALLY));
+
+    }
+
+    @Test
+    public void sendFactionRelationshipRequestAllyTheirLimitReached() {
+        Faction factionA = new FactionBuilder().build();
+        Faction factionB = new FactionBuilder().build();
+        Faction factionC = new FactionBuilder().build();
+
+
+        IridiumFactions.getInstance().getFactionManager().setFactionRelationship(factionB, factionC, RelationshipType.ALLY);
+
+        User user = IridiumFactions.getInstance().getUserManager().getUser(
+                new UserBuilder(serverMock).withFaction(factionA).build()
+        );
+        assertEquals(FactionRelationShipRequestResponse.THEIR_LIMIT_REACHED, IridiumFactions.getInstance().getFactionManager().sendFactionRelationshipRequest(user, factionB, RelationshipType.ALLY));
+
     }
 
     @Test
