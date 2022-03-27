@@ -51,4 +51,5 @@ public class Commands {
     public FlyCommand flyCommand = new FlyCommand();
     public StrikeCommand strikeCommand = new StrikeCommand();
     public StrikesCommand strikesCommand = new StrikesCommand();
+    public RelationshipsCommand relationshipsCommand = new RelationshipsCommand();
 }
