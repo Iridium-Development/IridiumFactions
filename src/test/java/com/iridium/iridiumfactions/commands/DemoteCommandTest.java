@@ -103,6 +103,17 @@ class DemoteCommandTest {
     }
 
     @Test
+    public void executeDemoteCommandUserRankOwner() {
+        Faction faction = new FactionBuilder().build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction).withFactionRank(FactionRank.OWNER).build();
+
+        serverMock.dispatchCommand(playerMock, "f demote "+playerMock.getName());
+
+        playerMock.assertSaid(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotDemoteUser.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
+        playerMock.assertNoMoreSaid();
+    }
+
+    @Test
     public void executeDemoteCommandNoPermission() {
         PlayerMock playerMock = serverMock.addPlayer("player");
         User user = IridiumFactions.getInstance().getUserManager().getUser(playerMock);

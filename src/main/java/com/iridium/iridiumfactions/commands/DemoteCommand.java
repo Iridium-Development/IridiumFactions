@@ -41,7 +41,7 @@ public class DemoteCommand extends Command {
         }
 
         FactionRank nextRank = FactionRank.getByLevel(targetUser.getFactionRank().getLevel() - 1);
-        if (nextRank == null || nextRank.getLevel() >= user.getFactionRank().getLevel() || targetUser.getFactionRank() == FactionRank.MEMBER || !IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.DEMOTE)) {
+        if (nextRank == null || nextRank.getLevel() >= user.getFactionRank().getLevel() || targetUser.getFactionRank() == FactionRank.MEMBER || targetUser.getFactionRank() == FactionRank.OWNER || !IridiumFactions.getInstance().getFactionManager().getFactionPermission(faction, user, PermissionType.DEMOTE)) {
             player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotDemoteUser.replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)));
             return false;
         }
