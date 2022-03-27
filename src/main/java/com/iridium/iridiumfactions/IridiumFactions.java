@@ -52,13 +52,6 @@ public class IridiumFactions extends IridiumCore {
     @Setter
     private Economy economy;
 
-    /*
-    TODO LIST
-     View Active Relationships
-     View and Cancel Relationship requests
-     Faction Missions
-     */
-
     public IridiumFactions(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
         instance = this;
