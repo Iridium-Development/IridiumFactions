@@ -12,8 +12,8 @@ public enum RelationshipType {
     WARZONE("&c", -2),
     SAFEZONE("&e", -3);
 
-    private String color;
-    private int rank;
+    private final String color;
+    private final int rank;
 
     public String getColor() {
         return IridiumFactions.getInstance().getConfiguration().factionRelationshipColors.getOrDefault(this, getDefaultColor());
@@ -21,6 +21,19 @@ public enum RelationshipType {
 
     public String getDefaultColor() {
         return color;
+    }
+
+    public FactionRank toRank() {
+        switch (this) {
+            case ALLY:
+                return FactionRank.ALLY;
+            case ENEMY:
+                return FactionRank.ENEMY;
+            case TRUCE:
+                return FactionRank.TRUCE;
+            default:
+                return FactionRank.MEMBER;
+        }
     }
 
     public int getRank() {

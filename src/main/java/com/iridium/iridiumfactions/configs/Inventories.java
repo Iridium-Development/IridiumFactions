@@ -79,6 +79,13 @@ public class Inventories {
             "&c&l[!] &7Left click to uninvite"
     )));
 
+    public SingleItemGUI relationshipsGUI = new SingleItemGUI(0, "&7Faction Relationships", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%faction_name%", "%faction_owner%", Arrays.asList(
+            "&7Faction Name: %faction_name%",
+            "&7Relationship Type: %relationship_type%",
+            "",
+            "&c&l[!] &7Left click to set relationship to truce"
+    )));
+
     public SingleItemGUI strikesGUI = new SingleItemGUI(0, "&7Faction Strikes", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%reason%", "%player_name%", Arrays.asList(
             "&7Punished By: %player_name%",
             "&7Reason: %reason%"
