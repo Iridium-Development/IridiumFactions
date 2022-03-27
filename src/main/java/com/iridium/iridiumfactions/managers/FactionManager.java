@@ -454,6 +454,12 @@ public class FactionManager {
         }
     }
 
+    public List<FactionRelationshipRequest> getFactionRelationshipRequests(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntries().stream()
+                .filter(relationshipRequest -> relationshipRequest.getFactionID() == faction.getId() || relationshipRequest.getFaction2ID() == faction.getId())
+                .collect(Collectors.toList());
+    }
+
     public Optional<FactionRelationshipRequest> getFactionRelationshipRequest(Faction faction1, Faction faction2, RelationshipType relationshipType) {
         Optional<FactionRelationshipRequest> factionRelationshipRequestA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntry(new FactionRelationshipRequest(faction1, faction2, relationshipType, new User(UUID.randomUUID(), "")));
         if (factionRelationshipRequestA.isPresent()) {
