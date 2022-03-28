@@ -137,7 +137,7 @@ public class Messages {
     public String yourRelationshipLimitReached = "%prefix% &7You have reached the maximum number(%limit%) of %relationship%'s.";
     public String theirRelationshipLimitReached = "%prefix% &7The other faction has reached their maximum number(%limit%) of %relationship%'s.";
     public String noRequestsPresent = "%prefix% &7There are no open relationship requests between you and %faction%.";
-    public String requestsCanceled = "%prefix% &7%player% has canceled the %relationship% request to %faction%";
+    public String requestCanceled = "%prefix% &7%player% has canceled the %relationship% request to %faction%";
     public String requestDeclined = "%prefix% &7%player% has declined the %relationship% request from %faction%";
     public String yourRequestsCanceled = "%prefix% &7%player% has canceled the %relationship% request";
     public String yourRequestDeclined = "%prefix% &7%player% has declined your %relationship% request";

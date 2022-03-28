@@ -58,15 +58,26 @@ class FactionManagerTest {
         Faction faction1 = new FactionBuilder("Faction 1").build();
         Faction faction2 = new FactionBuilder("Faction 2").build();
 
+        assertNull(IridiumFactions.getInstance().getFactionManager().getFactionViaName("").orElse(null));
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Faction 1").orElse(null), faction1);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Faction 2").orElse(null), faction2);
 
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("faction 1").orElse(null), faction1);
         assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("FACTION 2").orElse(null), faction2);
 
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Wilderness").get().getFactionType(), FactionType.WILDERNESS);
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Warzone").get().getFactionType(), FactionType.WARZONE);
-        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Safezone").get().getFactionType(), FactionType.SAFEZONE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Wilderness").map(Faction::getFactionType).orElse(null), FactionType.WILDERNESS);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Warzone").map(Faction::getFactionType).orElse(null), FactionType.WARZONE);
+        assertEquals(IridiumFactions.getInstance().getFactionManager().getFactionViaName("Safezone").map(Faction::getFactionType).orElse(null), FactionType.SAFEZONE);
+    }
+
+    @Test
+    public void getFactionViaNameOrPlayer() {
+        Faction faction1 = new FactionBuilder("Faction 1").build();
+        PlayerMock playerMock = new UserBuilder(serverMock).withFaction(faction1).build();
+
+        assertFalse(IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer("").isPresent());
+        assertEquals(faction1, IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer(playerMock.getName()).orElse(null));
+        assertEquals(faction1, IridiumFactions.getInstance().getFactionManager().getFactionViaNameOrPlayer("faction 1").orElse(null));
     }
 
     @Test
@@ -422,7 +433,7 @@ class FactionManagerTest {
     }
 
     @Test
-    public void getFactionRelationships(){
+    public void getFactionRelationships() {
         Faction factionA = new FactionBuilder().build();
         Faction factionB = new FactionBuilder().build();
 

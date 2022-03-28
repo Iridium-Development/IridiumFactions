@@ -57,6 +57,7 @@ public class FactionManager {
     }
 
     public Optional<Faction> getFactionViaNameOrPlayer(String name) {
+        if (name == null || name.equals("")) return Optional.empty();
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(name);
         Faction playerFaction = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
         if (playerFaction.getFactionType() == FactionType.WILDERNESS) {

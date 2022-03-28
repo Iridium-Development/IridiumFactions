@@ -48,7 +48,7 @@ public class DeclineRequestCommand extends Command {
 
         allyRequest.ifPresent(relationshipRequest -> {
             boolean ourRequest = relationshipRequest.getFactionID() == userFaction.getId();
-            String ourMessage = ourRequest ? IridiumFactions.getInstance().getMessages().requestsCanceled : IridiumFactions.getInstance().getMessages().requestDeclined;
+            String ourMessage = ourRequest ? IridiumFactions.getInstance().getMessages().requestCanceled : IridiumFactions.getInstance().getMessages().requestDeclined;
             String theirMessage = ourRequest ? IridiumFactions.getInstance().getMessages().yourRequestsCanceled : IridiumFactions.getInstance().getMessages().yourRequestDeclined;
 
             IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().delete(relationshipRequest);
@@ -78,7 +78,7 @@ public class DeclineRequestCommand extends Command {
         });
         truceRequest.ifPresent(relationshipRequest -> {
             boolean ourRequest = relationshipRequest.getFactionID() == userFaction.getId();
-            String ourMessage = ourRequest ? IridiumFactions.getInstance().getMessages().requestsCanceled : IridiumFactions.getInstance().getMessages().requestDeclined;
+            String ourMessage = ourRequest ? IridiumFactions.getInstance().getMessages().requestCanceled : IridiumFactions.getInstance().getMessages().requestDeclined;
             String theirMessage = ourRequest ? IridiumFactions.getInstance().getMessages().yourRequestsCanceled : IridiumFactions.getInstance().getMessages().yourRequestDeclined;
 
             IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().delete(relationshipRequest);
