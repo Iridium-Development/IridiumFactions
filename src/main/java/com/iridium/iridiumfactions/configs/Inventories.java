@@ -86,6 +86,15 @@ public class Inventories {
             "&c&l[!] &7Left click to set relationship to truce"
     )));
 
+    public SingleItemGUI relationshipRequestsGUI = new SingleItemGUI(0, "&7Faction Relationship Requests", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%faction_name%", "%faction_owner%", Arrays.asList(
+            "&7Faction Name: %faction_name%",
+            "&7Relationship Type: %relationship_type%",
+            "&7Requested By: %player_name%",
+            "",
+            "&c&l[!] &7Left click to accept",
+            "&c&l[!] &7Right click to decline or cancel"
+    )));
+
     public SingleItemGUI strikesGUI = new SingleItemGUI(0, "&7Faction Strikes", background1, new Item(XMaterial.PLAYER_HEAD, 0, 1, "&c&l%reason%", "%player_name%", Arrays.asList(
             "&7Punished By: %player_name%",
             "&7Reason: %reason%"

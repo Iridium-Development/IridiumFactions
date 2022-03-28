@@ -52,4 +52,6 @@ public class Commands {
     public StrikeCommand strikeCommand = new StrikeCommand();
     public StrikesCommand strikesCommand = new StrikesCommand();
     public RelationshipsCommand relationshipsCommand = new RelationshipsCommand();
+    public RelationshipRequestsCommand relationshipRequestsCommand = new RelationshipRequestsCommand();
+    public DeclineRequestCommand declineRequestCommand = new DeclineRequestCommand();
 }

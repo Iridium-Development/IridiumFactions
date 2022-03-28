@@ -57,6 +57,7 @@ public class FactionManager {
     }
 
     public Optional<Faction> getFactionViaNameOrPlayer(String name) {
+        if (name == null || name.equals("")) return Optional.empty();
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(name);
         Faction playerFaction = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
         if (playerFaction.getFactionType() == FactionType.WILDERNESS) {
@@ -452,6 +453,12 @@ public class FactionManager {
             default:
                 return user.getFactionRank();
         }
+    }
+
+    public List<FactionRelationshipRequest> getFactionRelationshipRequests(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntries().stream()
+                .filter(relationshipRequest -> relationshipRequest.getFactionID() == faction.getId() || relationshipRequest.getFaction2ID() == faction.getId())
+                .collect(Collectors.toList());
     }
 
     public Optional<FactionRelationshipRequest> getFactionRelationshipRequest(Faction faction1, Faction faction2, RelationshipType relationshipType) {
