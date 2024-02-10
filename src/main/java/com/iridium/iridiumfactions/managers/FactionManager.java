@@ -16,6 +16,7 @@ import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.utils.LocationUtils;
+import com.iridium.iridiumteams.PermissionType;
 import com.iridium.iridiumteams.Rank;
 import com.iridium.iridiumteams.Setting;
 import com.iridium.iridiumteams.database.*;
@@ -478,12 +479,12 @@ public class FactionManager extends TeamManager<Faction, User> {
     public CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
         return CompletableFuture.runAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-//            if (!getFactionPermission(faction, user, PermissionType.CLAIM)) {
-//                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
-//                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-//                ));
-//                return;
-//            }
+            if (!getTeamPermission(faction, user, PermissionType.CLAIM)) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
             if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
@@ -534,12 +535,12 @@ public class FactionManager extends TeamManager<Faction, User> {
     public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
         return CompletableFuture.runAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-//            if (!getFactionPermission(faction, user, PermissionType.CLAIM)) {
-//                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
-//                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-//                ));
-//                return;
-//            }
+            if (!getTeamPermission(faction, user, PermissionType.CLAIM)) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
             World world = centerChunk.getWorld();
             for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
                 for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
