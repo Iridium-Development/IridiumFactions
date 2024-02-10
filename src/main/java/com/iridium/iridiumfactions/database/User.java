@@ -2,12 +2,12 @@ package com.iridium.iridiumfactions.database;
 
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumteams.database.IridiumUser;
+import com.j256.ormlite.field.DatabaseField;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -15,18 +15,17 @@ import java.util.UUID;
 @Setter
 public class User extends IridiumUser<Faction> {
 
+    @DatabaseField(columnName = "power", canBeNull = false)
+    private double power;
+
     public User(UUID uuid, String name) {
         setUuid(uuid);
         setName(name);
         setJoinTime(LocalDateTime.now());
+        this.power = IridiumFactions.getInstance().getConfiguration().startingPower;
     }
 
-    public Optional<Faction> getFaction() {
-        return IridiumFactions.getInstance().getTeamManager().getTeamViaID(getTeamID());
-    }
-
-    public Optional<Faction> getCurrentFaction() {
-        //TODO
-        return Optional.empty();
+    public Faction getFaction() {
+        return IridiumFactions.getInstance().getTeamManager().getFactionViaID(getTeamID());
     }
 }

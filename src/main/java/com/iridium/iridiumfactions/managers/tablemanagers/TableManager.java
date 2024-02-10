@@ -7,6 +7,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
+import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class TableManager<Key, Value extends DatabaseObject, ID> {
     private final ConcurrentHashMap<Key, Value> entries = new ConcurrentHashMap<>();
     private final Dao<Value, ID> dao;
+    @Getter
     private final DatabaseKey<Key, Value> databaseKey;
 
     private final ConnectionSource connectionSource;

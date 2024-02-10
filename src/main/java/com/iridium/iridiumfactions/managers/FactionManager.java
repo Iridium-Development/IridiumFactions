@@ -7,10 +7,13 @@ import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumcore.utils.ItemStackUtils;
 import com.iridium.iridiumcore.utils.Placeholder;
 import com.iridium.iridiumcore.utils.StringUtils;
+import com.iridium.iridiumfactions.FactionType;
 import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.RelationshipType;
 import com.iridium.iridiumfactions.api.FactionCreateEvent;
 import com.iridium.iridiumfactions.api.FactionDeleteEvent;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.utils.LocationUtils;
 import com.iridium.iridiumteams.Rank;
@@ -20,10 +23,7 @@ import com.iridium.iridiumteams.managers.TeamManager;
 import com.iridium.iridiumteams.missions.Mission;
 import com.iridium.iridiumteams.missions.MissionData;
 import com.iridium.iridiumteams.missions.MissionType;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -40,6 +40,19 @@ public class FactionManager extends TeamManager<Faction, User> {
         super(IridiumFactions.getInstance());
     }
 
+    public Faction getFactionViaID(int id){
+        switch (id) {
+            case -1:
+                return new Faction(FactionType.WILDERNESS);
+            case -2:
+                return new Faction(FactionType.WARZONE);
+            case -3:
+                return new Faction(FactionType.SAFEZONE);
+            default:
+                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(id).orElse(getFactionViaID(-1));
+        }
+    }
+
     @Override
     public Optional<Faction> getTeamViaID(int id) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(id);
@@ -52,30 +65,48 @@ public class FactionManager extends TeamManager<Faction, User> {
 
     @Override
     public Optional<Faction> getTeamViaLocation(Location location) {
-        //TODO
-        return Optional.empty();
+        return Optional.of(getFactionViaLocation(location));
+    }
+
+    public Faction getFactionViaLocation(Location location) {
+        return getFactionViaChunk(location.getChunk());
+    }
+
+    @NotNull
+    public Faction getFactionViaChunk(Chunk chunk) {
+        return getFactionViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    @NotNull
+    public Faction getFactionViaChunk(World world, int x, int z) {
+        return getFactionViaID(getFactionClaimViaChunk(world, x, z).map(FactionClaim::getTeamID).orElse(-1));
+    }
+
+    public Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
+        return getFactionClaimViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    public Optional<FactionClaim> getFactionClaimViaChunk(World world, int x, int z) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager()
+                .getEntry(new FactionClaim(new Faction(""), world.getName(), x, z));
     }
 
     @Override
     public Optional<Faction> getTeamViaNameOrPlayer(String name) {
         if (name == null || name.equals("")) return Optional.empty();
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(name);
-        Optional<Faction> team = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
-        if (!team.isPresent()) {
+        Faction team = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
+        if (team.getFactionType() != FactionType.PLAYER_FACTION) {
             return getTeamViaName(name);
         }
-        return team;
-    }
-
-    @Override
-    public Optional<Faction> getTeamViaPlayerLocation(Player player) {
-        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-        return user.getCurrentFaction();
+        return Optional.of(team);
     }
 
     @Override
     public void sendTeamTitle(Player player, Faction faction) {
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
         List<Placeholder> placeholders = IridiumFactions.getInstance().getTeamsPlaceholderBuilder().getPlaceholders(faction);
+        placeholders.add(new Placeholder("faction_relationship_color", getFactionRelationship(user, faction).getColor()));
         String top = StringUtils.processMultiplePlaceholders(IridiumFactions.getInstance().getConfiguration().factionTitleTop, placeholders);
         String bottom = StringUtils.processMultiplePlaceholders(IridiumFactions.getInstance().getConfiguration().factionTitleBottom, placeholders);
         IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color(top), StringUtils.color(bottom), 20, 40, 20);
@@ -384,6 +415,123 @@ public class FactionManager extends TeamManager<Faction, User> {
         player.setFallDistance(0.0F);
         PaperLib.teleportAsync(player, safeLocation);
         return true;
+    }
+
+
+
+    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk chunk, Player player) {
+        return claimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
+    }
+
+    public CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+//            if (!getFactionPermission(faction, user, PermissionType.CLAIM)) {
+//                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
+//                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+//                ));
+//                return;
+//            }
+            if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
+            Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
+            if (factionClaim.isPresent() && !user.isBypassing() && factionClaim.get().getFaction().getRemainingPower() >= 0) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%faction%", factionClaim.get().getFaction().getName())
+                ));
+                return;
+            }
+            getTeamMembers(faction).forEach(user1 -> {
+                Player p = user1.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", user.getName())
+                            .replace("%faction%", faction.getName())
+                            .replace("%x%", String.valueOf(x))
+                            .replace("%z%", String.valueOf(z))
+                    ));
+                }
+            });
+            if (user.getTeamID() != faction.getId()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", user.getName())
+                        .replace("%faction%", faction.getName())
+                        .replace("%x%", String.valueOf(x))
+                        .replace("%z%", String.valueOf(z))
+                ));
+            }
+            if (factionClaim.isPresent()) {
+                if (faction.getFactionType() == FactionType.WILDERNESS) {
+                    IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().delete(factionClaim.get());
+                } else {
+                    factionClaim.get().setFaction(faction);
+                }
+            } else {
+                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().addEntry(new FactionClaim(faction, world.getName(), x, z));
+            }
+        });
+    }
+
+    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+//            if (!getFactionPermission(faction, user, PermissionType.CLAIM)) {
+//                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
+//                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+//                ));
+//                return;
+//            }
+            World world = centerChunk.getWorld();
+            for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
+                for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
+                    if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
+                        player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
+                                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        ));
+                        return;
+                    }
+                    claimFactionLand(faction, world, x, z, player).join();
+                }
+            }
+        });
+    }
+
+    public RelationshipType getFactionRelationship(@NotNull Faction a, @NotNull Faction b) {
+        if (b.getFactionType() == FactionType.WILDERNESS) {
+            return RelationshipType.WILDERNESS;
+        }
+        if (b.getFactionType() == FactionType.WARZONE) {
+            return RelationshipType.WARZONE;
+        }
+        if (b.getFactionType() == FactionType.SAFEZONE) {
+            return RelationshipType.SAFEZONE;
+        }
+        if (a.getFactionType() != FactionType.PLAYER_FACTION) {
+            return RelationshipType.TRUCE;
+        }
+        if (a == b) {
+            return RelationshipType.OWN;
+        }
+//        Optional<FactionRelationship> factionRelationshipA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(a, b));
+//        if (factionRelationshipA.isPresent()) {
+//            return factionRelationshipA.get().getRelationshipType();
+//        }
+//        Optional<FactionRelationship> factionRelationshipB = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(b, a));
+//        if (factionRelationshipB.isPresent()) {
+//            return factionRelationshipB.get().getRelationshipType();
+//        }
+        return RelationshipType.TRUCE;
+    }
+
+    public RelationshipType getFactionRelationship(User user, @NotNull Faction faction) {
+        return getFactionRelationship(user.getFaction(), faction);
     }
 
 }

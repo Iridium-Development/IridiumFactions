@@ -168,6 +168,7 @@ public class IridiumFactions extends IridiumTeams<Faction, User> {
         getDatabaseManager().getTeamMissionDataTableManager().save();
         getDatabaseManager().getTeamRewardsTableManager().save();
         getDatabaseManager().getTeamSettingsTableManager().save();
+        getDatabaseManager().getFactionClaimsTableManager().save();
     }
 
     @Override

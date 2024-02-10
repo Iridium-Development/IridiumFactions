@@ -3,6 +3,7 @@ package com.iridium.iridiumfactions.managers;
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
 import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.TableManager;
@@ -43,6 +44,7 @@ public class DatabaseManager {
     private ForeignFactionTableManager<String, TeamMission> teamMissionTableManager;
     private ForeignFactionTableManager<String, TeamReward> teamRewardsTableManager;
     private ForeignFactionTableManager<String, TeamSetting> teamSettingsTableManager;
+    private TableManager<String, FactionClaim, Integer> factionClaimsTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -77,6 +79,7 @@ public class DatabaseManager {
         this.teamMissionTableManager = new ForeignFactionTableManager<>(teamMission -> teamMission.getTeamID()+"-"+teamMission.getMissionName(), connectionSource, TeamMission.class);
         this.teamRewardsTableManager = new ForeignFactionTableManager<>(teamRewards -> String.valueOf(teamRewards.getId()), connectionSource, TeamReward.class);
         this.teamSettingsTableManager = new ForeignFactionTableManager<>(teamSetting -> teamSetting.getTeamID()+"-"+teamSetting.getSetting(), connectionSource, TeamSetting.class);
+        this.factionClaimsTableManager = new TableManager<>(factionClaim -> factionClaim.getWorld()+"-"+factionClaim.getX()+"-"+factionClaim.getZ(), connectionSource, FactionClaim.class);
     }
 
     /**

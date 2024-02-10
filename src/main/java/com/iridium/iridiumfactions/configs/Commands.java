@@ -1,5 +1,7 @@
 package com.iridium.iridiumfactions.configs;
 
+import com.iridium.iridiumfactions.commands.ClaimCommand;
+import com.iridium.iridiumfactions.commands.MapCommand;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 
@@ -7,4 +9,7 @@ public class Commands extends com.iridium.iridiumteams.configs.Commands<Faction,
     public Commands() {
         super("iridiumfactions", "Faction", "f");
     }
+
+    public ClaimCommand claimCommand = new ClaimCommand();
+    public MapCommand mapCommand = new MapCommand();
 }
