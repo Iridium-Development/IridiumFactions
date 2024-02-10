@@ -340,6 +340,12 @@ public class FactionManager extends TeamManager<Faction, User> {
         return completableFuture;
     }
 
+    public List<FactionClaim> getFactionClaims(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().getEntries().stream()
+                        .filter(factionClaim -> factionClaim.getTeamID() == faction.getId())
+                        .collect(Collectors.toList());
+    }
+
     public CompletableFuture<List<Chunk>> getFactionChunks(Faction faction) {
         return CompletableFuture.supplyAsync(() ->
                 IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().getEntries().stream()

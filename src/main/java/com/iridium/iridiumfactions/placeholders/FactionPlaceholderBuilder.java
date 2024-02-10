@@ -48,7 +48,10 @@ public class FactionPlaceholderBuilder implements PlaceholderBuilder<Faction> {
                 new Placeholder("faction_members_online_count", String.valueOf(onlineUsers.size())),
                 new Placeholder("faction_members_offline", String.join(", ", offlineUsers)),
                 new Placeholder("faction_members_offline_count", String.valueOf(offlineUsers.size())),
-                new Placeholder("faction_members_count", String.valueOf(users.size()))
+                new Placeholder("faction_members_count", String.valueOf(users.size())),
+                new Placeholder("faction_total_power", String.valueOf(faction.getTotalPower())),
+                new Placeholder("faction_remaining_power", String.valueOf(faction.getRemainingPower())),
+                new Placeholder("faction_land", String.valueOf(IridiumFactions.getInstance().getFactionManager().getFactionClaims(faction).size()))
         ));
         for (BankItem bankItem : IridiumFactions.getInstance().getBankItemList()) {
             placeholderList.add(new Placeholder("faction_bank_" + bankItem.getName().toLowerCase(), String.valueOf(IridiumFactions.getInstance().getTeamManager().getTeamBank(faction, bankItem.getName()).getNumber())));
@@ -77,7 +80,10 @@ public class FactionPlaceholderBuilder implements PlaceholderBuilder<Faction> {
                 new Placeholder("faction_members_online_count", "N/A"),
                 new Placeholder("faction_members_offline", "N/A"),
                 new Placeholder("faction_members_offline_count", "N/A"),
-                new Placeholder("faction_members_count", "N/A")
+                new Placeholder("faction_members_count", "N/A"),
+                new Placeholder("faction_total_power", "N/A"),
+                new Placeholder("faction_remaining_power", "N/A"),
+                new Placeholder("faction_land", "N/A")
         ));
         for (BankItem bankItem : IridiumFactions.getInstance().getBankItemList()) {
             placeholderList.add(new Placeholder("faction_bank_" + bankItem.getName().toLowerCase(), "N/A"));

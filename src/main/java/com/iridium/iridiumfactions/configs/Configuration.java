@@ -36,8 +36,16 @@ public class Configuration extends com.iridium.iridiumteams.configs.Configuratio
                         "&c&l[!] &cLeft click to redeem"
                 )), Collections.emptyList(), 0, new ImmutableMap.Builder<String, Double>().put("Crystals", 10.00).build(), 2000, 0, XSound.ENTITY_PLAYER_LEVELUP))
                 .build();
-    }
 
+        this.teamInfo = Arrays.asList(
+                "&cDescription: &7%faction_description%",
+                "&cLand / Remaining Power / Total Power: &7%faction_land% / %faction_remaining_power% / %faction_total_power%",
+                "&cLevel: &7%faction_level% (#%faction_experience_rank%)",
+                "&cValue: &7%faction_value% (#%faction_value_rank%)",
+                "&cOnline Members(%faction_members_online_count%/%faction_members_count%): &7%faction_members_online%",
+                "&cOffline Members(%faction_members_offline_count%/%faction_members_count%): &7%faction_members_offline%"
+        );
+    }
     public String factionCreateTitle = "&c&lFaction Created";
     public String factionCreateSubTitle = "&7IridiumFactions by Peaches_MLG";
     public String defaultDescription = "Default faction description :c";
