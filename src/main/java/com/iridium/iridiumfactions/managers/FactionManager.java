@@ -24,6 +24,8 @@ import com.iridium.iridiumteams.missions.Mission;
 import com.iridium.iridiumteams.missions.MissionData;
 import com.iridium.iridiumteams.missions.MissionType;
 import org.bukkit.*;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class FactionManager extends TeamManager<Faction, User> {
 
@@ -40,7 +43,7 @@ public class FactionManager extends TeamManager<Faction, User> {
         super(IridiumFactions.getInstance());
     }
 
-    public Faction getFactionViaID(int id){
+    public Faction getFactionViaID(int id) {
         switch (id) {
             case -1:
                 return new Faction(FactionType.WILDERNESS);
@@ -292,10 +295,60 @@ public class FactionManager extends TeamManager<Faction, User> {
 
     @Override
     public CompletableFuture<Void> recalculateTeam(Faction faction) {
-        //TODO
         Map<XMaterial, Integer> teamBlocks = new HashMap<>();
         Map<EntityType, Integer> teamSpawners = new HashMap<>();
         return CompletableFuture.runAsync(() -> {
+            List<Chunk> chunks = getFactionChunks(faction).join();
+            for (Chunk chunk : chunks) {
+                ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        final int maxy = chunkSnapshot.getHighestBlockYAt(x, z);
+                        for (int y = 0; y <= maxy; y++) {
+                            XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
+                            teamBlocks.put(material, teamBlocks.getOrDefault(material, 0) + 1);
+                        }
+                    }
+                }
+                getSpawners(chunk).join().forEach(creatureSpawner ->
+                        teamSpawners.put(creatureSpawner.getSpawnedType(), teamSpawners.getOrDefault(creatureSpawner.getSpawnedType(), 0) + 1)
+                );
+            }
+        }).thenRun(() -> Bukkit.getScheduler().runTask(IridiumFactions.getInstance(), () -> {
+            List<TeamBlock> blocks = IridiumFactions.getInstance().getDatabaseManager().getTeamBlockTableManager().getEntries(faction);
+            List<TeamSpawners> spawners = IridiumFactions.getInstance().getDatabaseManager().getTeamSpawnerTableManager().getEntries(faction);
+            for (TeamBlock teamBlock : blocks) {
+                teamBlock.setAmount(teamBlocks.getOrDefault(teamBlock.getXMaterial(), 0));
+            }
+            for (TeamSpawners teamSpawner : spawners) {
+                teamSpawner.setAmount(teamSpawners.getOrDefault(teamSpawner.getEntityType(), 0));
+            }
+        }));
+    }
+
+    public CompletableFuture<List<CreatureSpawner>> getSpawners(Chunk chunk) {
+        CompletableFuture<List<CreatureSpawner>> completableFuture = new CompletableFuture<>();
+        Bukkit.getScheduler().runTask(IridiumFactions.getInstance(), () -> {
+            List<CreatureSpawner> creatureSpawners = new ArrayList<>();
+            for (BlockState blockState : chunk.getTileEntities()) {
+                if (!(blockState instanceof CreatureSpawner)) continue;
+                creatureSpawners.add((CreatureSpawner) blockState);
+            }
+            completableFuture.complete(creatureSpawners);
+        });
+        return completableFuture;
+    }
+
+    public CompletableFuture<List<Chunk>> getFactionChunks(Faction faction) {
+        return CompletableFuture.supplyAsync(() ->
+                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().getEntries().stream()
+                        .filter(factionClaim -> factionClaim.getTeamID() == faction.getId())
+                        .map(FactionClaim::getChunk)
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList())
+        ).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return Collections.emptyList();
         });
     }
 
@@ -416,7 +469,6 @@ public class FactionManager extends TeamManager<Faction, User> {
         PaperLib.teleportAsync(player, safeLocation);
         return true;
     }
-
 
 
     public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk chunk, Player player) {
