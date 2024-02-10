@@ -93,8 +93,9 @@ public class IridiumFactions extends IridiumTeams<Faction, User> {
 
         Bukkit.getScheduler().runTask(this, () -> this.economy = setupEconomy());
 
-        addBstats(5825);
-        startUpdateChecker(62480);
+        addBstats(6282);
+        //TODO
+//        startUpdateChecker();
         super.onEnable();
     }
 
