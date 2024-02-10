@@ -1,653 +1,389 @@
 package com.iridium.iridiumfactions.managers;
 
+import com.iridium.iridiumcore.dependencies.nbtapi.NBTCompound;
+import com.iridium.iridiumcore.dependencies.nbtapi.NBTItem;
+import com.iridium.iridiumcore.dependencies.paperlib.PaperLib;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
+import com.iridium.iridiumcore.utils.ItemStackUtils;
+import com.iridium.iridiumcore.utils.Placeholder;
 import com.iridium.iridiumcore.utils.StringUtils;
-import com.iridium.iridiumfactions.*;
-import com.iridium.iridiumfactions.bank.BankItem;
-import com.iridium.iridiumfactions.database.*;
+import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.api.FactionCreateEvent;
+import com.iridium.iridiumfactions.api.FactionDeleteEvent;
+import com.iridium.iridiumfactions.database.Faction;
+import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.utils.LocationUtils;
-import org.bukkit.*;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
+import com.iridium.iridiumteams.Rank;
+import com.iridium.iridiumteams.Setting;
+import com.iridium.iridiumteams.database.*;
+import com.iridium.iridiumteams.managers.TeamManager;
+import com.iridium.iridiumteams.missions.Mission;
+import com.iridium.iridiumteams.missions.MissionData;
+import com.iridium.iridiumteams.missions.MissionType;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-public class FactionManager {
+public class FactionManager extends TeamManager<Faction, User> {
 
-    @NotNull
-    public Faction getFactionViaId(int id) {
-        switch (id) {
-            case -1:
-                return new Faction(FactionType.WILDERNESS);
-            case -2:
-                return new Faction(FactionType.WARZONE);
-            case -3:
-                return new Faction(FactionType.SAFEZONE);
-            default:
-                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(id).orElse(getFactionViaId(-1));
-        }
+    public FactionManager() {
+        super(IridiumFactions.getInstance());
     }
 
-    public List<FactionWarp> getFactionWarps(Faction faction) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().getEntries(faction);
+    @Override
+    public Optional<Faction> getTeamViaID(int id) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(id);
     }
 
-    public Optional<FactionWarp> getFactionWarp(Faction faction, String name) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionWarpTableManager().getEntry(new FactionWarp(faction, null, name));
+    @Override
+    public Optional<Faction> getTeamViaName(String name) {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(name);
     }
 
-    public Optional<Faction> getFactionViaName(String name) {
-        switch (name.toUpperCase()) {
-            case "WILDERNESS":
-                return Optional.of(new Faction(FactionType.WILDERNESS));
-            case "WARZONE":
-                return Optional.of(new Faction(FactionType.WARZONE));
-            case "SAFEZONE":
-                return Optional.of(new Faction(FactionType.SAFEZONE));
-            default:
-                return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getFaction(name);
-        }
+    @Override
+    public Optional<Faction> getTeamViaLocation(Location location) {
+        //TODO
+        return Optional.empty();
     }
 
-    public Optional<Faction> getFactionViaNameOrPlayer(String name) {
+    @Override
+    public Optional<Faction> getTeamViaNameOrPlayer(String name) {
         if (name == null || name.equals("")) return Optional.empty();
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(name);
-        Faction playerFaction = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
-        if (playerFaction.getFactionType() == FactionType.WILDERNESS) {
-            return getFactionViaName(name);
+        Optional<Faction> team = IridiumFactions.getInstance().getUserManager().getUser(targetPlayer).getFaction();
+        if (!team.isPresent()) {
+            return getTeamViaName(name);
         }
-        return Optional.of(playerFaction);
+        return team;
     }
 
-    @NotNull
-    public Faction getFactionViaLocation(Location location) {
-        return getFactionViaChunk(location.getChunk());
+    @Override
+    public Optional<Faction> getTeamViaPlayerLocation(Player player) {
+        User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+        return user.getCurrentFaction();
     }
 
-    @NotNull
-    public Faction getFactionViaChunk(Chunk chunk) {
-        return getFactionViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    @Override
+    public void sendTeamTitle(Player player, Faction faction) {
+        List<Placeholder> placeholders = IridiumFactions.getInstance().getTeamsPlaceholderBuilder().getPlaceholders(faction);
+        String top = StringUtils.processMultiplePlaceholders(IridiumFactions.getInstance().getConfiguration().factionTitleTop, placeholders);
+        String bottom = StringUtils.processMultiplePlaceholders(IridiumFactions.getInstance().getConfiguration().factionTitleBottom, placeholders);
+        IridiumFactions.getInstance().getNms().sendTitle(player, StringUtils.color(top), StringUtils.color(bottom), 20, 40, 20);
     }
 
-    @NotNull
-    public Faction getFactionViaChunk(World world, int x, int z) {
-        return getFactionViaId(getFactionClaimViaChunk(world, x, z).map(FactionData::getFactionID).orElse(-1));
+    @Override
+    public List<Faction> getTeams() {
+        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
     }
 
-    public Optional<FactionClaim> getFactionClaimViaChunk(Chunk chunk) {
-        return getFactionClaimViaChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
-    }
-
-    public Optional<FactionClaim> getFactionClaimViaChunk(World world, int x, int z) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager()
-                .getEntry(new FactionClaim(new Faction(""), world.getName(), x, z));
-    }
-
-    public CompletableFuture<Faction> createFaction(@NotNull Player owner, @NotNull String name) {
+    @Override
+    public CompletableFuture<Faction> createTeam(@NotNull Player owner, String name) {
         return CompletableFuture.supplyAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(owner);
-            Faction faction = new Faction(name);
+
+            FactionCreateEvent factionCreateEvent = getFactionCreateEvent(user, name).join();
+            if (factionCreateEvent.isCancelled()) return null;
+
+            owner.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().creatingFaction
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+            ));
+
+            Faction faction = new Faction(factionCreateEvent.getFactionName());
 
             IridiumFactions.getInstance().getDatabaseManager().registerFaction(faction).join();
 
-            user.setFaction(faction);
-            user.setFactionRank(FactionRank.OWNER);
+            user.setTeam(faction);
+            user.setUserRank(Rank.OWNER.getId());
+
+            Bukkit.getScheduler().runTask(IridiumFactions.getInstance(), () -> {
+                IridiumFactions.getInstance().getNms().sendTitle(owner, IridiumFactions.getInstance().getConfiguration().factionCreateTitle, IridiumFactions.getInstance().getConfiguration().factionCreateSubTitle, 20, 40, 20);
+            });
 
             return faction;
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
         });
     }
 
-    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk chunk, Player player) {
-        return claimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
-    }
+    private CompletableFuture<FactionCreateEvent> getFactionCreateEvent(@NotNull User user, @Nullable String factionName) {
+        CompletableFuture<FactionCreateEvent> completableFuture = new CompletableFuture<>();
+        Bukkit.getScheduler().runTask(IridiumFactions.getInstance(), () -> {
+            FactionCreateEvent factionCreateEvent = new FactionCreateEvent(user, factionName);
+            Bukkit.getPluginManager().callEvent(factionCreateEvent);
+            completableFuture.complete(factionCreateEvent);
 
-    public CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
-        return CompletableFuture.runAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getFactionPermission(faction, user, PermissionType.CLAIM)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
-            if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
-            Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
-            if (factionClaim.isPresent() && !user.isBypassing() && factionClaim.get().getFaction().getRemainingPower() >= 0) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().landAlreadyClaimed
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%faction%", factionClaim.get().getFaction().getName())
-                ));
-                return;
-            }
-            getFactionMembers(faction).forEach(user1 -> {
-                Player p = user1.getPlayer();
-                if (p != null) {
-                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", user.getName())
-                            .replace("%faction%", faction.getName())
-                            .replace("%x%", String.valueOf(x))
-                            .replace("%z%", String.valueOf(z))
-                    ));
-                }
-            });
-            if (user.getFactionID() != faction.getId()) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionClaimedLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%player%", user.getName())
-                        .replace("%faction%", faction.getName())
-                        .replace("%x%", String.valueOf(x))
-                        .replace("%z%", String.valueOf(z))
-                ));
-            }
-            if (factionClaim.isPresent()) {
-                if (faction.getFactionType() == FactionType.WILDERNESS) {
-                    IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
-                } else {
-                    factionClaim.get().setFaction(faction);
-                }
-            } else {
-                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().addEntry(new FactionClaim(faction, world.getName(), x, z));
-            }
         });
+        return completableFuture;
     }
 
-    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        return CompletableFuture.runAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getFactionPermission(faction, user, PermissionType.CLAIM)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotClaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
-            World world = centerChunk.getWorld();
-            for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
-                for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
-                    if (faction.getRemainingPower() < 1 && !user.isBypassing()) {
-                        player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().notEnoughPowerToClaim
-                                .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        ));
-                        return;
-                    }
-                    claimFactionLand(faction, world, x, z, player).join();
-                }
-            }
-        });
+    @Override
+    public boolean deleteTeam(Faction faction, User user) {
+        FactionDeleteEvent factionDeleteEvent = new FactionDeleteEvent(faction, user);
+        Bukkit.getPluginManager().callEvent(factionDeleteEvent);
+        if (factionDeleteEvent.isCancelled()) return false;
+
+        IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().delete(faction);
+
+        return true;
     }
 
-    public CompletableFuture<Void> unClaimFactionLand(Faction faction, Chunk chunk, Player player) {
-        return unClaimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
+    @Override
+    public synchronized boolean getTeamPermission(Faction faction, int rank, String permission) {
+        if (rank == Rank.OWNER.getId()) return true;
+        return IridiumFactions.getInstance().getDatabaseManager().getPermissionsTableManager().getEntry(new TeamPermission(faction, permission, rank, true))
+                .map(TeamPermission::isAllowed)
+                .orElse(IridiumFactions.getInstance().getPermissionList().get(permission).getDefaultRank() <= rank);
     }
 
-    public CompletableFuture<Void> unClaimFactionLand(Faction faction, World world, int x, int z, Player player) {
-        return CompletableFuture.runAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getFactionPermission(faction, user, PermissionType.UNCLAIM)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnClaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
-            Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
-            Faction factionClaimedAtLand = getFactionViaId(factionClaim.map(FactionData::getFactionID).orElse(-1));
-            if (!factionClaim.isPresent() || factionClaimedAtLand.getId() != faction.getId()) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaim
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%faction%", faction.getName())
-                ));
-                return;
-            }
-            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim.get());
-            getFactionMembers(faction).forEach(user1 -> {
-                Player p = user1.getPlayer();
-                if (p != null) {
-                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", user.getName())
-                            .replace("%faction%", faction.getName())
-                            .replace("%x%", String.valueOf(x))
-                            .replace("%z%", String.valueOf(z))
-                    ));
-                }
-            });
-        });
-    }
-
-    public CompletableFuture<Void> unClaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
-        return CompletableFuture.runAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getFactionPermission(faction, user, PermissionType.UNCLAIM)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnClaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
-            for (FactionClaim factionClaim : IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction)) {
-                if (factionClaim.getX() > centerChunk.getX() - radius && factionClaim.getX() < centerChunk.getX() + radius) {
-                    if (factionClaim.getZ() > centerChunk.getZ() - radius && factionClaim.getZ() < centerChunk.getZ() + radius) {
-                        if (factionClaim.getWorld().equals(centerChunk.getWorld().getName())) {
-                            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(factionClaim).join();
-                            getFactionMembers(faction).forEach(user1 -> {
-                                Player p = user1.getPlayer();
-                                if (p != null) {
-                                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
-                                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                                            .replace("%player%", user.getName())
-                                            .replace("%faction%", faction.getName())
-                                            .replace("%x%", String.valueOf(factionClaim.getX()))
-                                            .replace("%z%", String.valueOf(factionClaim.getZ()))
-                                    ));
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    public CompletableFuture<Void> unClaimAllFactionLand(Faction faction, Player player) {
-        return CompletableFuture.runAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getFactionPermission(faction, user, PermissionType.UNCLAIM)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnClaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
-            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction));
-            getFactionMembers(faction).stream().map(User::getPlayer).filter(Objects::nonNull).forEach(member ->
-                    member.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", player.getName())
-                            .replace("%faction%", faction.getName())
-                    ))
-            );
-        });
-    }
-
-    public CompletableFuture<Void> deleteFaction(Faction faction, User user) {
-        return CompletableFuture.runAsync(() -> {
-            getFactionMembers(faction).forEach(user1 -> {
-                Player player = user1.getPlayer();
-                if (player != null) {
-                    player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionDisbanded
-                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                            .replace("%player%", user.getName())
-                            .replace("%faction%", faction.getName())
-                    ));
-                }
-                user1.setFaction(null);
-            });
-            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().delete(IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction));
-            IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().delete(faction);
-        });
-    }
-
-    public List<FactionStrike> getFactionStrikes(@NotNull Faction faction) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionStrikeTableManager().getEntries(faction);
-    }
-
-    public boolean getFactionPermission(@NotNull Faction faction, @NotNull FactionRank factionRank, @NotNull Permission permission, @NotNull String key) {
-        if (faction.getFactionType() == FactionType.WILDERNESS) return true;
-        if (faction.getFactionType() != FactionType.PLAYER_FACTION) return false;
-        Optional<FactionPermission> factionPermission = IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().getEntry(new FactionPermission(faction, key, factionRank, true));
-        return factionPermission.map(FactionPermission::isAllowed).orElseGet(() -> factionRank.getLevel() >= permission.getDefaultRank().getLevel());
-    }
-
-    public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull Permission permission, @NotNull String key) {
-        return user.isBypassing() || getFactionPermission(faction, getFactionRank(user, faction), permission, key);
-    }
-
-    public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull PermissionType permissionType) {
-        return getFactionPermission(faction, user, IridiumFactions.getInstance().getPermissionList().get(permissionType.getPermissionKey()), permissionType.getPermissionKey());
-    }
-
-    public boolean getFactionPermission(@NotNull Faction faction, @NotNull User user, @NotNull PermissionType permissionType, @NotNull Location location) {
-        Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(location.getChunk());
-        if (factionClaim.isPresent()) {
-            Optional<FactionAccess> factionAccess = IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().getEntry(new FactionAccess(faction, factionClaim.get(), user.getFactionRank(), true));
-            if (!factionAccess.map(FactionAccess::isAllowed).orElse(true)) return false;
-        }
-        return getFactionPermission(faction, user, permissionType);
-    }
-
-    public Inventory getFactionChestInventory(Faction faction, int page) {
-        FactionChest factionChest = getFactionChest(faction, page);
-        FactionUpgrade factionUpgrade = getFactionUpgrade(faction, UpgradeType.CHEST_UPGRADE);
-        int maxSlots = IridiumFactions.getInstance().getUpgrades().chestUpgrade.upgrades.get(factionUpgrade.getLevel()).rows * 9;
-        int inventorySize = Math.min(54, maxSlots - ((page - 1) * 54));
-        if (factionChest.getFactionChest() != null && factionChest.getFactionChest().getSize() == inventorySize) {
-            return factionChest.getFactionChest();
+    @Override
+    public synchronized void setTeamPermission(Faction faction, int rank, String permission, boolean allowed) {
+        TeamPermission factionPermission = new TeamPermission(faction, permission, rank, allowed);
+        Optional<TeamPermission> teamPermission = IridiumFactions.getInstance().getDatabaseManager().getPermissionsTableManager().getEntry(factionPermission);
+        if (teamPermission.isPresent()) {
+            teamPermission.get().setAllowed(allowed);
         } else {
-            Inventory inventory = Bukkit.createInventory(null, inventorySize, StringUtils.color(IridiumFactions.getInstance().getConfiguration().factionChestTitle.replace("%faction_name%", faction.getName())));
-            Inventory oldInventory = factionChest.getFactionChest();
-            if (oldInventory != null) {
-                inventory.setContents(oldInventory.getContents());
-                oldInventory.clear();
-                for (HumanEntity humanEntity : new ArrayList<>(oldInventory.getViewers())) {
-                    humanEntity.openInventory(inventory);
-                }
-            }
-            factionChest.setFactionChest(inventory);
-            return inventory;
+            IridiumFactions.getInstance().getDatabaseManager().getPermissionsTableManager().addEntry(factionPermission);
         }
     }
 
-    private synchronized FactionChest getFactionChest(Faction faction, int page) {
-        Optional<FactionChest> factionChest = IridiumFactions.getInstance().getDatabaseManager().getFactionChestTableManager().getEntry(new FactionChest(faction, null, page));
-        if (factionChest.isPresent()) {
-            return factionChest.get();
-        } else {
-            FactionChest chest = new FactionChest(faction, null, page);
-            IridiumFactions.getInstance().getDatabaseManager().getFactionChestTableManager().addEntry(chest);
-            return chest;
-        }
+    @Override
+    public Optional<TeamInvite> getTeamInvite(Faction team, User user) {
+        return IridiumFactions.getInstance().getDatabaseManager().getInvitesTableManager().getEntry(new TeamInvite(team, user.getUuid(), user.getUuid()));
     }
 
-    public synchronized void setFactionPermission(@NotNull Faction faction, @NotNull FactionRank factionRank, @NotNull String key, boolean allowed) {
-        Optional<FactionPermission> factionPermission = IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().getEntry(new FactionPermission(faction, key, factionRank, allowed));
-        if (factionPermission.isPresent()) {
-            factionPermission.get().setAllowed(allowed);
-        } else {
-            IridiumFactions.getInstance().getDatabaseManager().getFactionPermissionTableManager().addEntry(new FactionPermission(faction, key, factionRank, allowed));
-        }
+    @Override
+    public List<TeamInvite> getTeamInvites(Faction team) {
+        return IridiumFactions.getInstance().getDatabaseManager().getInvitesTableManager().getEntries(team);
     }
 
-    public synchronized void setFactionAccess(Faction faction, FactionRank factionRank, FactionClaim factionClaim, boolean allowed) {
-        Optional<FactionAccess> factionAccess = IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().getEntry(new FactionAccess(faction, factionClaim, factionRank, allowed));
-        if (factionAccess.isPresent()) {
-            factionAccess.get().setAllowed(allowed);
-        } else {
-            IridiumFactions.getInstance().getDatabaseManager().getFactionAccessTableManager().addEntry(new FactionAccess(faction, factionClaim, factionRank, allowed));
-        }
+    @Override
+    public void createTeamInvite(Faction team, User user, User invitee) {
+        IridiumFactions.getInstance().getDatabaseManager().getInvitesTableManager().addEntry(new TeamInvite(team, user.getUuid(), invitee.getUuid()));
     }
 
-    public synchronized FactionBank getFactionBank(Faction faction, BankItem bankItem) {
-        Optional<FactionBank> factionBank = IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().getEntry(new FactionBank(faction, bankItem.getName(), 0));
-        if (factionBank.isPresent()) {
-            return factionBank.get();
+    @Override
+    public void deleteTeamInvite(TeamInvite teamInvite) {
+        IridiumFactions.getInstance().getDatabaseManager().getInvitesTableManager().delete(teamInvite);
+    }
+
+    @Override
+    public Optional<TeamTrust> getTeamTrust(Faction faction, User user) {
+        return IridiumFactions.getInstance().getDatabaseManager().getTrustTableManager().getEntry(new TeamTrust(faction, user.getUuid(), user.getUuid()));
+    }
+
+    @Override
+    public List<TeamTrust> getTeamTrusts(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getTrustTableManager().getEntries(faction);
+    }
+
+    @Override
+    public void createTeamTrust(Faction faction, User user, User invitee) {
+        IridiumFactions.getInstance().getDatabaseManager().getTrustTableManager().addEntry(new TeamTrust(faction, user.getUuid(), invitee.getUuid()));
+    }
+
+    @Override
+    public void deleteTeamTrust(TeamTrust teamTrust) {
+        IridiumFactions.getInstance().getDatabaseManager().getTrustTableManager().delete(teamTrust);
+    }
+
+    @Override
+    public synchronized TeamBank getTeamBank(Faction faction, String bankItem) {
+        Optional<TeamBank> teamBank = IridiumFactions.getInstance().getDatabaseManager().getBankTableManager().getEntry(new TeamBank(faction, bankItem, 0));
+        if (teamBank.isPresent()) {
+            return teamBank.get();
         } else {
-            FactionBank bank = new FactionBank(faction, bankItem.getName(), 0);
-            IridiumFactions.getInstance().getDatabaseManager().getFactionBankTableManager().addEntry(bank);
+            TeamBank bank = new TeamBank(faction, bankItem, 0);
+            IridiumFactions.getInstance().getDatabaseManager().getBankTableManager().addEntry(bank);
             return bank;
         }
     }
 
-    public List<Faction> getFactionRelationships(Faction faction, RelationshipType relationshipType) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntries().stream()
-                .filter(factionRelationship -> factionRelationship.getFactionID() == faction.getId() || factionRelationship.getFaction2ID() == faction.getId())
-                .filter(factionRelationshipEntry -> factionRelationshipEntry.getRelationshipType() == relationshipType)
-                .map(relationship -> faction.getId() == relationship.getFactionID() ? relationship.getFaction2ID() : relationship.getFactionID())
-                .map(this::getFactionViaId)
-                .collect(Collectors.toList());
-    }
-
-    public RelationshipType getFactionRelationship(@NotNull Faction a, @NotNull Faction b) {
-        if (b.getFactionType() == FactionType.WILDERNESS) {
-            return RelationshipType.WILDERNESS;
-        }
-        if (b.getFactionType() == FactionType.WARZONE) {
-            return RelationshipType.WARZONE;
-        }
-        if (b.getFactionType() == FactionType.SAFEZONE) {
-            return RelationshipType.SAFEZONE;
-        }
-        if (a.getFactionType() != FactionType.PLAYER_FACTION) {
-            return RelationshipType.TRUCE;
-        }
-        if (a == b) {
-            return RelationshipType.OWN;
-        }
-        Optional<FactionRelationship> factionRelationshipA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(a, b));
-        if (factionRelationshipA.isPresent()) {
-            return factionRelationshipA.get().getRelationshipType();
-        }
-        Optional<FactionRelationship> factionRelationshipB = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(b, a));
-        if (factionRelationshipB.isPresent()) {
-            return factionRelationshipB.get().getRelationshipType();
-        }
-        return RelationshipType.TRUCE;
-    }
-
-    public RelationshipType getFactionRelationship(User user, @NotNull Faction faction) {
-        return getFactionRelationship(user.getFaction(), faction);
-    }
-
-    public void setFactionRelationship(Faction a, Faction b, RelationshipType relationshipType) {
-        Optional<FactionRelationship> factionRelationshipA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(a, b));
-        if (factionRelationshipA.isPresent()) {
-            factionRelationshipA.get().setRelationshipType(relationshipType);
-            return;
-        }
-        Optional<FactionRelationship> factionRelationshipB = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().getEntry(new FactionRelationship(b, a));
-        if (factionRelationshipB.isPresent()) {
-            factionRelationshipB.get().setRelationshipType(relationshipType);
-            return;
-        }
-        FactionRelationship factionRelationship = new FactionRelationship(a, b, relationshipType);
-        IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipTableManager().addEntry(factionRelationship);
-    }
-
-    public FactionRank getFactionRank(User user, Faction faction) {
-        switch (getFactionRelationship(user, faction)) {
-            case ALLY:
-                return FactionRank.ALLY;
-            case TRUCE:
-                return FactionRank.TRUCE;
-            case ENEMY:
-                return FactionRank.ENEMY;
-            default:
-                return user.getFactionRank();
+    @Override
+    public synchronized TeamSpawners getTeamSpawners(Faction faction, EntityType entityType) {
+        Optional<TeamSpawners> teamSpawner = IridiumFactions.getInstance().getDatabaseManager().getTeamSpawnerTableManager().getEntry(new TeamSpawners(faction, entityType, 0));
+        if (teamSpawner.isPresent()) {
+            return teamSpawner.get();
+        } else {
+            TeamSpawners spawner = new TeamSpawners(faction, entityType, 0);
+            IridiumFactions.getInstance().getDatabaseManager().getTeamSpawnerTableManager().addEntry(spawner);
+            return spawner;
         }
     }
 
-    public List<FactionRelationshipRequest> getFactionRelationshipRequests(Faction faction) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntries().stream()
-                .filter(relationshipRequest -> relationshipRequest.getFactionID() == faction.getId() || relationshipRequest.getFaction2ID() == faction.getId())
-                .collect(Collectors.toList());
-    }
-
-    public Optional<FactionRelationshipRequest> getFactionRelationshipRequest(Faction faction1, Faction faction2, RelationshipType relationshipType) {
-        Optional<FactionRelationshipRequest> factionRelationshipRequestA = IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntry(new FactionRelationshipRequest(faction1, faction2, relationshipType, new User(UUID.randomUUID(), "")));
-        if (factionRelationshipRequestA.isPresent()) {
-            return factionRelationshipRequestA;
+    @Override
+    public synchronized TeamBlock getTeamBlock(Faction faction, XMaterial xMaterial) {
+        Optional<TeamBlock> teamBlock = IridiumFactions.getInstance().getDatabaseManager().getTeamBlockTableManager().getEntry(new TeamBlock(faction, xMaterial, 0));
+        if (teamBlock.isPresent()) {
+            return teamBlock.get();
+        } else {
+            TeamBlock block = new TeamBlock(faction, xMaterial, 0);
+            IridiumFactions.getInstance().getDatabaseManager().getTeamBlockTableManager().addEntry(block);
+            return block;
         }
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().getEntry(new FactionRelationshipRequest(faction2, faction1, relationshipType, new User(UUID.randomUUID(), "")));
     }
 
-    public FactionRelationShipRequestResponse sendFactionRelationshipRequest(User user, Faction faction, RelationshipType newRelationship) {
-        Faction userFaction = user.getFaction();
-        RelationshipType relationshipType = getFactionRelationship(user, faction);
-        if (relationshipType == newRelationship) return FactionRelationShipRequestResponse.SAME_RELATIONSHIP;
-        if (IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.containsKey(newRelationship)) {
-            int limit = IridiumFactions.getInstance().getConfiguration().factionRelationshipLimits.get(newRelationship);
-            if (getFactionRelationships(faction, newRelationship).size() >= limit && limit > 0) {
-                return FactionRelationShipRequestResponse.THEIR_LIMIT_REACHED;
-            }
-            if (getFactionRelationships(userFaction, newRelationship).size() >= limit && limit > 0) {
-                return FactionRelationShipRequestResponse.YOUR_LIMIT_REACHED;
-            }
+    @Override
+    public synchronized TeamSetting getTeamSetting(Faction faction, String settingKey) {
+        Setting settingConfig = IridiumFactions.getInstance().getSettingsList().get(settingKey);
+        String defaultValue = settingConfig == null ? "" : settingConfig.getDefaultValue();
+        Optional<TeamSetting> teamSetting = IridiumFactions.getInstance().getDatabaseManager().getTeamSettingsTableManager().getEntry(new TeamSetting(faction, settingKey, defaultValue));
+        if (teamSetting.isPresent()) {
+            return teamSetting.get();
+        } else {
+            TeamSetting setting = new TeamSetting(faction, settingKey, defaultValue);
+            IridiumFactions.getInstance().getDatabaseManager().getTeamSettingsTableManager().addEntry(setting);
+            return setting;
         }
-        if (newRelationship.getRank() < relationshipType.getRank()) {
-            setFactionRelationship(userFaction, faction, newRelationship);
-            return FactionRelationShipRequestResponse.SET;
+    }
+
+    @Override
+    public synchronized TeamEnhancement getTeamEnhancement(Faction faction, String enhancementName) {
+        Optional<TeamEnhancement> teamEnhancement = IridiumFactions.getInstance().getDatabaseManager().getEnhancementTableManager().getEntry(new TeamEnhancement(faction, enhancementName, 0));
+        if (teamEnhancement.isPresent()) {
+            return teamEnhancement.get();
+        } else {
+            TeamEnhancement enhancement = new TeamEnhancement(faction, enhancementName, 0);
+            IridiumFactions.getInstance().getDatabaseManager().getEnhancementTableManager().addEntry(enhancement);
+            return enhancement;
         }
-        Optional<FactionRelationshipRequest> factionRelationshipRequest = getFactionRelationshipRequest(userFaction, faction, newRelationship);
-        if (factionRelationshipRequest.isPresent()) {
-            if (user.equals(factionRelationshipRequest.get().getUser().orElse(null))) {
-                return FactionRelationShipRequestResponse.ALREADY_SENT_REQUEST;
-            }
-            factionRelationshipRequest.get().accept(user);
-            return FactionRelationShipRequestResponse.REQUEST_ACCEPTED;
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionRelationshipRequestTableManager().addEntry(new FactionRelationshipRequest(userFaction, faction, newRelationship, user));
-        return FactionRelationShipRequestResponse.REQUEST_SENT;
     }
 
-    /**
-     * Gets the FactionBlocks for a specific island and material.
-     *
-     * @param faction  The specified Faction
-     * @param material The specified Material
-     * @return The IslandBlock
-     */
-    public synchronized FactionBlocks getFactionBlock(@NotNull Faction faction, @NotNull XMaterial material) {
-        FactionBlocks factionBlocks = new FactionBlocks(faction, material);
-        Optional<FactionBlocks> factionBlocksOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().getEntry(factionBlocks);
-        if (factionBlocksOptional.isPresent()) {
-            return factionBlocksOptional.get();
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().addEntry(factionBlocks);
-        return factionBlocks;
-    }
-
-    /**
-     * Gets the FactionSpawners for a specific island and material.
-     *
-     * @param faction     The specified Faction
-     * @param spawnerType The specified spawner type
-     * @return The IslandBlock
-     */
-    public synchronized FactionSpawners getFactionSpawners(@NotNull Faction faction, @NotNull EntityType spawnerType) {
-        FactionSpawners factionSpawners = new FactionSpawners(faction, spawnerType);
-        Optional<FactionSpawners> factionSpawnersOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().getEntry(factionSpawners);
-        if (factionSpawnersOptional.isPresent()) {
-            return factionSpawnersOptional.get();
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().addEntry(factionSpawners);
-        return factionSpawners;
-    }
-
-    public FactionUpgrade getFactionUpgrade(Faction faction, UpgradeType upgradeType) {
-        return getFactionUpgrade(faction, upgradeType.getName());
-    }
-
-    public synchronized FactionUpgrade getFactionUpgrade(Faction faction, String upgrade) {
-        FactionUpgrade factionUpgrade = new FactionUpgrade(faction, upgrade);
-        Optional<FactionUpgrade> factionUpgradeOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().getEntry(factionUpgrade);
-        if (factionUpgradeOptional.isPresent()) {
-            return factionUpgradeOptional.get();
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionUpgradeTableManager().addEntry(factionUpgrade);
-        return factionUpgrade;
-    }
-
-    public FactionBooster getFactionBooster(Faction faction, BoosterType boosterType) {
-        return getFactionBooster(faction, boosterType.getName());
-    }
-
-    public synchronized FactionBooster getFactionBooster(Faction faction, String booster) {
-        FactionBooster factionBooster = new FactionBooster(faction, booster);
-        Optional<FactionBooster> factionBoosterOptional = IridiumFactions.getInstance().getDatabaseManager().getFactionBoosterTableManager().getEntry(factionBooster);
-        if (factionBoosterOptional.isPresent()) {
-            return factionBoosterOptional.get();
-        }
-        IridiumFactions.getInstance().getDatabaseManager().getFactionBoosterTableManager().addEntry(factionBooster);
-        return factionBooster;
-    }
-
-    public int getFactionSpawnerAmount(@NotNull Faction faction, EntityType entityType) {
-        return getFactionSpawners(faction, entityType).getAmount();
-    }
-
-    public int getFactionBlockAmount(@NotNull Faction faction, XMaterial xMaterial) {
-        return getFactionBlock(faction, xMaterial).getAmount();
-    }
-
-    public CompletableFuture<Void> recalculateFactionValue(@NotNull Faction faction) {
+    @Override
+    public CompletableFuture<Void> recalculateTeam(Faction faction) {
+        //TODO
+        Map<XMaterial, Integer> teamBlocks = new HashMap<>();
+        Map<EntityType, Integer> teamSpawners = new HashMap<>();
         return CompletableFuture.runAsync(() -> {
-            IridiumFactions.getInstance().getDatabaseManager().getFactionSpawnersTableManager().getEntries(faction).forEach(factionSpawners -> factionSpawners.setAmount(0));
-            IridiumFactions.getInstance().getDatabaseManager().getFactionBlocksTableManager().getEntries(faction).forEach(factionBlocks -> factionBlocks.setAmount(0));
-            for (Chunk chunk : getFactionChunks(faction).join()) {
-                ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false, false);
-                World world = chunk.getWorld();
-                int maxHeight = world.getMaxHeight() - 1;
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        final int maxy = Math.min(maxHeight, chunkSnapshot.getHighestBlockYAt(x, z));
-                        for (int y = LocationUtils.getMinHeight(world); y <= maxy; y++) {
-                            XMaterial material = XMaterial.matchXMaterial(chunkSnapshot.getBlockType(x, y, z));
-                            if (material.equals(XMaterial.AIR)) continue;
-                            FactionBlocks factionBlocks = getFactionBlock(faction, material);
-                            factionBlocks.setAmount(factionBlocks.getAmount() + 1);
-                        }
-                    }
-                }
-
-                for (BlockState blockState : chunk.getTileEntities()) {
-                    if (!(blockState instanceof CreatureSpawner)) continue;
-                    CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
-                    FactionSpawners factionSpawners = getFactionSpawners(faction, creatureSpawner.getSpawnedType());
-                    factionSpawners.setAmount(factionSpawners.getAmount() + 1);
-                }
-            }
         });
     }
 
-    public CompletableFuture<List<Chunk>> getFactionChunks(@NotNull Faction faction) {
-        return CompletableFuture.supplyAsync(() ->
-                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimTableManager().getEntries(faction).stream()
-                        .map(FactionClaim::getChunk)
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList()));
+    @Override
+    public void createWarp(Faction faction, UUID creator, Location location, String name, String password) {
+        IridiumFactions.getInstance().getDatabaseManager().getTeamWarpTableManager().addEntry(new TeamWarp(faction, creator, location, name, password));
     }
 
-    /**
-     * Gets a list of all Factions sorted by SortType
-     *
-     * @param sortType How we are sorting the Factions
-     * @return The sorted list of all Factions
-     */
-    public List<Faction> getFactions(SortType sortType) {
-        if (sortType == SortType.VALUE) {
-            return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries().stream()
-                    .sorted(Comparator.comparing(Faction::getValue).reversed())
-                    .collect(Collectors.toList());
+    @Override
+    public void deleteWarp(TeamWarp teamWarp) {
+        IridiumFactions.getInstance().getDatabaseManager().getTeamWarpTableManager().delete(teamWarp);
+    }
+
+    @Override
+    public List<TeamWarp> getTeamWarps(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getTeamWarpTableManager().getEntries(faction);
+    }
+
+    @Override
+    public Optional<TeamWarp> getTeamWarp(Faction faction, String name) {
+        return IridiumFactions.getInstance().getDatabaseManager().getTeamWarpTableManager().getEntry(new TeamWarp(faction, UUID.randomUUID(), null, name));
+    }
+
+    @Override
+    public List<TeamMission> getTeamMissions(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().getEntries(faction);
+    }
+
+    @Override
+    public synchronized TeamMission getTeamMission(Faction faction, String missionName) {
+        Mission mission = IridiumFactions.getInstance().getMissions().missions.get(missionName);
+        LocalDateTime localDateTime = IridiumFactions.getInstance().getMissionManager().getExpirationTime(mission == null ? MissionType.ONCE : mission.getMissionType(), LocalDateTime.now());
+
+        TeamMission newTeamMission = new TeamMission(faction, missionName, localDateTime);
+        Optional<TeamMission> teamMission = IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().getEntry(newTeamMission);
+        if (teamMission.isPresent()) {
+            return teamMission.get();
+        } else {
+            //TODO need to consider reworking this, it could generate some lag
+            IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().save(newTeamMission);
+            IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().addEntry(newTeamMission);
+            return newTeamMission;
         }
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
     }
 
-    /**
-     * Gets a list of all Factions
-     *
-     * @return The list of all Factions
-     */
-    public List<Faction> getFactions() {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionTableManager().getEntries();
+    @Override
+    public synchronized TeamMissionData getTeamMissionData(TeamMission teamMission, int missionIndex) {
+        Optional<TeamMissionData> teamMissionData = IridiumFactions.getInstance().getDatabaseManager().getTeamMissionDataTableManager().getEntry(new TeamMissionData(teamMission, missionIndex));
+        if (teamMissionData.isPresent()) {
+            return teamMissionData.get();
+        } else {
+            TeamMissionData missionData = new TeamMissionData(teamMission, missionIndex);
+            IridiumFactions.getInstance().getDatabaseManager().getTeamMissionDataTableManager().addEntry(missionData);
+            return missionData;
+        }
     }
 
-    /**
-     * Represents a way of ordering Islands.
-     */
-    public enum SortType {
-        VALUE
+    @Override
+    public List<TeamMissionData> getTeamMissionData(TeamMission teamMission) {
+        MissionData missionData = IridiumFactions.getInstance().getMissions().missions.get(teamMission.getMissionName()).getMissionData().get(teamMission.getMissionLevel());
+
+        List<TeamMissionData> list = new ArrayList<>();
+        for (int i = 0; i < missionData.getMissions().size(); i++) {
+            list.add(getTeamMissionData(teamMission, i));
+        }
+        return list;
     }
 
-    public List<FactionInvite> getFactionInvites(@NotNull Faction faction) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntries().stream()
-                .filter(factionInvite -> factionInvite.getFactionID() == faction.getId())
-                .collect(Collectors.toList());
+    @Override
+    public void deleteTeamMission(TeamMission teamMission) {
+        IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().delete(teamMission);
     }
 
-    public List<User> getFactionMembers(@NotNull Faction faction) {
-        return IridiumFactions.getInstance().getDatabaseManager().getUserTableManager().getEntries().stream().filter(user -> user.getFactionID() == faction.getId()).collect(Collectors.toList());
+    @Override
+    public List<TeamReward> getTeamRewards(Faction faction) {
+        return IridiumFactions.getInstance().getDatabaseManager().getTeamRewardsTableManager().getEntries(faction);
     }
 
-    public Optional<FactionInvite> getFactionInvite(@NotNull Faction faction, @NotNull User user) {
-        return IridiumFactions.getInstance().getDatabaseManager().getFactionInviteTableManager().getEntry(new FactionInvite(faction, user, user));
+    @Override
+    public void addTeamReward(TeamReward teamReward) {
+        IridiumFactions.getInstance().getDatabaseManager().getTeamRewardsTableManager().addEntry(teamReward);
     }
+
+    @Override
+    public void deleteTeamReward(TeamReward teamReward) {
+        IridiumFactions.getInstance().getDatabaseManager().getTeamRewardsTableManager().delete(teamReward);
+    }
+
+    public ItemStack getFactionCrystal(int amount) {
+        ItemStack itemStack = ItemStackUtils.makeItem(IridiumFactions.getInstance().getConfiguration().factionCrystal, Collections.singletonList(
+                new Placeholder("amount", String.valueOf(amount))
+        ));
+        NBTItem nbtItem = new NBTItem(itemStack);
+        NBTCompound nbtCompound = nbtItem.getOrCreateCompound("com/iridium/iridiumfactions");
+        nbtCompound.setInteger("factionCrystals", amount);
+        return nbtItem.getItem();
+    }
+
+    public int getFactionCrystals(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() == Material.AIR) return 0;
+        NBTCompound nbtCompound = new NBTItem(itemStack).getOrCreateCompound("com/iridium/iridiumfactions");
+        if (nbtCompound.hasKey("factionCrystals")) {
+            return nbtCompound.getInteger("factionCrystals");
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean teleport(Player player, Location location, Faction team) {
+        Location safeLocation = LocationUtils.getSafeLocation(location, team);
+        if (safeLocation == null) {
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noSafeLocation
+                    .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+            ));
+            return false;
+        }
+        player.setFallDistance(0.0F);
+        PaperLib.teleportAsync(player, safeLocation);
+        return true;
+    }
+
 }

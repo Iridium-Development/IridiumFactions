@@ -1,70 +1,48 @@
 package com.iridium.iridiumfactions.managers.tablemanagers;
 
-import com.iridium.iridiumcore.utils.SortedList;
-import com.iridium.iridiumfactions.IridiumFactions;
+import com.iridium.iridiumfactions.managers.DatabaseKey;
+import com.iridium.iridiumteams.database.DatabaseObject;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
-import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-/**
- * Used for handling Crud operations on a table + handling cache
- *
- * @param <T> The Table Class
- * @param <S> The Table Primary Id Class
- */
-public class TableManager<T, S> {
-    private final SortedList<T> entries;
-    private Dao<T, S> dao;
-    private final Class<T> clazz;
-    @Getter
-    private boolean saved;
+public class TableManager<Key, Value extends DatabaseObject, ID> {
+    private final ConcurrentHashMap<Key, Value> entries = new ConcurrentHashMap<>();
+    private final Dao<Value, ID> dao;
+    private final DatabaseKey<Key, Value> databaseKey;
 
     private final ConnectionSource connectionSource;
 
-    public TableManager(ConnectionSource connectionSource, Class<T> clazz, Comparator<T> comparator) throws SQLException {
+    public TableManager(DatabaseKey<Key, Value> databaseKey, ConnectionSource connectionSource, Class<Value> clazz) throws SQLException {
         this.connectionSource = connectionSource;
-        this.entries = new SortedList<>(comparator);
-        if (!IridiumFactions.getInstance().isTesting()) {
-            TableUtils.createTableIfNotExists(connectionSource, clazz);
-            this.dao = DaoManager.createDao(connectionSource, clazz);
-            this.dao.setAutoCommit(getDatabaseConnection(), false);
-            this.entries.addAll(dao.queryForAll());
-        }
-        this.clazz = clazz;
+        this.databaseKey = databaseKey;
+        this.dao = DaoManager.createDao(connectionSource, clazz);
+        this.dao.setAutoCommit(getDatabaseConnection(), false);
+
+        TableUtils.createTableIfNotExists(connectionSource, clazz);
+        dao.queryForAll().forEach(this::addEntry);
+        getEntries().forEach(value -> value.setChanged(false));
     }
 
-    /**
-     * A TableManager used for UnitTesting
-     *
-     * @param clazz      The class
-     * @param comparator The comparator
-     */
-    public TableManager(Class<T> clazz, Comparator<T> comparator) {
-        this.connectionSource = null;
-        this.entries = new SortedList<>(comparator);
-        this.clazz = clazz;
-    }
-
-    /**
-     * Saves everything to the Database
-     */
     public void save() {
-        saved = true;
-        if (IridiumFactions.getInstance().isTesting()) return;
         try {
-            List<T> entryList = new ArrayList<>(entries);
-            for (T t : entryList) {
+            List<Value> entryList = new ArrayList<>(entries.values());
+            for (Value t : entryList) {
+                if (!t.isChanged()) continue;
                 dao.createOrUpdate(t);
+                t.setChanged(false);
             }
             dao.commit(getDatabaseConnection());
         } catch (SQLException throwables) {
@@ -72,35 +50,46 @@ public class TableManager<T, S> {
         }
     }
 
-    /**
-     * Adds an entry to list
-     *
-     * @param t the item we are adding
-     */
-    public void addEntry(T t) {
-        entries.add(t);
+    public void save(Value value) {
+        try {
+            if (!value.isChanged()) return;
+            dao.createOrUpdate(value);
+            dao.commit(getDatabaseConnection());
+            value.setChanged(false);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
-    /**
-     * Gets all T's from cache
-     *
-     * @return The list of all T's
-     */
-    public List<T> getEntries() {
-        return entries;
+    public void addEntry(Value value) {
+        entries.put(databaseKey.getKey(value), value);
     }
 
-    /**
-     * Delete T from the database
-     *
-     * @param t the variable we are deleting
-     */
-    public CompletableFuture<Void> delete(T t) {
-        entries.remove(t);
+    public List<Value> getEntries(Function<? super Value, Boolean> searchFunction) {
+        return entries.values().stream().filter(searchFunction::apply).collect(Collectors.toList());
+    }
+
+    public List<Value> getEntries() {
+        return new ArrayList<>(entries.values());
+    }
+
+    public Optional<Value> getEntry(Key key) {
+        return Optional.ofNullable(entries.get(key));
+    }
+
+    public Optional<Value> getEntry(Value value) {
+        return getEntry(databaseKey.getKey(value));
+    }
+
+    public Optional<Value> getEntry(Function<? super Value, Boolean> searchFunction) {
+        return entries.values().stream().filter(searchFunction::apply).findFirst();
+    }
+
+    public CompletableFuture<Void> delete(Value value) {
+        entries.remove(databaseKey.getKey(value));
         return CompletableFuture.runAsync(() -> {
-            if (IridiumFactions.getInstance().isTesting()) return;
             try {
-                dao.delete(t);
+                dao.delete(value);
                 dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -108,17 +97,11 @@ public class TableManager<T, S> {
         });
     }
 
-    /**
-     * Delete all t's in the database
-     *
-     * @param t The collection of variables we are deleting
-     */
-    public CompletableFuture<Void> delete(Collection<T> t) {
-        entries.removeAll(t);
+    public CompletableFuture<Void> delete(Collection<Value> values) {
+        values.forEach(value -> entries.remove(databaseKey.getKey(value)));
         return CompletableFuture.runAsync(() -> {
-            if (IridiumFactions.getInstance().isTesting()) return;
             try {
-                dao.delete(t);
+                dao.delete(values);
                 dao.commit(getDatabaseConnection());
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -126,35 +109,7 @@ public class TableManager<T, S> {
         });
     }
 
-    /**
-     * Returns a connection from the connection source.
-     *
-     * @return The connection to the database for operations
-     * @throws SQLException If there is an error with the exception
-     */
     private DatabaseConnection getDatabaseConnection() throws SQLException {
         return connectionSource.getReadWriteConnection(null);
-    }
-
-    /**
-     * Clear all entries in the database & cache
-     */
-    public void clear() {
-        try {
-            TableUtils.clearTable(connectionSource, clazz);
-            dao.commit(getDatabaseConnection());
-            entries.clear();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-    /**
-     * Returns the Dao for this class
-     *
-     * @return The dao
-     */
-    public Dao<T, S> getDao() {
-        return dao;
     }
 }

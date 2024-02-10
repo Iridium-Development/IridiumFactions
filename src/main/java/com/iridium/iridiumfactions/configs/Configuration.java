@@ -1,98 +1,48 @@
 package com.iridium.iridiumfactions.configs;
 
 import com.google.common.collect.ImmutableMap;
-import com.iridium.iridiumcore.utils.NumberFormatter;
-import com.iridium.iridiumfactions.FactionConfiguration;
-import com.iridium.iridiumfactions.FactionRank;
-import com.iridium.iridiumfactions.RelationshipType;
+import com.iridium.iridiumcore.Item;
+import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
+import com.iridium.iridiumcore.dependencies.xseries.XSound;
+import com.iridium.iridiumteams.Reward;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 
-public class Configuration {
-    public String prefix = "&c&lIridiumFactions &8»";
-    public String dateTimeFormat = "EEEE, MMMM dd HH:mm:ss";
+public class Configuration extends com.iridium.iridiumteams.configs.Configuration {
+    public Configuration() {
+        super("&c", "Faction", "IridiumFactions");
+        this.createRequiresName = true;
 
-    public boolean factionMenu = true;
-    public int mapWidth = 52;
-    public int mapHeight = 10;
-    public int factionRecalculateInterval = 5;
-    public int minFactionNameLength = 3;
-    public int maxFactionNameLength = 20;
-    public double maxPower = 10;
-    public double minPower = -10;
-    public double startingPower = 0;
-    public int powerLossPerDeath = 3;
-    public int powerRecoveryDelayInSeconds = 600;
-    public double powerRecoveryAmount = 1;
+        this.levelRewards = ImmutableMap.<Integer, Reward>builder()
+                .put(1, new Reward(new Item(XMaterial.EXPERIENCE_BOTTLE, 1, "&c&lLevel %faction_level% Reward", Arrays.asList(
+                        "&7Faction Level %faction_level% Rewards:",
+                        "&c&l* &c1000 Money",
+                        "&c&l* &c5 Faction Crystals",
+                        "",
+                        "&c&l[!] &cLeft click to redeem"
+                )), Collections.emptyList(), 0, new ImmutableMap.Builder<String, Double>().put("Crystals", 5.00).build(), 200, 0, XSound.ENTITY_PLAYER_LEVELUP))
 
-    public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
-    public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
-    public String mapTitleFiller = "&8&m ";
-    public String factionChestTitle = "&7%faction_name%'s Faction Chest";
+                .put(5, new Reward(new Item(XMaterial.EXPERIENCE_BOTTLE, 1, "&c&lLevel %faction_level% Reward", Arrays.asList(
+                        "&7Faction Level %faction_level% Rewards:",
+                        "&c&l* &c10000 Money",
+                        "&c&l* &c10 Faction Crystals",
+                        "",
+                        "&c&l[!] &cLeft click to redeem"
+                )), Collections.emptyList(), 0, new ImmutableMap.Builder<String, Double>().put("Crystals", 10.00).build(), 2000, 0, XSound.ENTITY_PLAYER_LEVELUP))
+                .build();
+    }
 
-    public FactionConfiguration playerFaction = new FactionConfiguration("Default Faction Description");
-    public FactionConfiguration wildernessFaction = new FactionConfiguration("Wilderness", "");
-    public FactionConfiguration warzoneFaction = new FactionConfiguration("Warzone", "");
-    public FactionConfiguration safezoneFaction = new FactionConfiguration("Safezone", "");
+    public String factionCreateTitle = "&c&lFaction Created";
+    public String factionCreateSubTitle = "&7IridiumFactions by Peaches_MLG";
+    public String defaultDescription = "Default faction description :c";
+    public String factionTitleTop = "&c%faction_name%";
+    public String factionTitleBottom = "&7%faction_description%";
 
-    public NumberFormatter numberFormatter = new NumberFormatter();
+    public Item factionCrystal = new Item(XMaterial.NETHER_STAR, 1, "&c*** &c&lFaction Crystal &c***", Arrays.asList(
+            "",
+            "&c%amount% Faction Crystals",
+            "&c&l[!] &cRight-Click to Redeem"
+    ));
 
-    public List<Integer> factionWarpSlots = Arrays.asList(9, 11, 13, 15, 17);
-
-    public Map<FactionRank, String> factionRankNames = new HashMap<>(ImmutableMap.<FactionRank, String>builder()
-            .put(FactionRank.OWNER, "Owner")
-            .put(FactionRank.CO_OWNER, "CoOwner")
-            .put(FactionRank.MODERATOR, "Moderator")
-            .put(FactionRank.MEMBER, "Member")
-            .put(FactionRank.TRUCE, "Truce")
-            .put(FactionRank.ALLY, "Ally")
-            .put(FactionRank.ENEMY, "Enemy")
-            .build());
-    public Map<RelationshipType, String> factionRelationshipColors = new HashMap<>(ImmutableMap.<RelationshipType, String>builder()
-            .put(RelationshipType.OWN, "&a")
-            .put(RelationshipType.ALLY, "&d")
-            .put(RelationshipType.TRUCE, "&7")
-            .put(RelationshipType.ENEMY, "&c")
-            .put(RelationshipType.WILDERNESS, "&2")
-            .put(RelationshipType.WARZONE, "&c")
-            .put(RelationshipType.SAFEZONE, "&e")
-            .build());
-    public Map<RelationshipType, Integer> factionRelationshipLimits = new HashMap<>(ImmutableMap.<RelationshipType, Integer>builder()
-            .put(RelationshipType.ALLY, 1)
-            .build());
-
-    public String factionInfoTitle = "&8[ %faction% &8]";
-    public String factionInfoTitleFiller = "&8&m ";
-    public List<String> factionInfo = Arrays.asList(
-            "&cDescription: &7%faction_description%",
-            "&cLand / Remaining Power / Total Power: &7%faction_land% / %faction_remaining_power% / %faction_total_power%",
-            "&cRank: &7#%faction_rank%",
-            "&cValue: &7%faction_value%",
-            "&cOnline Members(%faction_members_online_count%/%faction_members_count%): &7%faction_members_online%",
-            "&cOffline Members(%faction_members_offline_count%/%faction_members_count%): &7%faction_members_offline%"
-    );
-
-    public Map<Integer, Integer> factionTopSlots = ImmutableMap.<Integer, Integer>builder()
-            .put(1, 4)
-            .put(2, 12)
-            .put(3, 14)
-            .put(4, 19)
-            .put(5, 20)
-            .put(6, 21)
-            .put(7, 22)
-            .put(8, 23)
-            .put(9, 24)
-            .put(10, 25)
-            .build();
-
-    public Map<Integer, Integer> factionStrikesValueReductionPercent = ImmutableMap.<Integer, Integer>builder()
-            .put(1, 20)
-            .put(2, 40)
-            .put(3, 60)
-            .put(4, 80)
-            .put(5, 100)
-            .build();
 }

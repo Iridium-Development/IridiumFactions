@@ -2,13 +2,13 @@ package com.iridium.iridiumfactions.managers;
 
 import com.iridium.iridiumfactions.IridiumFactions;
 import com.iridium.iridiumfactions.configs.SQL;
-import com.iridium.iridiumfactions.database.*;
-import com.iridium.iridiumfactions.database.types.InventoryType;
-import com.iridium.iridiumfactions.database.types.LocationType;
-import com.iridium.iridiumfactions.database.types.XMaterialType;
+import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.managers.tablemanagers.FactionTableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.ForeignFactionTableManager;
+import com.iridium.iridiumfactions.managers.tablemanagers.TableManager;
 import com.iridium.iridiumfactions.managers.tablemanagers.UserTableManager;
+import com.iridium.iridiumteams.database.*;
+import com.iridium.iridiumteams.database.types.*;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.jdbc.db.DatabaseTypeUtils;
@@ -21,12 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Class which handles the database connection and acts as a DAO.
- */
 @Getter
 public class DatabaseManager {
 
@@ -35,21 +31,18 @@ public class DatabaseManager {
 
     private UserTableManager userTableManager;
     private FactionTableManager factionTableManager;
-    private ForeignFactionTableManager<FactionInvite, Integer> factionInviteTableManager;
-    private ForeignFactionTableManager<FactionClaim, Integer> factionClaimTableManager;
-    private ForeignFactionTableManager<FactionPermission, Integer> factionPermissionTableManager;
-    private ForeignFactionTableManager<FactionRelationship, Integer> factionRelationshipTableManager;
-    private ForeignFactionTableManager<FactionRelationshipRequest, Integer> factionRelationshipRequestTableManager;
-    private ForeignFactionTableManager<FactionBlocks, Integer> factionBlocksTableManager;
-    private ForeignFactionTableManager<FactionSpawners, Integer> factionSpawnersTableManager;
-    private ForeignFactionTableManager<FactionWarp, Integer> factionWarpTableManager;
-    private ForeignFactionTableManager<FactionUpgrade, Integer> factionUpgradeTableManager;
-    private ForeignFactionTableManager<FactionChest, Integer> factionChestTableManager;
-    private ForeignFactionTableManager<FactionAccess, Integer> factionAccessTableManager;
-    private ForeignFactionTableManager<FactionBank, Integer> factionBankTableManager;
-    private ForeignFactionTableManager<FactionBooster, Integer> factionBoosterTableManager;
-    private ForeignFactionTableManager<FactionStrike, Integer> factionStrikeTableManager;
-
+    private TableManager<String, TeamMissionData, Integer> teamMissionDataTableManager;
+    private ForeignFactionTableManager<String, TeamInvite> invitesTableManager;
+    private ForeignFactionTableManager<String, TeamTrust> trustTableManager;
+    private ForeignFactionTableManager<String, TeamPermission> permissionsTableManager;
+    private ForeignFactionTableManager<String, TeamBank> bankTableManager;
+    private ForeignFactionTableManager<String, TeamEnhancement> enhancementTableManager;
+    private ForeignFactionTableManager<String, TeamBlock> teamBlockTableManager;
+    private ForeignFactionTableManager<String, TeamSpawners> teamSpawnerTableManager;
+    private ForeignFactionTableManager<String, TeamWarp> teamWarpTableManager;
+    private ForeignFactionTableManager<String, TeamMission> teamMissionTableManager;
+    private ForeignFactionTableManager<String, TeamReward> teamRewardsTableManager;
+    private ForeignFactionTableManager<String, TeamSetting> teamSettingsTableManager;
 
     public void init() throws SQLException {
         LoggerFactory.setLogBackendFactory(new NullLogBackend.NullLogBackendFactory());
@@ -60,33 +53,30 @@ public class DatabaseManager {
         DataPersisterManager.registerDataPersisters(XMaterialType.getSingleton());
         DataPersisterManager.registerDataPersisters(LocationType.getSingleton());
         DataPersisterManager.registerDataPersisters(InventoryType.getSingleton());
+        DataPersisterManager.registerDataPersisters(LocalDateTimeType.getSingleton());
+        DataPersisterManager.registerDataPersisters(RewardType.getSingleton(IridiumFactions.getInstance()));
 
-        if (!IridiumFactions.getInstance().isTesting()) {
-
-            this.connectionSource = new JdbcConnectionSource(
-                    databaseURL,
-                    sqlConfig.username,
-                    sqlConfig.password,
-                    DatabaseTypeUtils.createDatabaseType(databaseURL)
-            );
-        }
+        this.connectionSource = new JdbcConnectionSource(
+                databaseURL,
+                sqlConfig.username,
+                sqlConfig.password,
+                DatabaseTypeUtils.createDatabaseType(databaseURL)
+        );
 
         this.userTableManager = new UserTableManager(connectionSource);
         this.factionTableManager = new FactionTableManager(connectionSource);
-        this.factionRelationshipTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationship.class, Comparator.comparing(FactionRelationship::getFactionID).thenComparing(FactionRelationship::getFaction2ID));
-        this.factionInviteTableManager = new ForeignFactionTableManager<>(connectionSource, FactionInvite.class, Comparator.comparing(FactionInvite::getFactionID).thenComparing(FactionInvite::getUser));
-        this.factionClaimTableManager = new ForeignFactionTableManager<>(connectionSource, FactionClaim.class, Comparator.comparing(FactionClaim::getWorld).thenComparing(FactionClaim::getX).thenComparing(FactionClaim::getZ));
-        this.factionPermissionTableManager = new ForeignFactionTableManager<>(connectionSource, FactionPermission.class, Comparator.comparing(FactionPermission::getFactionID).thenComparing(FactionPermission::getRank).thenComparing(FactionPermission::getPermission));
-        this.factionRelationshipRequestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionRelationshipRequest.class, Comparator.comparing(FactionRelationshipRequest::getFactionID).thenComparing(FactionRelationshipRequest::getFaction2ID).thenComparing(FactionRelationshipRequest::getRelationshipType));
-        this.factionBlocksTableManager = new ForeignFactionTableManager<>(connectionSource, FactionBlocks.class, Comparator.comparing(FactionBlocks::getFactionID).thenComparing(FactionBlocks::getMaterial));
-        this.factionSpawnersTableManager = new ForeignFactionTableManager<>(connectionSource, FactionSpawners.class, Comparator.comparing(FactionSpawners::getFactionID).thenComparing(FactionSpawners::getSpawnerType));
-        this.factionWarpTableManager = new ForeignFactionTableManager<>(connectionSource, FactionWarp.class, Comparator.comparing(FactionWarp::getFactionID).thenComparing(FactionWarp::getName));
-        this.factionUpgradeTableManager = new ForeignFactionTableManager<>(connectionSource, FactionUpgrade.class, Comparator.comparing(FactionUpgrade::getFactionID).thenComparing(FactionUpgrade::getUpgrade));
-        this.factionChestTableManager = new ForeignFactionTableManager<>(connectionSource, FactionChest.class, Comparator.comparing(FactionChest::getFactionID).thenComparing(FactionChest::getPage));
-        this.factionAccessTableManager = new ForeignFactionTableManager<>(connectionSource, FactionAccess.class, Comparator.comparing(FactionAccess::getFactionID).thenComparing(FactionAccess::getClaimID).thenComparing(FactionAccess::getFactionRank));
-        this.factionBankTableManager = new ForeignFactionTableManager<>(connectionSource, FactionBank.class, Comparator.comparing(FactionBank::getFactionID).thenComparing(FactionBank::getBankItem));
-        this.factionBoosterTableManager = new ForeignFactionTableManager<>(connectionSource, FactionBooster.class, Comparator.comparing(FactionBooster::getFactionID).thenComparing(FactionBooster::getBooster));
-        this.factionStrikeTableManager = new ForeignFactionTableManager<>(connectionSource, FactionStrike.class, Comparator.comparing(FactionStrike::getFactionID));
+        this.teamMissionDataTableManager = new TableManager<>(teamMissionData -> teamMissionData.getMissionID()+"-"+teamMissionData.getMissionIndex() ,connectionSource, TeamMissionData.class);
+        this.invitesTableManager = new ForeignFactionTableManager<>(teamInvite -> teamInvite.getTeamID()+"-"+teamInvite.getUser().toString(), connectionSource, TeamInvite.class);
+        this.trustTableManager = new ForeignFactionTableManager<>(teamTrust -> teamTrust.getTeamID()+"-"+teamTrust.getUser().toString(), connectionSource, TeamTrust.class);
+        this.permissionsTableManager = new ForeignFactionTableManager<>(teamPermission -> teamPermission.getTeamID()+"-"+teamPermission.getPermission()+"-"+teamPermission.getRank(), connectionSource, TeamPermission.class);
+        this.bankTableManager = new ForeignFactionTableManager<>(teamBank -> teamBank.getTeamID()+"-"+teamBank.getBankItem(), connectionSource, TeamBank.class);
+        this.enhancementTableManager = new ForeignFactionTableManager<>(teamEnhancement -> teamEnhancement.getTeamID()+"-"+teamEnhancement.getEnhancementName(), connectionSource, TeamEnhancement.class);
+        this.teamBlockTableManager = new ForeignFactionTableManager<>(teamBlock -> teamBlock.getTeamID()+"-"+teamBlock.getXMaterial().name(), connectionSource, TeamBlock.class);
+        this.teamSpawnerTableManager = new ForeignFactionTableManager<>(teamSpawner -> teamSpawner.getTeamID()+"-"+teamSpawner.getEntityType().name(), connectionSource, TeamSpawners.class);
+        this.teamWarpTableManager = new ForeignFactionTableManager<>(teamWarp -> teamWarp.getTeamID()+"-"+teamWarp.getName(), connectionSource, TeamWarp.class);
+        this.teamMissionTableManager = new ForeignFactionTableManager<>(teamMission -> teamMission.getTeamID()+"-"+teamMission.getMissionName(), connectionSource, TeamMission.class);
+        this.teamRewardsTableManager = new ForeignFactionTableManager<>(teamRewards -> String.valueOf(teamRewards.getId()), connectionSource, TeamReward.class);
+        this.teamSettingsTableManager = new ForeignFactionTableManager<>(teamSetting -> teamSetting.getTeamID()+"-"+teamSetting.getSetting(), connectionSource, TeamSetting.class);
     }
 
     /**
@@ -107,11 +97,10 @@ public class DatabaseManager {
 
     public CompletableFuture<Void> registerFaction(Faction faction) {
         return CompletableFuture.runAsync(() -> {
+            // Saving the object will also assign the Factions's ID
+            factionTableManager.save(faction);
+
             factionTableManager.addEntry(faction);
-            // Saving the object will also assign the Faction's ID
-            factionTableManager.save();
-            // Since the FactionID was null before we need to resort
-            factionTableManager.sort();
         });
     }
 
