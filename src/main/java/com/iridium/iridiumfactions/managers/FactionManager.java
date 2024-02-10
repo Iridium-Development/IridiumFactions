@@ -563,6 +563,72 @@ public class FactionManager extends TeamManager<Faction, User> {
         });
     }
 
+    public CompletableFuture<Void> unclaimFactionLand(Faction faction, Chunk chunk, Player player) {
+        return unclaimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
+    }
+
+    public CompletableFuture<Void> unclaimFactionLand(Faction faction, World world, int x, int z, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+            if (!getTeamPermission(faction, user, PermissionType.CLAIM) && !user.isBypassing()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnclaimLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
+            Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
+            if (!factionClaim.isPresent()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaimed
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%faction%", factionClaim.get().getFaction().getName())
+                ));
+                return;
+            }
+            getTeamMembers(faction).forEach(user1 -> {
+                Player p = user1.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", user.getName())
+                            .replace("%faction%", faction.getName())
+                            .replace("%x%", String.valueOf(x))
+                            .replace("%z%", String.valueOf(z))
+                    ));
+                }
+            });
+            if (user.getTeamID() != faction.getId()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", user.getName())
+                        .replace("%faction%", faction.getName())
+                        .replace("%x%", String.valueOf(x))
+                        .replace("%z%", String.valueOf(z))
+                ));
+            }
+            if (factionClaim.isPresent()) {
+                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().delete(factionClaim.get());
+            }
+        });
+    }
+
+    public CompletableFuture<Void> unclaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+            if (!getTeamPermission(faction, user, PermissionType.CLAIM)) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnclaimLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
+            World world = centerChunk.getWorld();
+            for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
+                for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
+                    unclaimFactionLand(faction, world, x, z, player).join();
+                }
+            }
+        });
+    }
+
     public RelationshipType getFactionRelationship(@NotNull Faction a, @NotNull Faction b) {
         if (b.getFactionType() == FactionType.WILDERNESS) {
             return RelationshipType.WILDERNESS;

@@ -18,6 +18,7 @@ public class CommandManager extends com.iridium.iridiumteams.managers.CommandMan
     public void registerCommands() {
         super.registerCommands();
         registerCommand(IridiumFactions.getInstance().getCommands().claimCommand);
+        registerCommand(IridiumFactions.getInstance().getCommands().unclaimCommand);
         registerCommand(IridiumFactions.getInstance().getCommands().mapCommand);
     }
 
