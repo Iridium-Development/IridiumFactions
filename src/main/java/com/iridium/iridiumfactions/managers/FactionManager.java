@@ -175,6 +175,7 @@ public class FactionManager extends TeamManager<Faction, User> {
 
     @Override
     public synchronized boolean getTeamPermission(Faction faction, int rank, String permission) {
+        if(faction.getFactionType() == FactionType.WILDERNESS) return true;
         if (rank == Rank.OWNER.getId()) return true;
         return IridiumFactions.getInstance().getDatabaseManager().getPermissionsTableManager().getEntry(new TeamPermission(faction, permission, rank, true))
                 .map(TeamPermission::isAllowed)
