@@ -3,7 +3,7 @@
 
 ## Introduction
 
-IridiumFactions is a Factions plugin designed from the ground up for speed, performance, and excellence. It features an advanced missions system, a shop, island upgrades and boosters, teamwork and cooperation features, and so much more.
+IridiumFactions is a Factions plugin designed from the ground up for speed, performance, and excellence. It features an advanced missions system, a shop, faction upgrades and boosters, teamwork and cooperation features, and so much more.
 
 This plugin, as with all of Iridium Development's software, aims to deliver a premium image, streamlining the setup process and eliminating the headache of having to figure out the details, while also proving to be extremely configurable to create an unparalleled experience. 
 
