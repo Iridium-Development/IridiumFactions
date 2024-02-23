@@ -15,7 +15,6 @@ import com.iridium.iridiumfactions.api.FactionDeleteEvent;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.FactionClaim;
 import com.iridium.iridiumfactions.database.User;
-import com.iridium.iridiumfactions.utils.LocationUtils;
 import com.iridium.iridiumteams.PermissionType;
 import com.iridium.iridiumteams.Rank;
 import com.iridium.iridiumteams.Setting;
@@ -469,15 +468,13 @@ public class FactionManager extends TeamManager<Faction, User> {
 
     @Override
     public boolean teleport(Player player, Location location, Faction team) {
-        Location safeLocation = LocationUtils.getSafeLocation(location, team);
-        if (safeLocation == null) {
-            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().noSafeLocation
+        if(getFactionViaLocation(location).getId() != team.getId()){
+            player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().teleportNotInFactionLand
                     .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
             ));
-            return false;
         }
         player.setFallDistance(0.0F);
-        PaperLib.teleportAsync(player, safeLocation);
+        PaperLib.teleportAsync(player, location);
         return true;
     }
 

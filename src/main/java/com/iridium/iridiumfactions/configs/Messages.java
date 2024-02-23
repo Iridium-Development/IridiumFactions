@@ -16,8 +16,7 @@ public class Messages extends com.iridium.iridiumteams.configs.Messages {
     public String factionLandNotClaimed = "%prefix% &7This land has not been claimed.";
     public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed land at (%x%,%z%).";
     public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
-    public String factionDescriptionChanged = "%prefix% &7%player% has changed your faction description to %description%.";
-    public String factionNameChanged = "%prefix% &7%player% has changed your faction name to %name%.";
     public String notEnoughPowerToClaim = "%prefix% &7You do not have enough power to claim this land.";
     public String cannotClaimLand = "%prefix% &7You cannot claim land in this Faction.";
+    public String teleportNotInFactionLand = "%prefix% &7That teleport is not in your faction land.";
 }
