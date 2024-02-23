@@ -6,9 +6,7 @@ import com.iridium.iridiumcore.Item;
 import com.iridium.iridiumcore.dependencies.fasterxml.annotation.JsonIgnore;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumteams.configs.inventories.InventoryConfig;
-import com.iridium.iridiumteams.configs.inventories.SingleItemGUI;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Inventories extends com.iridium.iridiumteams.configs.Inventories {
@@ -29,25 +27,18 @@ public class Inventories extends com.iridium.iridiumteams.configs.Inventories {
             .build());
 
     public InventoryConfig factionMenu = new InventoryConfig(45, "&7Faction Menu", background1, ImmutableMap.<String, Item>builder()
-            .put("f regen", new Item(XMaterial.GRASS_BLOCK, 12, 1, "&c&lFaction Regen", Collections.singletonList("&7Regenerate your faction")))
             .put("f boosters", new Item(XMaterial.EXPERIENCE_BOTTLE, 23, 1, "&c&lFaction Boosters", Collections.singletonList("&7View your faction boosters")))
             .put("f home", new Item(XMaterial.WHITE_BED, 13, 1, "&c&lFaction Home", Collections.singletonList("&7Teleport to your faction home")))
             .put("f members", new Item(XMaterial.PLAYER_HEAD, 14, 1, "&c&lFaction Members", "Peaches_MLG", Collections.singletonList("&7View your faction members")))
             .put("f warps", new Item(XMaterial.END_PORTAL_FRAME, 20, 1, "&c&lFaction Warps", Collections.singletonList("&7View your faction warps")))
             .put("f upgrades", new Item(XMaterial.DIAMOND, 21, 1, "&c&lFaction Upgrades", Collections.singletonList("&7View your faction upgrades")))
             .put("f missions", new Item(XMaterial.IRON_SWORD, 22, 1, "&c&lFaction Missions", Collections.singletonList("&7View your faction missions")))
-            .put("f border", new Item(XMaterial.BEACON, 24, 1, "&c&lFaction Border", Collections.singletonList("&7Change your faction border")))
             .put("f bank", new Item(XMaterial.PLAYER_HEAD, 30, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODM4MWM1MjlkNTJlMDNjZDc0YzNiZjM4YmI2YmEzZmRlMTMzN2FlOWJmNTAzMzJmYWE4ODllMGEyOGU4MDgxZiJ9fX0", 1, "&c&lFaction Bank", Collections.singletonList("&7View your faction bank")))
             .put("f permissions", new Item(XMaterial.WRITABLE_BOOK, 31, 1, "&c&lFaction Permissions", Collections.singletonList("&7View your faction permissions")))
             .put("f invites", new Item(XMaterial.NAME_TAG, 32, 1, "&c&lFaction Invites", Collections.singletonList("&7View your faction invites")))
             .put("f delete", new Item(XMaterial.BARRIER, 44, 1, "&c&lDelete Faction", Collections.singletonList("&7Delete your faction")))
             .build()
     );
-
-    public SingleItemGUI visitGUI = new SingleItemGUI(54, "&7Visit a Faction", background1, new Item(XMaterial.PLAYER_HEAD, 1, "&c&l%faction_name%", "%faction_owner%", Arrays.asList(
-            "&cCreated: &7%faction_create%",
-            "&cOwner: &7%faction_owner%"
-    )));
 
     public Inventories() {
         super("Faction", "&c");
