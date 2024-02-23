@@ -626,6 +626,39 @@ public class FactionManager extends TeamManager<Faction, User> {
         });
     }
 
+    public CompletableFuture<Void> unClaimAllFactionLand(Faction faction, Player player) {
+        return CompletableFuture.runAsync(() -> {
+            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
+
+            if (!getTeamPermission(faction, user, PermissionType.CLAIM) && !user.isBypassing()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnclaimLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
+            List<FactionClaim> claims = IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().getEntries(factionClaim -> factionClaim.getTeamID() == faction.getId());
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().delete(claims);
+
+            getTeamMembers(faction).forEach(user1 -> {
+                Player p = user1.getPlayer();
+                if (p != null) {
+                    p.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
+                            .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                            .replace("%player%", user.getName())
+                            .replace("%faction%", faction.getName())
+                    ));
+                }
+            });
+            if (user.getTeamID() != faction.getId()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionUnClaimedAllLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                        .replace("%player%", user.getName())
+                        .replace("%faction%", faction.getName())
+                ));
+            }
+        });
+    }
+
     public RelationshipType getFactionRelationship(@NotNull Faction a, @NotNull Faction b) {
         if (b.getFactionType() == FactionType.WILDERNESS) {
             return RelationshipType.WILDERNESS;
@@ -656,5 +689,4 @@ public class FactionManager extends TeamManager<Faction, User> {
     public RelationshipType getFactionRelationship(User user, @NotNull Faction faction) {
         return getFactionRelationship(user.getFaction(), faction);
     }
-
 }

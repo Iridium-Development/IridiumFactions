@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 
-public class UnclaimCommand extends Command<Faction, User> {
+public class UnClaimCommand extends Command<Faction, User> {
 
-    public UnclaimCommand() {
+    public UnClaimCommand() {
         super(Collections.singletonList("unclaim"), "Unclaim land for your faction", "%prefix% &7/f unclaim (size)", "", 0);
     }
 
