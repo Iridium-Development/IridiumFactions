@@ -13,7 +13,7 @@ public class Messages extends com.iridium.iridiumteams.configs.Messages {
     public String factionClaimedLand = "%prefix% &7%player% has claimed land at (%x%,%z%).";
     public String landAlreadyClaimed = "%prefix% &7This land has already been claimed by %faction%.";
     public String cannotUnclaimLand = "%prefix% &7You do not have permission to unclaim land.";
-    public String factionLandNotClaimed = "%prefix% &7This land has not been claimed by %faction%.";
+    public String factionLandNotClaimed = "%prefix% &7This land has not been claimed.";
     public String factionUnClaimedLand = "%prefix% &7%player% has un-claimed land at (%x%,%z%).";
     public String factionUnClaimedAllLand = "%prefix% &7%player% has un-claimed all land for %faction%.";
     public String factionDescriptionChanged = "%prefix% &7%player% has changed your faction description to %description%.";

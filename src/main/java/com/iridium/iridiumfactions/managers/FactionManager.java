@@ -175,7 +175,7 @@ public class FactionManager extends TeamManager<Faction, User> {
 
     @Override
     public synchronized boolean getTeamPermission(Faction faction, int rank, String permission) {
-        if(faction.getFactionType() == FactionType.WILDERNESS) return true;
+        if (faction.getFactionType() == FactionType.WILDERNESS) return true;
         if (rank == Rank.OWNER.getId()) return true;
         return IridiumFactions.getInstance().getDatabaseManager().getPermissionsTableManager().getEntry(new TeamPermission(faction, permission, rank, true))
                 .map(TeamPermission::isAllowed)
@@ -343,8 +343,8 @@ public class FactionManager extends TeamManager<Faction, User> {
 
     public List<FactionClaim> getFactionClaims(Faction faction) {
         return IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().getEntries().stream()
-                        .filter(factionClaim -> factionClaim.getTeamID() == faction.getId())
-                        .collect(Collectors.toList());
+                .filter(factionClaim -> factionClaim.getTeamID() == faction.getId())
+                .collect(Collectors.toList());
     }
 
     public CompletableFuture<List<Chunk>> getFactionChunks(Faction faction) {
@@ -563,24 +563,30 @@ public class FactionManager extends TeamManager<Faction, User> {
         });
     }
 
-    public CompletableFuture<Void> unclaimFactionLand(Faction faction, Chunk chunk, Player player) {
-        return unclaimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
+    public CompletableFuture<Void> unClaimFactionLand(Chunk chunk, Player player) {
+        return unClaimFactionLand(chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
     }
 
-    public CompletableFuture<Void> unclaimFactionLand(Faction faction, World world, int x, int z, Player player) {
+    public CompletableFuture<Void> unClaimFactionLand(World world, int x, int z, Player player) {
         return CompletableFuture.runAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getTeamPermission(faction, user, PermissionType.CLAIM) && !user.isBypassing()) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnclaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
             Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
             if (!factionClaim.isPresent()) {
                 player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaimed
                         .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                        .replace("%faction%", factionClaim.get().getFaction().getName())
+                ));
+                return;
+            }
+            Faction faction = factionClaim.get().getFaction();
+            if (faction.getFactionType() == FactionType.WILDERNESS) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().factionLandNotClaimed
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
+                ));
+                return;
+            }
+            if (!getTeamPermission(faction, user, PermissionType.CLAIM) && !user.isBypassing()) {
+                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnclaimLand
+                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
                 ));
                 return;
             }
@@ -605,25 +611,16 @@ public class FactionManager extends TeamManager<Faction, User> {
                         .replace("%z%", String.valueOf(z))
                 ));
             }
-            if (factionClaim.isPresent()) {
-                IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().delete(factionClaim.get());
-            }
+            IridiumFactions.getInstance().getDatabaseManager().getFactionClaimsTableManager().delete(factionClaim.get());
         });
     }
 
-    public CompletableFuture<Void> unclaimFactionLand(Faction faction, Chunk centerChunk, int radius, Player player) {
+    public CompletableFuture<Void> unClaimFactionLand(Chunk centerChunk, int radius, Player player) {
         return CompletableFuture.runAsync(() -> {
-            User user = IridiumFactions.getInstance().getUserManager().getUser(player);
-            if (!getTeamPermission(faction, user, PermissionType.CLAIM)) {
-                player.sendMessage(StringUtils.color(IridiumFactions.getInstance().getMessages().cannotUnclaimLand
-                        .replace("%prefix%", IridiumFactions.getInstance().getConfiguration().prefix)
-                ));
-                return;
-            }
             World world = centerChunk.getWorld();
             for (int x = centerChunk.getX() - (radius - 1); x <= centerChunk.getX() + (radius - 1); x++) {
                 for (int z = centerChunk.getZ() - (radius - 1); z <= centerChunk.getZ() + (radius - 1); z++) {
-                    unclaimFactionLand(faction, world, x, z, player).join();
+                    unClaimFactionLand(world, x, z, player).join();
                 }
             }
         });
