@@ -16,6 +16,7 @@ repositories {
     maven("https://jitpack.io")
     maven("https://maven.enginehub.org/repo/")
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -23,7 +24,7 @@ dependencies {
     implementation("org.jetbrains:annotations:24.1.0")
     implementation("com.j256.ormlite:ormlite-core:6.1")
     implementation("com.j256.ormlite:ormlite-jdbc:6.1")
-    implementation("com.iridium:IridiumTeams:2.3.5")
+    implementation("com.iridium:IridiumTeams:2.3.8")
 
     // Other dependencies that are not required or already available at runtime
     compileOnly("org.projectlombok:lombok:1.18.30")

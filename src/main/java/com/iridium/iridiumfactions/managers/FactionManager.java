@@ -270,9 +270,12 @@ public class FactionManager extends TeamManager<Faction, User> {
     }
 
     @Override
-    public synchronized TeamSetting getTeamSetting(Faction faction, String settingKey) {
+    public synchronized @Nullable TeamSetting getTeamSetting(Faction faction, String settingKey) {
         Setting settingConfig = IridiumFactions.getInstance().getSettingsList().get(settingKey);
-        String defaultValue = settingConfig == null ? "" : settingConfig.getDefaultValue();
+        if (settingConfig == null) {
+            return null;
+        }
+        String defaultValue = settingConfig.getDefaultValue();
         Optional<TeamSetting> teamSetting = IridiumFactions.getInstance().getDatabaseManager().getTeamSettingsTableManager().getEntry(new TeamSetting(faction, settingKey, defaultValue));
         if (teamSetting.isPresent()) {
             return teamSetting.get();

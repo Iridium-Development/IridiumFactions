@@ -18,6 +18,7 @@ public class Configuration extends com.iridium.iridiumteams.configs.Configuratio
     public Configuration() {
         super("&c", "Faction", "IridiumFactions");
         this.createRequiresName = true;
+        this.preventTntGriefing = false;
 
         this.levelRewards = ImmutableMap.<Integer, Reward>builder()
                 .put(1, new Reward(new Item(XMaterial.EXPERIENCE_BOTTLE, 1, "&c&lLevel %faction_level% Reward", Arrays.asList(
