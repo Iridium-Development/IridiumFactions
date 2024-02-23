@@ -479,11 +479,11 @@ public class FactionManager extends TeamManager<Faction, User> {
     }
 
 
-    public CompletableFuture<Void> claimFactionLand(Faction faction, Chunk chunk, Player player) {
+    public synchronized CompletableFuture<Void> claimFactionLand(Faction faction, Chunk chunk, Player player) {
         return claimFactionLand(faction, chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
     }
 
-    public CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
+    public synchronized CompletableFuture<Void> claimFactionLand(Faction faction, World world, int x, int z, Player player) {
         return CompletableFuture.runAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(player);
             if (!getTeamPermission(faction, user, PermissionType.CLAIM)) {
@@ -563,11 +563,11 @@ public class FactionManager extends TeamManager<Faction, User> {
         });
     }
 
-    public CompletableFuture<Void> unClaimFactionLand(Chunk chunk, Player player) {
+    public synchronized CompletableFuture<Void> unClaimFactionLand(Chunk chunk, Player player) {
         return unClaimFactionLand(chunk.getWorld(), chunk.getX(), chunk.getZ(), player);
     }
 
-    public CompletableFuture<Void> unClaimFactionLand(World world, int x, int z, Player player) {
+    public synchronized CompletableFuture<Void> unClaimFactionLand(World world, int x, int z, Player player) {
         return CompletableFuture.runAsync(() -> {
             User user = IridiumFactions.getInstance().getUserManager().getUser(player);
             Optional<FactionClaim> factionClaim = getFactionClaimViaChunk(world, x, z);
