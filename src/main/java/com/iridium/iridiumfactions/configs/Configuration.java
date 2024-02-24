@@ -62,6 +62,8 @@ public class Configuration extends com.iridium.iridiumteams.configs.Configuratio
     public int powerRecoveryDelayInSeconds = 600;
     public double powerRecoveryAmount = 1;
 
+    public boolean disablePortals = true;
+
     public char[] mapChars = "\\/#$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890abcdeghjmnopqrsuvwxyz?".toCharArray();
     public String mapTitle = "&8[ &c(%chunk_x%, %chunk_z%) %faction% &8]";
     public String mapTitleFiller = "&8&m ";
