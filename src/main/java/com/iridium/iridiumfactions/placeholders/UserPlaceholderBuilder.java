@@ -18,7 +18,8 @@ public class UserPlaceholderBuilder implements PlaceholderBuilder<User> {
     private final List<Placeholder> defaultPlaceholders = Arrays.asList(
             new Placeholder("player_rank", "N/A"),
             new Placeholder("player_name", "N/A"),
-            new Placeholder("player_join", "N/A")
+            new Placeholder("player_join", "N/A"),
+            new Placeholder("player_power", "N/A")
     );
 
     @Override
@@ -26,7 +27,8 @@ public class UserPlaceholderBuilder implements PlaceholderBuilder<User> {
         return cache.get(user, Duration.ofSeconds(1), () -> Arrays.asList(
                 new Placeholder("player_rank", IridiumFactions.getInstance().getUserRanks().getOrDefault(user.getUserRank(), new UserRank("N/A", null)).name),
                 new Placeholder("player_name", user.getName()),
-                new Placeholder("player_join", user.getJoinTime().format(DateTimeFormatter.ofPattern(IridiumFactions.getInstance().getConfiguration().dateTimeFormat)))
+                new Placeholder("player_join", user.getJoinTime().format(DateTimeFormatter.ofPattern(IridiumFactions.getInstance().getConfiguration().dateTimeFormat))),
+                new Placeholder("player_power", String.valueOf(user.getPower()))
         ));
     }
 

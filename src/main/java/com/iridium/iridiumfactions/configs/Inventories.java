@@ -7,6 +7,7 @@ import com.iridium.iridiumcore.dependencies.fasterxml.annotation.JsonIgnore;
 import com.iridium.iridiumcore.dependencies.xseries.XMaterial;
 import com.iridium.iridiumteams.configs.inventories.InventoryConfig;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Inventories extends com.iridium.iridiumteams.configs.Inventories {
@@ -43,5 +44,7 @@ public class Inventories extends com.iridium.iridiumteams.configs.Inventories {
     public Inventories() {
         super("Faction", "&c");
         missionTypeSelectorGUI.weekly.enabled = false;
+
+        membersGUI.item.lore = Arrays.asList("&cJoined: &7%player_join%", "&cRank: &7%player_rank%", "&cPower: &7%player_power%", "", "&c&l[!] &7Right Click to promote", "&c&l[!] &7Left click to demote/kick");
     }
 }

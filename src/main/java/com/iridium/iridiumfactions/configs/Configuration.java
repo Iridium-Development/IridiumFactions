@@ -59,7 +59,7 @@ public class Configuration extends com.iridium.iridiumteams.configs.Configuratio
     public double maxPower = 10;
     public double minPower = -10;
     public double startingPower = 10;
-    public int powerLossPerDeath = 3;
+    public double powerLossPerDeath = 3;
     public int powerRecoveryDelayInSeconds = 600;
     public double powerRecoveryAmount = 1;
 
