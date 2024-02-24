@@ -47,6 +47,7 @@ public class Configuration extends com.iridium.iridiumteams.configs.Configuratio
                 "&cOffline Members(%faction_members_offline_count%/%faction_members_count%): &7%faction_members_offline%"
         );
     }
+
     public String factionCreateTitle = "&c&lFaction Created";
     public String factionCreateSubTitle = "&7IridiumFactions by Peaches_MLG";
     public String defaultDescription = "Default faction description :c";

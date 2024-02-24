@@ -4,6 +4,7 @@ import com.iridium.iridiumfactions.configs.*;
 import com.iridium.iridiumfactions.database.Faction;
 import com.iridium.iridiumfactions.database.User;
 import com.iridium.iridiumfactions.listeners.EntityDamageListener;
+import com.iridium.iridiumfactions.listeners.PlayerDeathListener;
 import com.iridium.iridiumfactions.listeners.PlayerPortalListener;
 import com.iridium.iridiumfactions.managers.CommandManager;
 import com.iridium.iridiumfactions.managers.DatabaseManager;
@@ -111,6 +112,7 @@ public class IridiumFactions extends IridiumTeams<Faction, User> {
     public void registerListeners() {
         super.registerListeners();
         Bukkit.getPluginManager().registerEvents(new PlayerPortalListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerDeathListener(), this);
         Bukkit.getPluginManager().registerEvents(new EntityDamageListener(), this);
     }
 
