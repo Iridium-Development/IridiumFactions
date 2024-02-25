@@ -154,21 +154,22 @@ public class IridiumFactions extends IridiumTeams<Faction, User> {
 
     @Override
     public void saveData() {
-        getDatabaseManager().getUserTableManager().save();
-        getDatabaseManager().getFactionTableManager().save();
-        getDatabaseManager().getInvitesTableManager().save();
-        getDatabaseManager().getTrustTableManager().save();
-        getDatabaseManager().getPermissionsTableManager().save();
-        getDatabaseManager().getBankTableManager().save();
-        getDatabaseManager().getEnhancementTableManager().save();
-        getDatabaseManager().getTeamBlockTableManager().save();
-        getDatabaseManager().getTeamSpawnerTableManager().save();
-        getDatabaseManager().getTeamWarpTableManager().save();
-        getDatabaseManager().getTeamMissionTableManager().save();
-        getDatabaseManager().getTeamMissionDataTableManager().save();
-        getDatabaseManager().getTeamRewardsTableManager().save();
-        getDatabaseManager().getTeamSettingsTableManager().save();
-        getDatabaseManager().getFactionClaimsTableManager().save();
+        // This is running in an async thread
+        getDatabaseManager().getUserTableManager().save().join();
+        getDatabaseManager().getFactionTableManager().save().join();
+        getDatabaseManager().getInvitesTableManager().save().join();
+        getDatabaseManager().getTrustTableManager().save().join();
+        getDatabaseManager().getPermissionsTableManager().save().join();
+        getDatabaseManager().getBankTableManager().save().join();
+        getDatabaseManager().getEnhancementTableManager().save().join();
+        getDatabaseManager().getTeamBlockTableManager().save().join();
+        getDatabaseManager().getTeamSpawnerTableManager().save().join();
+        getDatabaseManager().getTeamWarpTableManager().save().join();
+        getDatabaseManager().getTeamMissionTableManager().save().join();
+        getDatabaseManager().getTeamMissionDataTableManager().save().join();
+        getDatabaseManager().getTeamRewardsTableManager().save().join();
+        getDatabaseManager().getTeamSettingsTableManager().save().join();
+        getDatabaseManager().getFactionClaimsTableManager().save().join();
     }
 
     @Override

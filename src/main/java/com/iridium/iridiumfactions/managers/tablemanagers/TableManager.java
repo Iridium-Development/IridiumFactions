@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class TableManager<Key, Value extends DatabaseObject, ID> {
     private final ConcurrentHashMap<Key, Value> entries = new ConcurrentHashMap<>();
     private final Dao<Value, ID> dao;
+    private final Object lock = new Object();
     @Getter
     private final DatabaseKey<Key, Value> databaseKey;
 
@@ -38,29 +39,41 @@ public class TableManager<Key, Value extends DatabaseObject, ID> {
         getEntries().forEach(value -> value.setChanged(false));
     }
 
-    public void save() {
-        try {
-            List<Value> entryList = new ArrayList<>(entries.values());
-            for (Value t : entryList) {
-                if (!t.isChanged()) continue;
-                dao.createOrUpdate(t);
-                t.setChanged(false);
+    public CompletableFuture<Void> save() {
+        return CompletableFuture.runAsync(() -> {
+            synchronized (lock) {
+                try {
+                    List<Value> entryList = new ArrayList<>(entries.values());
+                    boolean hasAnyChanged = false;
+                    for (Value t : entryList) {
+                        if (!t.isChanged()) continue;
+                        dao.createOrUpdate(t);
+                        t.setChanged(false);
+                        hasAnyChanged = true;
+                    }
+                    if (hasAnyChanged) {
+                        dao.commit(getDatabaseConnection());
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
-            dao.commit(getDatabaseConnection());
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        });
     }
 
-    public void save(Value value) {
-        try {
-            if (!value.isChanged()) return;
-            dao.createOrUpdate(value);
-            dao.commit(getDatabaseConnection());
-            value.setChanged(false);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+    public CompletableFuture<Void> save(Value value) {
+        return CompletableFuture.runAsync(() -> {
+            synchronized (lock) {
+                try {
+                    if (!value.isChanged()) return;
+                    dao.createOrUpdate(value);
+                    dao.commit(getDatabaseConnection());
+                    value.setChanged(false);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
     }
 
     public void addEntry(Value value) {
@@ -88,25 +101,30 @@ public class TableManager<Key, Value extends DatabaseObject, ID> {
     }
 
     public CompletableFuture<Void> delete(Value value) {
-        entries.remove(databaseKey.getKey(value));
         return CompletableFuture.runAsync(() -> {
-            try {
-                dao.delete(value);
-                dao.commit(getDatabaseConnection());
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            synchronized (lock) {
+                entries.remove(databaseKey.getKey(value));
+                try {
+                    dao.delete(value);
+                    dao.commit(getDatabaseConnection());
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
     }
 
     public CompletableFuture<Void> delete(Collection<Value> values) {
-        values.forEach(value -> entries.remove(databaseKey.getKey(value)));
         return CompletableFuture.runAsync(() -> {
-            try {
-                dao.delete(values);
-                dao.commit(getDatabaseConnection());
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            synchronized (lock) {
+                if (values.isEmpty()) return;
+                values.forEach(value -> entries.remove(databaseKey.getKey(value)));
+                try {
+                    dao.delete(values);
+                    dao.commit(getDatabaseConnection());
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
     }

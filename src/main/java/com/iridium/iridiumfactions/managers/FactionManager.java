@@ -398,7 +398,7 @@ public class FactionManager extends TeamManager<Faction, User> {
             return teamMission.get();
         } else {
             //TODO need to consider reworking this, it could generate some lag
-            IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().save(newTeamMission);
+            IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().save(newTeamMission).join();
             IridiumFactions.getInstance().getDatabaseManager().getTeamMissionTableManager().addEntry(newTeamMission);
             return newTeamMission;
         }
